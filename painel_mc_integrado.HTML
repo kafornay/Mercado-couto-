@@ -1,0 +1,23 @@
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Produtos");
+
+  // Verifique se há dados
+  if (e.postData.contents) {
+    const data = JSON.parse(e.postData.contents); // Convertendo o JSON recebido
+
+    // Adicionando o produto na planilha
+    if (data.produto) {
+      sheet.appendRow([data.produto, new Date()]);
+    }
+
+    return ContentService.createTextOutput("Produto salvo com sucesso!");
+  } else {
+    return ContentService.createTextOutput("Erro: Nenhum dado recebido.");
+  }
+}
+
+function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Produtos");
+  const produtos = sheet.getRange("A2:A" + sheet.getLastRow()).getValues().flat();
+  return ContentService.createTextOutput(JSON.stringify(produtos)).setMimeType(ContentService.MimeType.JSON);
+}
