@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel - Programa MC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #0275d8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            padding: 30px;
+        }
+        h2 {
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 1rem;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .password-section {
+            margin-top: 100px;
+            text-align: center;
+        }
+        .painel-section {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Painel de Controle - Programa MC</h1>
+        <p>Mercado Couto</p>
+    </div>
+
+    <div class="container password-section">
+        <h2>🛡️ Acesso ao Painel</h2>
+        <input type="password" id="senha" placeholder="Digite a senha" />
+        <button onclick="acessarPainel()">Entrar</button>
+        <p id="erro" style="color: red; display: none;">Senha incorreta. Tente novamente.</p>
+    </div>
+
+    <div class="container painel-section" id="painel">
+        <h2>📦 Adicionar Produto Disponível</h2>
+        <input type="text" id="produtoNome" placeholder="Ex: Arroz 5kg">
+        <button onclick="adicionarProduto()">Salvar Produto</button>
+
+        <h2>📝 Produtos Disponíveis</h2>
+        <table id="tabelaProdutos">
+            <thead>
+                <tr><th>Produto</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="produtosTabela"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const senhaCorreta = "kafornay";
+
+        function acessarPainel() {
+            const senha = document.getElementById("senha").value.trim();
+            if (senha === senhaCorreta) {
+                document.querySelector(".password-section").style.display = "none";
+                document.getElementById("painel").style.display = "block";
+            } else {
+                document.getElementById("erro").style.display = "block";
+            }
+        }
+
+        function adicionarProduto() {
+            const nome = document.getElementById("produtoNome").value.trim();
+            if (!nome) {
+                alert("Digite o nome do produto.");
+                return;
+            }
+
+            fetch("https://script.google.com/macros/s/AKfycbwiGtR781Rw8JX9BJ-sL-PPwkeOd6kd253syO1WHzwMDXkC3XEk4QJW5lbEj2dfyDSs/exec", {
+                method: "POST",
+                body: JSON.stringify({ produto: nome }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.text())
+            .then(() => {
+                renderizarProduto(nome);
+                document.getElementById("produtoNome").value = "";
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Erro ao salvar o produto.");
+            });
+        }
+
+        function renderizarProduto(nome) {
+            const tabela = document.getElementById("produtosTabela");
+            const row = tabela.insertRow();
+            row.innerHTML = `
+                <td>${nome}</td>
+                <td><button class='danger' onclick='this.parentElement.parentElement.remove()'>Remover</button></td>
+            `;
+        }
+    </script>
+</body>
+</html>
