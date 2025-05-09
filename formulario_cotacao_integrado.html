@@ -121,7 +121,7 @@
         let itens = [];
 
         // Carregar produtos do Google Sheets
-        fetch("https://script.google.com/macros/s/AKfycbwiGtR781Rw8JX9BJ-sL-PPwkeOd6kd253syO1WHzwMDXkC3XEk4QJW5lbEj2dfyDSs/exec")
+        fetch("https://script.google.com/macros/s/AKfycby9vAv_vCy82CknOR1h6y-D7KjIOTuvjEu09ELEivH1O8cVNyuKXlkvY4lbymUs7puXkQ/exec")
         .then(res => res.json())
         .then(produtos => {
             produtoSelect.innerHTML = produtos.map(p => `<option>${p}</option>`).join("");
@@ -169,7 +169,7 @@
                 return;
             }
 
-            fetch("https://script.google.com/macros/s/AKfycbwiGtR781Rw8JX9BJ-sL-PPwkeOd6kd253syO1WHzwMDXkC3XEk4QJW5lbEj2dfyDSs/exec", {
+            fetch("https://script.google.com/macros/s/AKfycby9vAv_vCy82CknOR1h6y-D7KjIOTuvjEu09ELEivH1O8cVNyuKXlkvY4lbymUs7puXkQ/exec", {
                 method: "POST",
                 body: JSON.stringify({ empresa, itens }),
                 headers: { "Content-Type": "application/json" }
