@@ -8,32 +8,23 @@
     body {
       font-family: Arial, sans-serif;
       background: #f9f9f9;
-      padding: 10px;
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      padding-bottom: 80px; /* espaço para o botão fixo */
     }
 
     .container {
-      max-width: 700px;
-      width: 100%;
+      max-width: 650px;
+      margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-      max-height: 95vh;
+      margin-top: 20px;
     }
 
     h1 {
       text-align: center;
       color: #d35400;
-      margin-bottom: 20px;
-      font-size: 1.8rem;
-      text-transform: uppercase;
     }
 
     .field {
@@ -41,34 +32,31 @@
     }
 
     label {
-      font-weight: bold;
       display: block;
       margin-bottom: 5px;
+      font-weight: bold;
     }
 
     input, select {
       width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
+      padding: 10px;
       border-radius: 8px;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
     }
 
     button {
-      padding: 14px;
-      font-size: 1rem;
+      padding: 12px;
       border: none;
       border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
       width: 100%;
       box-sizing: border-box;
-      transition: background-color 0.3s ease;
     }
 
     #addItem {
       background-color: #d35400;
-      color: white;
+      color: #fff;
       margin-top: 10px;
     }
 
@@ -76,93 +64,56 @@
       background-color: #e67e22;
     }
 
-    #sendData {
-      background-color: #27ae60;
-      color: white;
-      margin-top: 20px;
-    }
-
-    #sendData:hover {
-      background-color: #2ecc71;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      font-size: 0.95rem;
     }
 
     th, td {
-      padding: 10px;
       border: 1px solid #ddd;
+      padding: 10px;
       text-align: left;
     }
 
     th {
       background-color: #f3f3f3;
-      color: #333;
-    }
-
-    tbody tr {
-      background-color: #fafafa;
-    }
-
-    tbody tr:hover {
-      background-color: #f1f1f1;
     }
 
     .removeBtn {
-      color: #e74c3c;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1.1rem;
       background: none;
+      color: #e74c3c;
+      font-size: 1.1rem;
       border: none;
-      padding: 0;
-      margin-left: 10px;
-      transition: color 0.3s ease;
-    }
-
-    .removeBtn:hover {
-      color: #c0392b;
+      cursor: pointer;
     }
 
     #totalDisplay {
-      margin-top: 10px;
       text-align: right;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-
-    .field-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .field-inline {
-      flex: 1;
-      min-width: 120px;
-    }
-
-    @media (max-width: 600px) {
-      .field-group {
-        flex-direction: column;
-      }
-    }
-
-    #sucessoMsg {
-      display: none;
-      text-align: center;
       margin-top: 10px;
-      color: green;
       font-weight: bold;
+    }
+
+    #sendData {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 650px;
+      background-color: #27ae60;
+      color: white;
+      z-index: 999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    #sendData:hover {
+      background-color: #2ecc71;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h1>🛒 Cotação - Mercado Couto</h1>
 
@@ -176,30 +127,27 @@
       <input type="date" id="dataEntrega" required />
     </div>
 
-    <div class="field-group">
-      <div class="field-inline">
-        <label for="produto">Produto:</label>
-        <select id="produto"></select>
-      </div>
+    <div class="field">
+      <label for="produto">Produto:</label>
+      <select id="produto"></select>
+    </div>
 
-      <div class="field-inline">
-        <label for="marca">Marca:</label>
-        <input type="text" id="marca" placeholder="Digite a marca" />
-      </div>
+    <div class="field">
+      <label for="marca">Marca:</label>
+      <input type="text" id="marca" />
+    </div>
 
-      <div class="field-inline">
-        <label for="quantidade">Quantidade:</label>
-        <input type="number" id="quantidade" placeholder="Ex: 30" />
-      </div>
+    <div class="field">
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" id="quantidade" />
+    </div>
 
-      <div class="field-inline">
-        <label for="valor">Valor unitário (R$):</label>
-        <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
-      </div>
+    <div class="field">
+      <label for="valor">Valor unitário (R$):</label>
+      <input type="number" id="valor" step="0.01" />
     </div>
 
     <button id="addItem">+ Adicionar à Lista</button>
-    <p id="sucessoMsg">Item adicionado com sucesso ✅</p>
 
     <table id="listaItens">
       <thead>
@@ -215,9 +163,9 @@
     </table>
 
     <div id="totalDisplay"></div>
-
-    <button id="sendData">Enviar via WhatsApp</button>
   </div>
+
+  <button id="sendData">Enviar via WhatsApp</button>
 
   <script>
     const produtoSelect = document.getElementById("produto");
@@ -225,7 +173,6 @@
     const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
     const sendDataBtn = document.getElementById("sendData");
     const totalDisplay = document.getElementById("totalDisplay");
-    const sucessoMsg = document.getElementById("sucessoMsg");
 
     let itens = JSON.parse(localStorage.getItem('itens')) || [];
 
@@ -290,11 +237,6 @@
       document.getElementById("quantidade").value = '';
       document.getElementById("valor").value = '';
 
-      sucessoMsg.style.display = "block";
-      setTimeout(() => {
-        sucessoMsg.style.display = "none";
-      }, 2000);
-
       renderLista();
     });
 
@@ -325,5 +267,6 @@
 
     renderLista();
   </script>
+
 </body>
 </html>
