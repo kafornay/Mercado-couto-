@@ -60,6 +60,13 @@
     th {
       background-color: #eee;
     }
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -100,6 +107,7 @@
           <th>Marca</th>
           <th>Qtd</th>
           <th>Valor</th>
+          <th>Remover</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -116,13 +124,14 @@
 
     let itens = [];
 
-    // Carregar produtos do endpoint
+    // Carregar e ordenar produtos sem duplicatas
     fetch("https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec")
       .then(res => res.json())
       .then(data => {
-        data.forEach(item => {
+        const produtosUnicos = [...new Set(data.map(item => item.produto || item))];
+        produtosUnicos.sort().forEach(produto => {
           const option = document.createElement("option");
-          option.textContent = item.produto || item;
+          option.textContent = produto;
           produtoSelect.appendChild(option);
         });
       })
@@ -133,23 +142,26 @@
 
     addItemBtn.addEventListener("click", () => {
       const produto = produtoSelect.value;
-      const marca = document.getElementById("marca").value;
-      const quantidade = document.getElementById("quantidade").value;
-      const valor = document.getElementById("valor").value;
+      const marca = document.getElementById("marca").value.trim();
+      const quantidade = parseFloat(document.getElementById("quantidade").value);
+      const valor = parseFloat(document.getElementById("valor").value);
 
-      if (!marca || !quantidade || !valor) {
-        alert("Preencha todos os campos antes de adicionar.");
+      if (!marca || quantidade <= 0 || valor <= 0) {
+        alert("Preencha todos os campos com valores válidos.");
         return;
       }
 
-      itens.push({ produto, marca, quantidade, valor });
+      const item = { produto, marca, quantidade, valor };
+      itens.push(item);
 
+      const index = itens.length - 1;
       const row = listaItens.insertRow();
       row.innerHTML = `
         <td>${produto}</td>
         <td>${marca}</td>
         <td>${quantidade}</td>
-        <td>R$ ${parseFloat(valor).toFixed(2)}</td>
+        <td>R$ ${valor.toFixed(2)}</td>
+        <td><button class="remove-btn" onclick="removerItem(${index}, this)">❌</button></td>
       `;
 
       document.getElementById("marca").value = '';
@@ -157,21 +169,34 @@
       document.getElementById("valor").value = '';
     });
 
+    function removerItem(index, btn) {
+      itens.splice(index, 1);
+      btn.closest('tr').remove();
+    }
+
     sendDataBtn.addEventListener("click", () => {
-      const empresa = document.getElementById("empresa").value;
+      const empresa = document.getElementById("empresa").value.trim();
       if (!empresa || itens.length === 0) {
         alert("Informe o nome da empresa e adicione ao menos um item.");
         return;
       }
 
+      sendDataBtn.disabled = true;
+      sendDataBtn.textContent = "Enviando...";
+
       let mensagem = `*Cotação - ${empresa}*\n\n`;
       itens.forEach((item, index) => {
-        mensagem += `${index + 1}. ${item.produto} - ${item.marca}, ${item.quantidade} unid. - R$ ${parseFloat(item.valor).toFixed(2)}\n`;
+        mensagem += `${index + 1}. ${item.produto} - ${item.marca}, ${item.quantidade} unid. - R$ ${item.valor.toFixed(2)}\n`;
       });
 
-      const numero = "5521992576333"; // Substitua pelo seu número de WhatsApp
+      const numero = "5521992576333";
       const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
       window.open(link, "_blank");
+
+      setTimeout(() => {
+        sendDataBtn.disabled = false;
+        sendDataBtn.textContent = "Enviar via WhatsApp";
+      }, 3000);
     });
   </script>
 </body>
