@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -14,7 +15,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: auto;
+      overflow: hidden;
     }
 
     .container {
@@ -26,7 +27,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
       max-height: 90vh;
-      padding-bottom: 120px; /* espaço pro botão fixo */
     }
 
     h1 {
@@ -73,8 +73,18 @@
       margin-top: 10px;
     }
 
-    #addItem:hover {
+    #addItem\:hover {
       background-color: #e67e22;
+    }
+
+    #sendData {
+      background-color: #27ae60;
+      color: white;
+      margin-top: 20px;
+    }
+
+    #sendData\:hover {
+      background-color: #2ecc71;
     }
 
     table {
@@ -97,10 +107,9 @@
 
     tbody tr {
       background-color: #fafafa;
-      animation: fadeIn 0.3s ease-in-out; /* animação ao adicionar item */
     }
 
-    tbody tr:hover {
+    tbody tr\:hover {
       background-color: #f1f1f1;
     }
 
@@ -116,7 +125,7 @@
       transition: color 0.3s ease;
     }
 
-    .removeBtn:hover {
+    .removeBtn\:hover {
       color: #c0392b;
     }
 
@@ -125,35 +134,6 @@
       text-align: right;
       font-weight: bold;
       color: #2c3e50;
-    }
-
-    #sendData {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #25D366;
-      color: white;
-      font-weight: bold;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 30px;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
-
-    #sendData:hover {
-      background-color: #20ba5a;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 480px) {
@@ -185,6 +165,7 @@
       }
     }
   </style>
+
 </head>
 <body>
   <div class="container">
@@ -216,7 +197,7 @@
     </div>
 
     <div class="field">
-      <label for="valor">Valor unitário (R$):</label>
+      <label for="valor">Valor unitário (R\$):</label>
       <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
     </div>
 
@@ -228,7 +209,7 @@
           <th>Produto</th>
           <th>Marca</th>
           <th>Qtd</th>
-          <th>Total (R$)</th>
+          <th>Total (R\$)</th>
           <th>Remover</th>
         </tr>
       </thead>
@@ -236,23 +217,20 @@
     </table>
 
     <div id="totalDisplay"></div>
-  </div>
 
-  <button id="sendData">
-    <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;" />
-    Enviar via WhatsApp
-  </button>
+    <button id="sendData">Enviar via WhatsApp</button>
+  </div>
 
   <script>
     const produtoSelect = document.getElementById("produto");
     const addItemBtn = document.getElementById("addItem");
-    const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
+    const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')\[0];
     const sendDataBtn = document.getElementById("sendData");
     const totalDisplay = document.getElementById("totalDisplay");
 
-    let itens = JSON.parse(localStorage.getItem('itens')) || [];
+    let itens = JSON.parse(localStorage.getItem('itens')) || \[];
 
-    const apiUrl = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
+    const apiUrl = "[https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec](https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec)";
 
     fetch(apiUrl)
       .then(res => res.json())
@@ -273,19 +251,18 @@
       let total = 0;
 
       itens.forEach((item, index) => {
-        const subtotal = parseFloat(item.valor) * parseFloat(item.quantidade);
+        const subtotal = parseFloat(item.valor) \* parseFloat(item.quantidade);
         total += subtotal;
 
         const row = listaItens.insertRow();
-        row.innerHTML = `
-          <td>${item.produto}</td>
+        row\.innerHTML = `          <td>${item.produto}</td>
           <td>${item.marca}</td>
           <td>${item.quantidade}</td>
           <td>R$ ${subtotal.toFixed(2)}</td>
           <td><button class="removeBtn">X</button></td>
-        `;
+       `;
 
-        row.querySelector(".removeBtn").addEventListener("click", () => {
+        row\.querySelector(".removeBtn").addEventListener("click", () => {
           itens.splice(index, 1);
           localStorage.setItem('itens', JSON.stringify(itens));
           renderLista();
@@ -293,12 +270,56 @@
       });
 
       totalDisplay.textContent = `Total: R$ ${total.toFixed(2)}`;
-
-      listaItens.lastChild.scrollIntoView({ behavior: "smooth" }); // move a página até o último item adicionado
     }
 
     addItemBtn.addEventListener("click", () => {
       const produto = produtoSelect.value;
       const marca = document.getElementById("marca").value;
       const quantidade = document.getElementById("quantidade").value;
-      const valor = document
+      const valor = document.getElementById("valor").value;
+
+      if (!marca || !quantidade || !valor) {
+        alert("Preencha todos os campos antes de adicionar.");
+        return;
+      }
+
+      itens.push({ produto, marca, quantidade, valor });
+      localStorage.setItem('itens', JSON.stringify(itens));
+
+      document.getElementById("marca").value = '';
+      document.getElementById("quantidade").value = '';
+      document.getElementById("valor").value = '';
+
+      renderLista();
+    });
+
+    sendDataBtn.addEventListener("click", () => {
+      const empresa = document.getElementById("empresa").value;
+      const dataEntrega = document.getElementById("dataEntrega").value;
+
+      if (!empresa || !dataEntrega || itens.length === 0) {
+        alert("Informe o nome da empresa, a data de entrega e adicione ao menos um item.");
+        return;
+      }
+
+      let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n\n`;
+      let total = 0;
+
+      itens.forEach(item => {
+        const subtotal = parseFloat(item.valor) \* parseFloat(item.quantidade);
+        mensagem += `📦 *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor unitário: R$ ${parseFloat(item.valor).toFixed(2)}\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
+        total += subtotal;
+      });
+
+      mensagem += `*Total geral:* R$ ${total.toFixed(2)}`;
+
+      const numero = "5521992576333";
+      const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+      window\.open(link, "\_blank");
+    });
+
+    renderLista(); // inicializa a lista ao carregar
+  </script>
+
+</body>
+</html>
