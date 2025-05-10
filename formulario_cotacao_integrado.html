@@ -174,17 +174,18 @@
                 body: JSON.stringify({ empresa, itens }),
                 headers: { "Content-Type": "application/json" }
             })
-            .then(res => res.text())
             .then(() => {
-                alert("Cotação enviada com sucesso!");
-                listaItens.innerHTML = "";
-                itens = [];
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Erro ao enviar os dados.");
-            });
-        });
-    </script>
-</body>
-</html>
+    alert("Cotação enviada com sucesso!");
+
+    // Cria a mensagem para WhatsApp
+    let mensagem = `*Cotação - ${empresa}*\n`;
+    itens.forEach((item, index) => {
+        mensagem += `\n${index + 1}) *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor: R$ ${parseFloat(item.valor).toFixed(2)}\n`;
+    });
+
+    const linkWhatsApp = `https://wa.me/21992576333?text=${encodeURIComponent(mensagem)}`;
+    window.open(linkWhatsApp, "_blank");
+
+    listaItens.innerHTML = "";
+    itens = [];
+})
