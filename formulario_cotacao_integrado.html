@@ -1,325 +1,324 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Cotação - Mercado Couto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 10px;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
+  <meta charset="UTF-8" />
+  <title>Cotação - Mercado Couto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 10px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    .container {
-      max-width: 650px;
-      width: 100%;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-      max-height: 90vh;
-    }
+    .container {
+      max-width: 650px;
+      width: 100%;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      max-height: 90vh;
+    }
 
-    h1 {
-      text-align: center;
-      color: #d35400;
-      margin-bottom: 20px;
-      font-size: 1.8rem;
-      text-transform: uppercase;
-    }
+    h1 {
+      text-align: center;
+      color: #d35400;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      text-transform: uppercase;
+    }
 
-    .field {
-      margin-bottom: 15px;
-    }
+    .field {
+      margin-bottom: 15px;
+    }
 
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
 
-    button {
-      padding: 14px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      box-sizing: border-box;
-      transition: background-color 0.3s ease;
-    }
+    button {
+      padding: 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease;
+    }
 
-    #addItem {
-      background-color: #d35400;
-      color: white;
-      margin-top: 10px;
-    }
+    #addItem {
+      background-color: #d35400;
+      color: white;
+      margin-top: 10px;
+    }
 
-    #addItem\:hover {
-      background-color: #e67e22;
-    }
+    #addItem:hover {
+      background-color: #e67e22;
+    }
 
-    #sendData {
-      background-color: #27ae60;
-      color: white;
-      margin-top: 20px;
-    }
+    #sendData {
+      background-color: #27ae60;
+      color: white;
+      margin-top: 20px;
+    }
 
-    #sendData\:hover {
-      background-color: #2ecc71;
-    }
+    #sendData:hover {
+      background-color: #2ecc71;
+    }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 0.95rem;
-    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
 
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
 
-    th {
-      background-color: #f3f3f3;
-      color: #333;
-    }
+    th {
+      background-color: #f3f3f3;
+      color: #333;
+    }
 
-    tbody tr {
-      background-color: #fafafa;
-    }
+    tbody tr {
+      background-color: #fafafa;
+    }
 
-    tbody tr\:hover {
-      background-color: #f1f1f1;
-    }
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
 
-    .removeBtn {
-      color: #e74c3c;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1.1rem;
-      background: none;
-      border: none;
-      padding: 0;
-      margin-left: 10px;
-      transition: color 0.3s ease;
-    }
+    .removeBtn {
+      color: #e74c3c;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.1rem;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-left: 10px;
+      transition: color 0.3s ease;
+    }
 
-    .removeBtn\:hover {
-      color: #c0392b;
-    }
+    .removeBtn:hover {
+      color: #c0392b;
+    }
 
-    #totalDisplay {
-      margin-top: 10px;
-      text-align: right;
-      font-weight: bold;
-      color: #2c3e50;
-    }
+    #totalDisplay {
+      margin-top: 10px;
+      text-align: right;
+      font-weight: bold;
+      color: #2c3e50;
+    }
 
-    @media (max-width: 480px) {
-      input, select, button {
-        font-size: 1rem;
-        padding: 12px;
-      }
+    @media (max-width: 480px) {
+      input, select, button {
+        font-size: 1rem;
+        padding: 12px;
+      }
 
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
 
-      tr {
-        margin-bottom: 15px;
-      }
+      tr {
+        margin-bottom: 15px;
+      }
 
-      th {
-        background: none;
-        font-weight: bold;
-      }
+      th {
+        background: none;
+        font-weight: bold;
+      }
 
-      td {
-        padding: 5px 0;
-      }
+      td {
+        padding: 5px 0;
+      }
 
-      #totalDisplay {
-        text-align: center;
-      }
-    }
-  </style>
-
+      #totalDisplay {
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🛒 Cotação - Mercado Couto</h1>
+  <div class="container">
+    <h1>🛒 Cotação - Mercado Couto</h1>
 
-    <div class="field">
-      <label for="empresa">Nome da Empresa:</label>
-      <input type="text" id="empresa" placeholder="Digite o nome da sua empresa" required />
-    </div>
+    <div class="field">
+      <label for="empresa">Nome da Empresa:</label>
+      <input type="text" id="empresa" placeholder="Digite o nome da sua empresa" required />
+    </div>
 
-    <div class="field">
-      <label for="dataEntrega">Data de Entrega:</label>
-      <input type="date" id="dataEntrega" required />
-    </div>
+    <div class="field">
+      <label for="dataEntrega">Data de Entrega:</label>
+      <input type="date" id="dataEntrega" required />
+    </div>
 
-    <div class="field">
-      <label for="produto">Produto:</label>
-      <select id="produto"></select>
-    </div>
+    <div class="field">
+      <label for="produto">Produto:</label>
+      <select id="produto"></select>
+    </div>
 
-    <div class="field">
-      <label for="marca">Marca:</label>
-      <input type="text" id="marca" placeholder="Digite a marca" />
-    </div>
+    <div class="field">
+      <label for="marca">Marca:</label>
+      <input type="text" id="marca" placeholder="Digite a marca" />
+    </div>
 
-    <div class="field">
-      <label for="quantidade">Quantidade:</label>
-      <input type="number" id="quantidade" placeholder="Ex: 30" />
-    </div>
+    <div class="field">
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" id="quantidade" placeholder="Ex: 30" />
+    </div>
 
-    <div class="field">
-      <label for="valor">Valor unitário (R\$):</label>
-      <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
-    </div>
+    <div class="field">
+      <label for="valor">Valor unitário (R$):</label>
+      <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
+    </div>
 
-    <button id="addItem">+ Adicionar à Lista</button>
+    <button id="addItem">+ Adicionar à Lista</button>
 
-    <table id="listaItens">
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Marca</th>
-          <th>Qtd</th>
-          <th>Total (R\$)</th>
-          <th>Remover</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <table id="listaItens">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Marca</th>
+          <th>Qtd</th>
+          <th>Total (R$)</th>
+          <th>Remover</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-    <div id="totalDisplay"></div>
+    <div id="totalDisplay"></div>
 
-    <button id="sendData">Enviar via WhatsApp</button>
-  </div>
+    <button id="sendData">Enviar via WhatsApp</button>
+  </div>
 
-  <script>
-    const produtoSelect = document.getElementById("produto");
-    const addItemBtn = document.getElementById("addItem");
-    const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')\[0];
-    const sendDataBtn = document.getElementById("sendData");
-    const totalDisplay = document.getElementById("totalDisplay");
+  <script>
+    const produtoSelect = document.getElementById("produto");
+    const addItemBtn = document.getElementById("addItem");
+    const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
+    const sendDataBtn = document.getElementById("sendData");
+    const totalDisplay = document.getElementById("totalDisplay");
 
-    let itens = JSON.parse(localStorage.getItem('itens')) || \[];
+    let itens = JSON.parse(localStorage.getItem('itens')) || [];
 
-    const apiUrl = "[https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec](https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec)";
+    const apiUrl = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
 
-    fetch(apiUrl)
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(item => {
-          const option = document.createElement("option");
-          option.textContent = item.Produto || item.produto;
-          produtoSelect.appendChild(option);
-        });
-      })
-      .catch(err => {
-        console.error("Erro ao carregar produtos:", err);
-        produtoSelect.innerHTML = '<option>Erro ao carregar</option>';
-      });
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(item => {
+          const option = document.createElement("option");
+          option.textContent = item.Produto || item.produto;
+          produtoSelect.appendChild(option);
+        });
+      })
+      .catch(err => {
+        console.error("Erro ao carregar produtos:", err);
+        produtoSelect.innerHTML = '<option>Erro ao carregar</option>';
+      });
 
-    function renderLista() {
-      listaItens.innerHTML = "";
-      let total = 0;
+    function renderLista() {
+      listaItens.innerHTML = "";
+      let total = 0;
 
-      itens.forEach((item, index) => {
-        const subtotal = parseFloat(item.valor) \* parseFloat(item.quantidade);
-        total += subtotal;
+      itens.forEach((item, index) => {
+        const subtotal = parseFloat(item.valor) * parseFloat(item.quantidade);
+        total += subtotal;
 
-        const row = listaItens.insertRow();
-        row\.innerHTML = `          <td>${item.produto}</td>
-          <td>${item.marca}</td>
-          <td>${item.quantidade}</td>
-          <td>R$ ${subtotal.toFixed(2)}</td>
-          <td><button class="removeBtn">X</button></td>
-       `;
+        const row = listaItens.insertRow();
+        row.innerHTML = `
+          <td>${item.produto}</td>
+          <td>${item.marca}</td>
+          <td>${item.quantidade}</td>
+          <td>R$ ${subtotal.toFixed(2)}</td>
+          <td><button class="removeBtn">X</button></td>
+        `;
 
-        row\.querySelector(".removeBtn").addEventListener("click", () => {
-          itens.splice(index, 1);
-          localStorage.setItem('itens', JSON.stringify(itens));
-          renderLista();
-        });
-      });
+        row.querySelector(".removeBtn").addEventListener("click", () => {
+          itens.splice(index, 1);
+          localStorage.setItem('itens', JSON.stringify(itens));
+          renderLista();
+        });
+      });
 
-      totalDisplay.textContent = `Total: R$ ${total.toFixed(2)}`;
-    }
+      totalDisplay.textContent = `Total: R$ ${total.toFixed(2)}`;
+    }
 
-    addItemBtn.addEventListener("click", () => {
-      const produto = produtoSelect.value;
-      const marca = document.getElementById("marca").value;
-      const quantidade = document.getElementById("quantidade").value;
-      const valor = document.getElementById("valor").value;
+    addItemBtn.addEventListener("click", () => {
+      const produto = produtoSelect.value;
+      const marca = document.getElementById("marca").value;
+      const quantidade = document.getElementById("quantidade").value;
+      const valor = document.getElementById("valor").value;
 
-      if (!marca || !quantidade || !valor) {
-        alert("Preencha todos os campos antes de adicionar.");
-        return;
-      }
+      if (!marca || !quantidade || !valor) {
+        alert("Preencha todos os campos antes de adicionar.");
+        return;
+      }
 
-      itens.push({ produto, marca, quantidade, valor });
-      localStorage.setItem('itens', JSON.stringify(itens));
+      itens.push({ produto, marca, quantidade, valor });
+      localStorage.setItem('itens', JSON.stringify(itens));
 
-      document.getElementById("marca").value = '';
-      document.getElementById("quantidade").value = '';
-      document.getElementById("valor").value = '';
+      document.getElementById("marca").value = '';
+      document.getElementById("quantidade").value = '';
+      document.getElementById("valor").value = '';
+      produtoSelect.selectedIndex = 0;
 
-      renderLista();
-    });
+      renderLista();
+    });
 
-    sendDataBtn.addEventListener("click", () => {
-      const empresa = document.getElementById("empresa").value;
-      const dataEntrega = document.getElementById("dataEntrega").value;
+    sendDataBtn.addEventListener("click", () => {
+      const empresa = document.getElementById("empresa").value;
+      const dataEntrega = document.getElementById("dataEntrega").value;
 
-      if (!empresa || !dataEntrega || itens.length === 0) {
-        alert("Informe o nome da empresa, a data de entrega e adicione ao menos um item.");
-        return;
-      }
+      if (!empresa || !dataEntrega || itens.length === 0) {
+        alert("Informe o nome da empresa, a data de entrega e adicione ao menos um item.");
+        return;
+      }
 
-      let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n\n`;
-      let total = 0;
+      let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n\n`;
+      let total = 0;
 
-      itens.forEach(item => {
-        const subtotal = parseFloat(item.valor) \* parseFloat(item.quantidade);
-        mensagem += `📦 *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor unitário: R$ ${parseFloat(item.valor).toFixed(2)}\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
-        total += subtotal;
-      });
+      itens.forEach(item => {
+        const subtotal = parseFloat(item.valor) * parseFloat(item.quantidade);
+        mensagem += `📦 *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor unitário: R$ ${parseFloat(item.valor).toFixed(2)}\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
+        total += subtotal;
+      });
 
-      mensagem += `*Total geral:* R$ ${total.toFixed(2)}`;
+      mensagem += `*Total geral:* R$ ${total.toFixed(2)}`;
 
-      const numero = "5521992576333";
-      const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-      window\.open(link, "\_blank");
-    });
+      const numero = "5521992576333";
+      const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+      window.open(link, "_blank");
+    });
 
-    renderLista(); // inicializa a lista ao carregar
-  </script>
-
+    renderLista(); // inicializa a lista ao carregar
+  </script>
 </body>
 </html>
