@@ -1,4 +1,3 @@
-<!-- painel_mc_integrado.html CORRIGIDO -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -100,15 +99,21 @@
         return;
       }
 
+      // Ajustando o nome do campo enviado para corresponder ao script do Google
       fetch("https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec", {
         method: "POST",
-        body: JSON.stringify({ produto: nome }),
+        body: JSON.stringify({ item: nome }), // Mudando o "produto" para "item"
         headers: { "Content-Type": "application/json" }
       })
-      .then(res => res.text())
-      .then(() => {
-        renderizarProduto(nome);
-        document.getElementById("produtoNome").value = "";
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message); // Exibe a mensagem de sucesso
+          renderizarProduto(nome);
+          document.getElementById("produtoNome").value = "";
+        } else {
+          alert("Erro ao salvar o produto: " + data.message);
+        }
       })
       .catch(err => {
         console.error(err);
