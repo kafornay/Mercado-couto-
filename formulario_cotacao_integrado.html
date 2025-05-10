@@ -12,18 +12,20 @@
       margin: 0;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .container {
-      max-width: 650px;
+      max-width: 700px;
       width: 100%;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 80px;
+      overflow-y: auto;
+      max-height: 95vh;
     }
 
     h1 {
@@ -75,18 +77,9 @@
     }
 
     #sendData {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
       background-color: #27ae60;
       color: white;
-      padding: 16px 24px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 50px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      z-index: 999;
+      margin-top: 20px;
     }
 
     #sendData:hover {
@@ -115,6 +108,10 @@
       background-color: #fafafa;
     }
 
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
     .removeBtn {
       color: #e74c3c;
       font-weight: bold;
@@ -138,33 +135,30 @@
       color: #2c3e50;
     }
 
-    @media (max-width: 480px) {
-      input, select, button {
-        font-size: 1rem;
-        padding: 12px;
-      }
+    .field-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
 
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
+    .field-inline {
+      flex: 1;
+      min-width: 120px;
+    }
 
-      tr {
-        margin-bottom: 15px;
+    @media (max-width: 600px) {
+      .field-group {
+        flex-direction: column;
       }
+    }
 
-      th {
-        background: none;
-        font-weight: bold;
-      }
-
-      td {
-        padding: 5px 0;
-      }
-
-      #totalDisplay {
-        text-align: center;
-      }
+    #sucessoMsg {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -182,27 +176,30 @@
       <input type="date" id="dataEntrega" required />
     </div>
 
-    <div class="field">
-      <label for="produto">Produto:</label>
-      <select id="produto"></select>
-    </div>
+    <div class="field-group">
+      <div class="field-inline">
+        <label for="produto">Produto:</label>
+        <select id="produto"></select>
+      </div>
 
-    <div class="field">
-      <label for="marca">Marca:</label>
-      <input type="text" id="marca" placeholder="Digite a marca" />
-    </div>
+      <div class="field-inline">
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" placeholder="Digite a marca" />
+      </div>
 
-    <div class="field">
-      <label for="quantidade">Quantidade:</label>
-      <input type="number" id="quantidade" placeholder="Ex: 30" />
-    </div>
+      <div class="field-inline">
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" placeholder="Ex: 30" />
+      </div>
 
-    <div class="field">
-      <label for="valor">Valor unitário (R$):</label>
-      <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
+      <div class="field-inline">
+        <label for="valor">Valor unitário (R$):</label>
+        <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
+      </div>
     </div>
 
     <button id="addItem">+ Adicionar à Lista</button>
+    <p id="sucessoMsg">Item adicionado com sucesso ✅</p>
 
     <table id="listaItens">
       <thead>
@@ -218,9 +215,9 @@
     </table>
 
     <div id="totalDisplay"></div>
-  </div>
 
-  <button id="sendData">📤 Enviar via WhatsApp</button>
+    <button id="sendData">Enviar via WhatsApp</button>
+  </div>
 
   <script>
     const produtoSelect = document.getElementById("produto");
@@ -228,6 +225,7 @@
     const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
     const sendDataBtn = document.getElementById("sendData");
     const totalDisplay = document.getElementById("totalDisplay");
+    const sucessoMsg = document.getElementById("sucessoMsg");
 
     let itens = JSON.parse(localStorage.getItem('itens')) || [];
 
@@ -291,6 +289,11 @@
       document.getElementById("marca").value = '';
       document.getElementById("quantidade").value = '';
       document.getElementById("valor").value = '';
+
+      sucessoMsg.style.display = "block";
+      setTimeout(() => {
+        sucessoMsg.style.display = "none";
+      }, 2000);
 
       renderLista();
     });
