@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel - Programa MC</title>
   <style>
     body {
@@ -11,12 +12,15 @@
       padding: 0;
     }
     .header {
-      background: #0275d8;
+      background: #007bff;
       color: white;
       padding: 20px;
       text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     .container {
+      max-width: 800px;
+      margin: auto;
       padding: 30px;
     }
     h2 {
@@ -27,28 +31,44 @@
       font-size: 1rem;
       margin-top: 5px;
       margin-bottom: 15px;
-      width: 100%;
+      width: calc(100% - 22px);
       box-sizing: border-box;
     }
     button {
       background: #28a745;
       color: white;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #218838;
     }
     .danger {
       background: #dc3545;
     }
-    .painel-section {
+    .danger:hover {
+      background: #c82333;
+    }
+    .password-section, .painel-section {
       display: none;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
     }
     th, td {
       padding: 10px;
       border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #e9ecef;
+    }
+    .error {
+      color: red;
     }
   </style>
 </head>
@@ -58,29 +78,35 @@
     <p>Mercado Couto</p>
   </div>
 
-  <div class="container password-section" id="senhaSection">
-    <h2>🛡️ Acesso ao Painel</h2>
-    <input type="password" id="senha" placeholder="Digite a senha" />
-    <button onclick="acessarPainel()">Entrar</button>
-    <p id="erro" style="color: red; display: none;">Senha incorreta. Tente novamente.</p>
-  </div>
+  <div class="container">
+    <div class="password-section" id="senhaSection">
+      <h2>🛡️ Acesso ao Painel</h2>
+      <input type="password" id="senha" placeholder="Digite a senha" />
+      <button onclick="acessarPainel()">Entrar</button>
+      <p id="erro" class="error" style="display: none;">Senha incorreta. Tente novamente.</p>
+    </div>
 
-  <div class="container painel-section" id="painel">
-    <h2>📦 Adicionar Produto Disponível</h2>
-    <input type="text" id="produtoNome" placeholder="Ex: Arroz 5kg">
-    <button onclick="adicionarProduto()">Salvar Produto</button>
+    <div class="painel-section" id="painel">
+      <h2>📦 Adicionar Produto Disponível</h2>
+      <input type="text" id="produtoNome" placeholder="Ex: Arroz 5kg">
+      <button onclick="adicionarProduto()">Salvar Produto</button>
 
-    <h2>📝 Produtos Disponíveis</h2>
-    <table id="tabelaProdutos">
-      <thead>
-        <tr><th>Produto</th><th>Ações</th></tr>
-      </thead>
-      <tbody id="produtosTabela"></tbody>
-    </table>
+      <h2>📝 Produtos Disponíveis</h2>
+      <table id="tabelaProdutos">
+        <thead>
+          <tr><th>Produto</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="produtosTabela"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
     const senhaCorreta = "kafornay";
+
+    window.onload = function() {
+      document.getElementById("senhaSection").style.display = "block"; // Mostrar seção de senha ao carregar
+    };
 
     function acessarPainel() {
       const senha = document.getElementById("senha").value.trim();
@@ -99,21 +125,20 @@
         return;
       }
 
-      // Ajustando o nome do campo enviado para corresponder ao script do Google
       fetch("https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec", {
         method: "POST",
-        body: JSON.stringify({ item: nome }), // Mudando o "produto" para "item"
+        body: JSON.stringify({ produto: nome }),
         headers: { "Content-Type": "application/json" }
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message) {
-          alert(data.message); // Exibe a mensagem de sucesso
-          renderizarProduto(nome);
-          document.getElementById("produtoNome").value = "";
-        } else {
-          alert("Erro ao salvar o produto: " + data.message);
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erro ao salvar o produto.");
         }
+        return res.json();
+      })
+      .then(data => {
+        renderizarProduto(data.produto); // Atualizando a função para renderizar o produto retornado
+        document.getElementById("produtoNome").value = "";
       })
       .catch(err => {
         console.error(err);
@@ -126,8 +151,13 @@
       const row = tabela.insertRow();
       row.innerHTML = `
         <td>${nome}</td>
-        <td><button class='danger' onclick='this.parentElement.parentElement.remove()'>Remover</button></td>
+        <td><button class='danger' onclick='removerProduto(this)'>Remover</button></td>
       `;
+    }
+
+    function removerProduto(button) {
+      const row = button.closest('tr');
+      row.remove();
     }
   </script>
 </body>
