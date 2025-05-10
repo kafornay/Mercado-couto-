@@ -18,7 +18,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 650px;
       width: 100%;
       background: #fff;
       padding: 20px;
@@ -91,7 +91,6 @@
       border-collapse: collapse;
       margin-top: 20px;
       font-size: 0.95rem;
-      transition: transform 0.3s ease;
     }
 
     th, td {
@@ -102,11 +101,11 @@
 
     th {
       background-color: #f3f3f3;
+      color: #333;
     }
 
     tbody tr {
       background-color: #fafafa;
-      transition: background-color 0.3s ease;
     }
 
     tbody tr:hover {
@@ -117,7 +116,7 @@
       color: #e74c3c;
       font-weight: bold;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       background: none;
       border: none;
       padding: 0;
@@ -127,6 +126,13 @@
 
     .removeBtn:hover {
       color: #c0392b;
+    }
+
+    #totalDisplay {
+      margin-top: 10px;
+      text-align: right;
+      font-weight: bold;
+      color: #2c3e50;
     }
 
     @media (max-width: 480px) {
@@ -151,6 +157,10 @@
 
       td {
         padding: 5px 0;
+      }
+
+      #totalDisplay {
+        text-align: center;
       }
     }
   </style>
@@ -185,7 +195,7 @@
     </div>
 
     <div class="field">
-      <label for="valor">Valor (R$):</label>
+      <label for="valor">Valor unitário (R$):</label>
       <input type="number" id="valor" step="0.01" placeholder="Ex: 4.65" />
     </div>
 
@@ -197,12 +207,14 @@
           <th>Produto</th>
           <th>Marca</th>
           <th>Qtd</th>
-          <th>Valor</th>
+          <th>Total (R$)</th>
           <th>Remover</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
+
+    <div id="totalDisplay"></div>
 
     <button id="sendData">Enviar via WhatsApp</button>
   </div>
@@ -212,6 +224,7 @@
     const addItemBtn = document.getElementById("addItem");
     const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
     const sendDataBtn = document.getElementById("sendData");
+    const totalDisplay = document.getElementById("totalDisplay");
 
     let itens = JSON.parse(localStorage.getItem('itens')) || [];
 
@@ -231,6 +244,33 @@
         produtoSelect.innerHTML = '<option>Erro ao carregar</option>';
       });
 
+    function renderLista() {
+      listaItens.innerHTML = "";
+      let total = 0;
+
+      itens.forEach((item, index) => {
+        const subtotal = parseFloat(item.valor) * parseFloat(item.quantidade);
+        total += subtotal;
+
+        const row = listaItens.insertRow();
+        row.innerHTML = `
+          <td>${item.produto}</td>
+          <td>${item.marca}</td>
+          <td>${item.quantidade}</td>
+          <td>R$ ${subtotal.toFixed(2)}</td>
+          <td><button class="removeBtn">X</button></td>
+        `;
+
+        row.querySelector(".removeBtn").addEventListener("click", () => {
+          itens.splice(index, 1);
+          localStorage.setItem('itens', JSON.stringify(itens));
+          renderLista();
+        });
+      });
+
+      totalDisplay.textContent = `Total: R$ ${total.toFixed(2)}`;
+    }
+
     addItemBtn.addEventListener("click", () => {
       const produto = produtoSelect.value;
       const marca = document.getElementById("marca").value;
@@ -243,27 +283,13 @@
       }
 
       itens.push({ produto, marca, quantidade, valor });
-
       localStorage.setItem('itens', JSON.stringify(itens));
-
-      const row = listaItens.insertRow();
-      row.innerHTML = `
-        <td>${produto}</td>
-        <td>${marca}</td>
-        <td>${quantidade}</td>
-        <td>R$ ${parseFloat(valor).toFixed(2)}</td>
-        <td><button class="removeBtn">X</button></td>
-      `;
-
-      row.querySelector(".removeBtn").addEventListener("click", () => {
-        itens = itens.filter(item => item.produto !== produto || item.marca !== marca || item.quantidade !== quantidade || item.valor !== valor);
-        localStorage.setItem('itens', JSON.stringify(itens));
-        row.remove();
-      });
 
       document.getElementById("marca").value = '';
       document.getElementById("quantidade").value = '';
       document.getElementById("valor").value = '';
+
+      renderLista();
     });
 
     sendDataBtn.addEventListener("click", () => {
@@ -276,35 +302,22 @@
       }
 
       let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n\n`;
+      let total = 0;
 
       itens.forEach(item => {
-        mensagem += `📦 *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor: R$ ${parseFloat(item.valor).toFixed(2)}\n\n`;
+        const subtotal = parseFloat(item.valor) * parseFloat(item.quantidade);
+        mensagem += `📦 *${item.produto}*\nMarca: ${item.marca}\nQtd: ${item.quantidade}\nValor unitário: R$ ${parseFloat(item.valor).toFixed(2)}\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
+        total += subtotal;
       });
+
+      mensagem += `*Total geral:* R$ ${total.toFixed(2)}`;
 
       const numero = "5521992576333";
       const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
       window.open(link, "_blank");
     });
 
-    // Preencher a lista de itens ao carregar a página
-    if (itens.length > 0) {
-      itens.forEach(item => {
-        const row = listaItens.insertRow();
-        row.innerHTML = `
-          <td>${item.produto}</td>
-          <td>${item.marca}</td>
-          <td>${item.quantidade}</td>
-          <td>R$ ${parseFloat(item.valor).toFixed(2)}</td>
-          <td><button class="removeBtn">X</button></td>
-        `;
-        
-        row.querySelector(".removeBtn").addEventListener("click", () => {
-          itens = itens.filter(it => it.produto !== item.produto || it.marca !== item.marca || it.quantidade !== item.quantidade || it.valor !== item.valor);
-          localStorage.setItem('itens', JSON.stringify(itens));
-          row.remove();
-        });
-      });
-    }
+    renderLista(); // inicializa a lista ao carregar
   </script>
 </body>
 </html>
