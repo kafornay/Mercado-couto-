@@ -5,17 +5,11 @@
   <title>Cotação - Mercado Couto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* Reset de estilos básicos */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f1f2f6;
-      color: #333;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 10px;
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -24,13 +18,14 @@
     }
 
     .container {
+      max-width: 600px;
+      width: 100%;
       background: #fff;
       padding: 20px;
-      border-radius: 15px;
+      border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 600px;
-      animation: fadeIn 0.5s ease-in-out;
+      overflow-y: auto;
+      max-height: 90vh;
     }
 
     h1 {
@@ -38,36 +33,26 @@
       color: #d35400;
       margin-bottom: 20px;
       font-size: 1.8rem;
-      font-weight: bold;
-      animation: slideIn 0.8s ease-in-out;
+      text-transform: uppercase;
     }
 
     .field {
       margin-bottom: 15px;
-      animation: fadeIn 1s ease-in-out;
     }
 
     label {
       font-weight: bold;
       display: block;
       margin-bottom: 5px;
-      color: #2c3e50;
     }
 
     input, select {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       font-size: 1rem;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      background: #f9f9f9;
-      transition: 0.3s;
-    }
-
-    input:focus, select:focus {
-      border-color: #d35400;
-      background: #fff;
-      box-shadow: 0 0 5px rgba(211, 84, 0, 0.5);
+      box-sizing: border-box;
     }
 
     button {
@@ -77,14 +62,18 @@
       border-radius: 8px;
       cursor: pointer;
       width: 100%;
-      transition: background-color 0.3s;
-      margin-top: 15px;
-      font-weight: bold;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease;
     }
 
     #addItem {
       background-color: #d35400;
       color: white;
+      margin-top: 10px;
+    }
+
+    #addItem:hover {
+      background-color: #e67e22;
     }
 
     #sendData {
@@ -93,8 +82,8 @@
       margin-top: 20px;
     }
 
-    #addItem:hover, #sendData:hover {
-      background-color: #e67e22;
+    #sendData:hover {
+      background-color: #2ecc71;
     }
 
     table {
@@ -102,60 +91,66 @@
       border-collapse: collapse;
       margin-top: 20px;
       font-size: 0.95rem;
+      transition: transform 0.3s ease;
     }
 
     th, td {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #ddd;
       text-align: left;
     }
 
     th {
       background-color: #f3f3f3;
-      font-weight: bold;
     }
 
     tbody tr {
-      transition: background-color 0.3s;
+      background-color: #fafafa;
+      transition: background-color 0.3s ease;
     }
 
     tbody tr:hover {
       background-color: #f1f1f1;
     }
 
-    /* Responsividade para dispositivos móveis */
+    .removeBtn {
+      color: #e74c3c;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.2rem;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-left: 10px;
+      transition: color 0.3s ease;
+    }
+
+    .removeBtn:hover {
+      color: #c0392b;
+    }
+
     @media (max-width: 480px) {
       input, select, button {
+        font-size: 1rem;
         padding: 12px;
       }
 
-      table {
-        font-size: 0.9rem;
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
       }
 
-      h1 {
-        font-size: 1.5rem;
+      tr {
+        margin-bottom: 15px;
       }
-    }
 
-    /* Animações */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
+      th {
+        background: none;
+        font-weight: bold;
       }
-      to {
-        opacity: 1;
-      }
-    }
 
-    @keyframes slideIn {
-      from {
-        transform: translateY(-30px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
+      td {
+        padding: 5px 0;
       }
     }
   </style>
@@ -203,6 +198,7 @@
           <th>Marca</th>
           <th>Qtd</th>
           <th>Valor</th>
+          <th>Remover</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -217,7 +213,7 @@
     const listaItens = document.getElementById("listaItens").getElementsByTagName('tbody')[0];
     const sendDataBtn = document.getElementById("sendData");
 
-    let itens = [];
+    let itens = JSON.parse(localStorage.getItem('itens')) || [];
 
     const apiUrl = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
 
@@ -248,13 +244,22 @@
 
       itens.push({ produto, marca, quantidade, valor });
 
+      localStorage.setItem('itens', JSON.stringify(itens));
+
       const row = listaItens.insertRow();
       row.innerHTML = `
         <td>${produto}</td>
         <td>${marca}</td>
         <td>${quantidade}</td>
         <td>R$ ${parseFloat(valor).toFixed(2)}</td>
+        <td><button class="removeBtn">X</button></td>
       `;
+
+      row.querySelector(".removeBtn").addEventListener("click", () => {
+        itens = itens.filter(item => item.produto !== produto || item.marca !== marca || item.quantidade !== quantidade || item.valor !== valor);
+        localStorage.setItem('itens', JSON.stringify(itens));
+        row.remove();
+      });
 
       document.getElementById("marca").value = '';
       document.getElementById("quantidade").value = '';
@@ -280,6 +285,26 @@
       const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
       window.open(link, "_blank");
     });
+
+    // Preencher a lista de itens ao carregar a página
+    if (itens.length > 0) {
+      itens.forEach(item => {
+        const row = listaItens.insertRow();
+        row.innerHTML = `
+          <td>${item.produto}</td>
+          <td>${item.marca}</td>
+          <td>${item.quantidade}</td>
+          <td>R$ ${parseFloat(item.valor).toFixed(2)}</td>
+          <td><button class="removeBtn">X</button></td>
+        `;
+        
+        row.querySelector(".removeBtn").addEventListener("click", () => {
+          itens = itens.filter(it => it.produto !== item.produto || it.marca !== item.marca || it.quantidade !== item.quantidade || it.valor !== item.valor);
+          localStorage.setItem('itens', JSON.stringify(itens));
+          row.remove();
+        });
+      });
+    }
   </script>
 </body>
 </html>
