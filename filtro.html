@@ -9,7 +9,7 @@
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      background: #f4f6f8; /* Fundo cinza bem claro */
+      background: #f4f6f8;
       color: #333;
     }
     .container {
@@ -21,7 +21,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     h2 {
-      color: #2c3e50; /* Azul mais escuro */
+      color: #2c3e50;
       text-align: center;
       margin-bottom: 20px;
     }
@@ -41,7 +41,7 @@
       margin-bottom: 10px;
     }
     .input-actions button {
-      background-color: #6c757d; /* Cinza mais escuro para ações secundárias */
+      background-color: #6c757d;
       color: white;
       padding: 8px 12px;
       border: none;
@@ -59,7 +59,7 @@
       margin: 5px;
       border: none;
       border-radius: 6px;
-      background: #2c3e50; /* Azul mais escuro */
+      background: #2c3e50;
       color: white;
       cursor: pointer;
       font-size: 16px;
@@ -77,7 +77,7 @@
     }
     .item-card {
       background: #e6ffe6;
-      border-left: 5px solid #27ae60; /* Verde */
+      border-left: 5px solid #27ae60;
       padding: 12px;
       margin-bottom: 8px;
       border-radius: 4px;
@@ -104,7 +104,7 @@
     }
     .fornecedor h3 {
       margin-top: 0;
-      color: #27ae60; /* Verde */
+      color: #27ae60;
       margin-bottom: 10px;
     }
     .fornecedor ul {
@@ -114,6 +114,20 @@
     .fornecedor li {
       margin-bottom: 5px;
       font-size: 15px;
+      position: relative;
+    }
+    .remove-btn {
+      position: absolute;
+      right: -25px;
+      top: 5px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
     }
     .whatsapp {
       display: inline-block;
@@ -129,8 +143,6 @@
     .whatsapp:hover {
       background-color: #128c7e;
     }
-
-    /* Estilos para telas menores (mobile) */
     @media (max-width: 600px) {
       .container {
         margin: 10px;
@@ -177,7 +189,6 @@
       }
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -188,11 +199,9 @@
       <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text).catch(err => console.error('Falha ao colar texto: ', err));">Colar</button>
     </div>
     <button onclick="adicionarCotacao()">Adicionar</button>
-
     <div id="listaCotacoes"></div>
     <hr />
     <div id="resultado"></div>
-
     <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
   </div>
 
@@ -238,23 +247,62 @@
         });
       });
 
-      // Agrupar por fornecedor
-      precosMap.forEach(({ empresa, texto }) => {
-        if (!fornecedores[empresa]) fornecedores[empresa] = [];
-        fornecedores[empresa].push(texto);
-      });
-
-      // Renderizar resultado
       const resultadoDiv = document.getElementById('resultado');
       resultadoDiv.innerHTML = '';
-      for (let [empresa, itens] of Object.entries(fornecedores)) {
+      const dadosPorFornecedor = {};
+
+      precosMap.forEach(({ empresa, texto }) => {
+        if (!dadosPorFornecedor[empresa]) dadosPorFornecedor[empresa] = [];
+        dadosPorFornecedor[empresa].push(texto);
+      });
+
+      for (let [empresa, itens] of Object.entries(dadosPorFornecedor)) {
         const div = document.createElement('div');
         div.className = 'fornecedor';
-        div.innerHTML = `<h3>${empresa}</h3><ul>${itens.map(i => `<li>${i.replace(/\n/g, '<br>')}</li>`).join('')}</ul>`;
-        const msg = encodeURIComponent(`Pedido ${empresa}:\n` + itens.join('\n\n'));
-        div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msg}' target='_blank'>Compartilhar via WhatsApp</a>`;
+
+        const ul = document.createElement('ul');
+
+        itens.forEach((itemTexto, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = itemTexto.replace(/\n/g, '<br>');
+          
+          const btn = document.createElement('button');
+          btn.className = 'remove-btn';
+          btn.textContent = 'X';
+          btn.onclick = () => {
+            ul.removeChild(li);
+            dadosPorFornecedor[empresa] = dadosPorFornecedor[empresa].filter((_, i) => i !== index);
+            atualizarLinkWhatsApp();
+          };
+
+          li.appendChild(btn);
+          ul.appendChild(li);
+        });
+
+        const h3 = document.createElement('h3');
+        h3.textContent = empresa;
+
+        const link = document.createElement('a');
+        link.className = 'whatsapp';
+        link.target = '_blank';
+        link.textContent = 'Compartilhar via WhatsApp';
+
+        link.href = gerarLinkWhatsApp(dadosPorFornecedor[empresa], empresa);
+
+        function atualizarLinkWhatsApp() {
+          link.href = gerarLinkWhatsApp(dadosPorFornecedor[empresa], empresa);
+        }
+
+        div.appendChild(h3);
+        div.appendChild(ul);
+        div.appendChild(link);
         resultadoDiv.appendChild(div);
       }
+    }
+
+    function gerarLinkWhatsApp(itens, empresa) {
+      const msg = encodeURIComponent(`Pedido ${empresa}:\n\n` + itens.join('\n\n'));
+      return `https://wa.me/?text=${msg}`;
     }
   </script>
 </body>
