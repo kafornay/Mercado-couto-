@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filtro de Melhores Preços</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: #f4f6f8; /* Fundo cinza bem claro */
+      color: #333;
+    }
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2c3e50; /* Azul mais escuro */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: calc(100% - 20px);
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    .input-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .input-actions button {
+      background-color: #6c757d; /* Cinza mais escuro para ações secundárias */
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+    .input-actions button:hover {
+      background-color: #5a6268;
+    }
+    button {
+      display: inline-block;
+      padding: 12px 24px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background: #2c3e50; /* Azul mais escuro */
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #1a2533;
+    }
+    #listaCotacoes {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+    }
+    .item-card {
+      background: #e6ffe6;
+      border-left: 5px solid #27ae60; /* Verde */
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin: 20px 0;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fff;
+    }
+    .fornecedor {
+      background: #f8f8f8;
+      border: 1px solid #eee;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+    }
+    .fornecedor h3 {
+      margin-top: 0;
+      color: #27ae60; /* Verde */
+      margin-bottom: 10px;
+    }
+    .fornecedor ul {
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+    .fornecedor li {
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+    .whatsapp {
+      display: inline-block;
+      margin-top: 15px;
+      background: #25d366;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    .whatsapp:hover {
+      background-color: #128c7e;
+    }
+
+    /* Estilos para telas menores (mobile) */
+    @media (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 15px;
+      }
+      h2 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+      }
+      textarea {
+        font-size: 14px;
+        height: 120px;
+      }
+      .input-actions {
+        flex-direction: column;
+        gap: 5px;
+      }
+      .input-actions button {
+        width: 100%;
+      }
+      button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        padding: 10px;
+        font-size: 14px;
+      }
+      .item-card {
+        font-size: 14px;
+        padding: 10px;
+      }
+      .fornecedor h3 {
+        font-size: 1.4em;
+      }
+      .fornecedor li {
+        font-size: 14px;
+      }
+      .whatsapp {
+        font-size: 14px;
+        padding: 8px 12px;
+        text-align: center;
+        display: block;
+        margin: 10px auto;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h2>Filtro de Melhores Preços</h2>
+    <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea>
+    <div class="input-actions">
+      <button onclick="document.getElementById('cotacao').value = '';">Limpar</button>
+      <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text).catch(err => console.error('Falha ao colar texto: ', err));">Colar</button>
+    </div>
+    <button onclick="adicionarCotacao()">Adicionar</button>
+
+    <div id="listaCotacoes"></div>
+    <hr />
+    <div id="resultado"></div>
+
+    <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
+  </div>
+
+  <script>
+    const cotacoes = [];
+
+    function adicionarCotacao() {
+      const texto = document.getElementById('cotacao').value.trim();
+      if (!texto) return;
+      cotacoes.push(texto);
+
+      const empresaMatch = texto.match(/\*Empresa:\* (.+)/);
+      const nomeEmpresa = empresaMatch ? empresaMatch[1].trim() : 'Empresa não identificada';
+
+      const div = document.createElement('div');
+      div.className = 'item-card';
+      div.textContent = `Cotação de: ${nomeEmpresa}`;
+      document.getElementById('listaCotacoes').appendChild(div);
+      document.getElementById('cotacao').value = '';
+    }
+
+    function filtrarMelhoresPrecos() {
+      const precosMap = new Map();
+      const fornecedores = {};
+
+      cotacoes.forEach(txt => {
+        const empresaMatch = txt.match(/\*Empresa:\* (.+)/);
+        const empresa = empresaMatch ? empresaMatch[1].trim() : 'Desconhecida';
+
+        const itens = txt.split('📦').slice(1);
+        itens.forEach(bloco => {
+          const linhas = bloco.trim().split('\n');
+          const nomeMatch = linhas[0].match(/\*(.+)\*/);
+          const nome = nomeMatch ? nomeMatch[1].toLowerCase().trim() : '';
+          const valorMatch = linhas.find(l => l.includes('Valor unitário')).match(/R\$\s*([\d,\.]+)/);
+          const valor = valorMatch ? parseFloat(valorMatch[1].replace(',', '.')) : Infinity;
+
+          if (!nome) return;
+
+          if (!precosMap.has(nome) || precosMap.get(nome).valor > valor) {
+            precosMap.set(nome, { valor, empresa, texto: bloco.trim() });
+          }
+        });
+      });
+
+      // Agrupar por fornecedor
+      precosMap.forEach(({ empresa, texto }) => {
+        if (!fornecedores[empresa]) fornecedores[empresa] = [];
+        fornecedores[empresa].push(texto);
+      });
+
+      // Renderizar resultado
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = '';
+      for (let [empresa, itens] of Object.entries(fornecedores)) {
+        const div = document.createElement('div');
+        div.className = 'fornecedor';
+        div.innerHTML = `<h3>${empresa}</h3><ul>${itens.map(i => `<li>${i.replace(/\n/g, '<br>')}</li>`).join('')}</ul>`;
+        const msg = encodeURIComponent(`Pedido ${empresa}:\n` + itens.join('\n\n'));
+        div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msg}' target='_blank'>Compartilhar via WhatsApp</a>`;
+        resultadoDiv.appendChild(div);
+      }
+    }
+  </script>
+</body>
+</html>
