@@ -2,15 +2,10 @@
 <html lang="pt-BR">
 
 <head>
-
   <meta charset="UTF-8">
-
   <title>Night Food - Personalize sua Imagem</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -88,18 +83,18 @@
 
     .valor-container {
       position: absolute;
-      top: 20px; /* Distância do topo */
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: rgba(0, 0, 0, 0.6); /* Fundo translúcido */
-      color: #fff; /* Cor do texto */
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
       padding: 10px 20px;
       border-radius: 8px;
       font-size: 20px;
       font-weight: bold;
       text-align: center;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 10; /* Coloca o valor acima de outros elementos */
+      z-index: 10;
     }
 
     input[type="number"] {
@@ -119,6 +114,14 @@
       outline: none;
       background-color: #f8b500;
       color: white;
+    }
+
+    .logo-upload {
+      margin-top: 20px;
+    }
+
+    .logo-upload input[type="file"] {
+      font-size: 16px;
     }
 
     @media (max-width: 600px) {
@@ -144,29 +147,28 @@
       }
     }
   </style>
-
 </head>
 
 <body>
-
   <div class="card">
     <h2>🍔 Night Food</h2>
     <p>Adicione sua imagem personalizada:</p>
 
     <input type="file" id="upload" accept="image/*"><br>
 
-    <!-- Campo para o valor -->
-    <div class="valor-container">
-      <label for="valor">Valor</label><br>
-      <input type="number" id="valor" name="valor" placeholder="Digite o valor" />
-    </div>
-
+    <!-- Campo para a descrição -->
     <div class="description-section">
       <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea><br>
       <div class="buttons">
         <button onclick="copyDescription()">📋 Copiar</button>
         <button onclick="clearDescription()">🧹 Limpar</button>
       </div>
+    </div>
+
+    <!-- Campo Valor -->
+    <div class="valor-container">
+      <label for="valor">Valor</label><br>
+      <input type="number" id="valor" name="valor" placeholder="Digite o valor" />
     </div>
 
     <!-- Logo Upload -->
@@ -263,6 +265,14 @@
           ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, startY + 60);
           ctx.fillText('📸 Instagram: @night_food', centerX, startY + 85);
 
+          // Adicionando o valor na imagem
+          const valor = valorInput.value.trim();
+          if (valor) {
+            ctx.font = 'bold 40px "Poppins", sans-serif';
+            ctx.fillStyle = '#f8b500';
+            ctx.fillText(`R$ ${valor}`, centerX, startY - 150); // Centraliza o valor
+          }
+
           ctx.globalAlpha = 1.0;
           ctx.shadowBlur = 0;
         };
@@ -296,6 +306,4 @@
   </script>
 
 </body>
-
 </html>
-</h
