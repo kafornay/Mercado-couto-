@@ -1,0 +1,219 @@
+<!DOCTYPE html> 
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Marca d'Água - Night Food</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fceabb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px;
+    }
+    h2 {
+      font-size: 24px;
+      color: #333333;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      margin-top: 20px;
+      width: 100%;
+      height: 80px;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #f8b500;
+      border: none;
+      color: white;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 48%;
+    }
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 20px;
+      }
+      .card {
+        padding: 15px;
+      }
+      .buttons {
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      textarea {
+        height: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🍔 Night Food</h2>
+    <p>Adicione sua imagem com marca d'água personalizada:</p>
+    <input type="file" id="upload" accept="image/*"><br>
+    <div class="description-section">
+      <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea><br>
+      <div class="buttons">
+        <button onclick="copyDescription()">📋 Copiar</button>
+        <button onclick="clearDescription()">🧹 Limpar</button>
+      </div>
+    </div>
+    <canvas id="canvas"></canvas><br>
+    <button id="downloadBtn">📥 Baixar Imagem</button>
+  </div>
+  <script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const descriptionInput = document.getElementById('description');
+    const downloadBtn = document.getElementById('downloadBtn');
+    window.onload = function () {
+      const savedDescription = localStorage.getItem('description');
+      if (savedDescription) {
+        descriptionInput.value = savedDescription;
+      }
+    }
+    descriptionInput.addEventListener('input', function () {
+      const description = descriptionInput.value.trim();
+      localStorage.setItem('description', description);
+    });
+    upload.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const size = 1000;
+          const scale = Math.min(size / img.width, size / img.height);
+          const newWidth = img.width * scale;
+          const newHeight = img.height * scale;
+          canvas.width = size;
+          canvas.height = size;
+          const xOffset = (size - newWidth) / 2;
+          const yOffset = (size - newHeight) / 2;
+          ctx.clearRect(0, 0, size, size);
+          ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+          ctx.globalAlpha = 0.7;
+          ctx.textAlign = 'center';
+          ctx.shadowColor = 'rgba(0,0,0,0.6)';
+          ctx.shadowOffsetX = 2;
+          ctx.shadowOffsetY = 2;
+          ctx.shadowBlur = 4;
+          const centerX = size / 2;
+          const startY = size - 120;
+          const description = descriptionInput.value.trim();
+          if (description) {
+            const maxLineLength = 30;
+            const words = description.split(" ");
+            const lines = [];
+            let line = "";
+            for (let word of words) {
+              if ((line + word).length <= maxLineLength) {
+                line += word + " ";
+              } else {
+                lines.push(line.trim());
+                line = word + " ";
+              }
+            }
+            if (line) lines.push(line.trim());
+            ctx.font = 'italic 36px "Playfair Display", serif';
+            lines.forEach((lineText, index) => {
+              const textY = startY - 90 - ((lines.length - 1 - index) * 40);
+              const textMetrics = ctx.measureText(lineText);
+              const textWidth = textMetrics.width;
+              const textHeight = 36;
+              const paddingX = 16;
+              const paddingY = 10;
+              const rectX = centerX - (textWidth / 2) - (paddingX / 2);
+              const rectY = textY - textHeight + paddingY / 2;
+              const rectWidth = textWidth + paddingX;
+              const rectHeight = textHeight + paddingY;
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+              ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+              ctx.fillStyle = 'rgba(51, 51, 51, 0.8)';
+              ctx.fillText(lineText, centerX, textY);
+            });
+          }
+          ctx.font = 'bold 30px Roboto';
+          ctx.fillStyle = '#333333';
+          ctx.fillText('🍔 Night Food', centerX, startY);
+          ctx.font = '22px Roboto';
+          ctx.fillText('Aceito Encomendas!', centerX, startY + 30);
+          ctx.font = '18px Roboto';
+          ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, startY + 60);
+          ctx.fillText('📸 Instagram: @night_food', centerX, startY + 85);
+          ctx.globalAlpha = 1.0;
+          ctx.shadowBlur = 0;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    downloadBtn.addEventListener('click', function () {
+      const link = document.createElement('a');
+      link.download = 'night-food.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+    function copyDescription() {
+      const description = descriptionInput.value.trim();
+      if (description) {
+        navigator.clipboard.writeText(description)
+          .then(() => alert("Descrição copiada para a área de transferência!"))
+          .catch(err => console.error("Erro ao copiar: ", err));
+      } else {
+        alert("Não há descrição para copiar.");
+      }
+    }
+    function clearDescription() {
+      descriptionInput.value = '';
+      localStorage.removeItem('description');
+    }
+  </script>
+</body>
+</html>
