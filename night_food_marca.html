@@ -1,14 +1,15 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Marca d'Água - Night Food</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Montserrat:wght@600&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <title>Night Food - Personalize sua Imagem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background: #fff4e6;
+      background: #fceabb;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -21,11 +22,13 @@
     .card {
       background: white;
       border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
       padding: 20px;
       text-align: center;
       width: 100%;
       max-width: 500px;
+      margin: 20px;
+      position: relative;
     }
 
     h2 {
@@ -40,7 +43,6 @@
       font-size: 16px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      width: 100%;
     }
 
     textarea {
@@ -63,7 +65,7 @@
 
     button {
       padding: 12px 20px;
-      background-color: #ff9800;
+      background-color: #f8b500;
       border: none;
       color: white;
       font-size: 14px;
@@ -76,10 +78,57 @@
       margin-top: 20px;
       max-width: 100%;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .valor-container {
+      margin-top: 15px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 5px;
+      text-align: center;
+      background-color: #fceabb;
+      color: #333;
+      font-weight: bold;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      background-color: #f8b500;
+      color: white;
+    }
+
+    .logo-upload {
+      margin-top: 20px;
+    }
+
+    .logo-upload input[type="file"] {
+      font-size: 16px;
     }
 
     @media (max-width: 600px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
       .buttons {
         flex-direction: column;
       }
@@ -95,43 +144,47 @@
     }
   </style>
 </head>
+
 <body>
   <div class="card">
     <h2>🍔 Night Food</h2>
-    <p>Adicione sua imagem com marca d'água personalizada:</p>
+    <p>Adicione sua imagem personalizada:</p>
 
-    <input type="file" id="uploadLogo" accept="image/png" />
-    <br><br>
-    <input type="file" id="upload" accept="image/*" /><br />
+    <input type="file" id="upload" accept="image/*"><br>
 
+    <!-- Campo para a descrição -->
     <div class="description-section">
-      <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea><br />
+      <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea><br>
       <div class="buttons">
         <button onclick="copyDescription()">📋 Copiar</button>
         <button onclick="clearDescription()">🧹 Limpar</button>
       </div>
-
-      <!-- Campo de valor abaixo da descrição -->
-      <div style="margin-top: 20px;">
-        <label for="valor" style="font-weight: bold;">Valor</label><br />
-        <input type="number" id="valor" name="valor" placeholder="Digite o valor" />
-      </div>
     </div>
 
-    <canvas id="canvas"></canvas><br />
+    <!-- Campo Valor movido para baixo da descrição -->
+    <div class="valor-container">
+      <label for="valor">Valor</label><br>
+      <input type="number" id="valor" name="valor" placeholder="Digite o valor" />
+    </div>
+
+    <!-- Logo Upload -->
+    <div class="logo-upload">
+      <p>Upload da sua logo (somente PNG):</p>
+      <input type="file" id="logoUpload" accept="image/png">
+    </div>
+
+    <canvas id="canvas"></canvas><br>
     <button id="downloadBtn">📥 Baixar Imagem</button>
   </div>
 
   <script>
     const upload = document.getElementById('upload');
-    const uploadLogo = document.getElementById('uploadLogo');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const descriptionInput = document.getElementById('description');
-    const valorInput = document.getElementById('valor');
     const downloadBtn = document.getElementById('downloadBtn');
-
-    let logoImage = null;
+    const valorInput = document.getElementById('valor');
+    const logoUpload = document.getElementById('logoUpload');
 
     window.onload = function () {
       const savedDescription = localStorage.getItem('description');
@@ -141,19 +194,8 @@
     }
 
     descriptionInput.addEventListener('input', function () {
-      localStorage.setItem('description', descriptionInput.value.trim());
-    });
-
-    uploadLogo.addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file || file.type !== 'image/png') return alert('A logo deve estar em formato PNG.');
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        logoImage = new Image();
-        logoImage.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      const description = descriptionInput.value.trim();
+      localStorage.setItem('description', description);
     });
 
     upload.addEventListener('change', function () {
@@ -171,59 +213,61 @@
 
           canvas.width = size;
           canvas.height = size;
+
           const xOffset = (size - newWidth) / 2;
           const yOffset = (size - newHeight) / 2;
 
           ctx.clearRect(0, 0, size, size);
           ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
 
-          ctx.globalAlpha = 0.8;
+          ctx.globalAlpha = 0.7;
           ctx.textAlign = 'center';
-          ctx.shadowColor = 'rgba(0,0,0,0.4)';
+          ctx.shadowColor = 'rgba(0,0,0,0.6)';
           ctx.shadowOffsetX = 2;
           ctx.shadowOffsetY = 2;
           ctx.shadowBlur = 4;
 
           const centerX = size / 2;
-          const startY = size - 160;
+          const startY = size - 120;
 
-          // Logo
-          if (logoImage) {
-            const logoSize = 120;
-            ctx.drawImage(logoImage, centerX - logoSize / 2, 40, logoSize, logoSize);
-          }
-
-          // Descrição formatada
           const description = descriptionInput.value.trim();
           if (description) {
-            ctx.font = 'italic 28px "Playfair Display", serif';
+            ctx.font = 'italic 36px "Playfair Display", serif';
+            const textMetrics = ctx.measureText(description);
+            const textWidth = textMetrics.width;
+            const textHeight = 36;
+            const paddingX = 16;
+            const paddingY = 10;
+
+            const rectX = centerX - (textWidth / 2) - (paddingX / 2);
+            const rectY = startY - 90 - textHeight + paddingY / 2;
+            const rectWidth = textWidth + paddingX;
+            const rectHeight = textHeight + paddingY;
+
             ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            const lines = wrapText(description, 30);
-            lines.forEach((line, i) => {
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-              const metrics = ctx.measureText(line);
-              ctx.fillRect(centerX - metrics.width / 2 - 10, 200 + i * 40 - 30, metrics.width + 20, 40);
-              ctx.fillStyle = '#333';
-              ctx.fillText(line, centerX, 200 + i * 40);
-            });
+            ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+            ctx.fillStyle = 'rgba(51, 51, 51, 0.8)';
+            ctx.fillText(description, centerX, startY - 90);
           }
 
-          // Valor centralizado
+          ctx.font = 'bold 30px Roboto';
+          ctx.fillStyle = '#333333';
+          ctx.fillText('🍔 Night Food', centerX, startY);
+
+          ctx.font = '22px Roboto';
+          ctx.fillText('Aceito Encomendas!', centerX, startY + 30);
+          ctx.font = '18px Roboto';
+          ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, startY + 60);
+          ctx.fillText('📸 Instagram: @night_food', centerX, startY + 85);
+
+          // Adicionando o valor na imagem
           const valor = valorInput.value.trim();
           if (valor) {
-            ctx.font = 'bold 48px Montserrat';
-            ctx.fillStyle = '#d32f2f';
-            ctx.fillText(`R$ ${parseFloat(valor).toFixed(2)}`, centerX, size / 2);
+            ctx.font = 'bold 40px "Poppins", sans-serif';
+            ctx.fillStyle = '#f8b500';
+            ctx.fillText(`R$ ${valor}`, centerX, startY - 150);
           }
-
-          // Informações fixas
-          ctx.font = 'bold 26px Roboto';
-          ctx.fillStyle = '#000';
-          ctx.fillText('Night Food', centerX, startY);
-
-          ctx.font = '20px Roboto';
-          ctx.fillText('📱 Contato: 21 99423-1834', centerX, startY + 30);
-          ctx.fillText('📸 Instagram: @night_food', centerX, startY + 60);
 
           ctx.globalAlpha = 1.0;
           ctx.shadowBlur = 0;
@@ -255,23 +299,7 @@
       descriptionInput.value = '';
       localStorage.removeItem('description');
     }
-
-    function wrapText(text, maxChars) {
-      const words = text.split(' ');
-      const lines = [];
-      let line = '';
-
-      for (let i = 0; i < words.length; i++) {
-        if ((line + words[i]).length <= maxChars) {
-          line += words[i] + ' ';
-        } else {
-          lines.push(line.trim());
-          line = words[i] + ' ';
-        }
-      }
-      if (line.trim()) lines.push(line.trim());
-      return lines;
-    }
   </script>
+
 </body>
 </html>
