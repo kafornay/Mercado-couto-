@@ -1,375 +1,396 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Night Food - Personalize sua Imagem</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=EB+Garamond:ital@1&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #fceabb;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <title>Night Food - Personalize sua Imagem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fceabb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
 
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px;
+      position: relative;
+    }
 
-        h2 {
-            font-size: 24px;
-            color: #333;
-        }
+    h2 {
+      font-size: 24px;
+      color: #333333;
+    }
 
-        input[type='file'],
-        input[type='number'],
-        input[type='color'],
-        textarea {
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    input[type="file"] {
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 6px;
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-        textarea {
-            height: 80px;
-            resize: none;
-        }
+    textarea {
+      margin-top: 20px;
+      width: 100%;
+      height: 80px;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+    }
 
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 10px;
+    }
 
-        button {
-            flex: 1;
-            padding: 12px;
-            background-color: #f8b500;
-            border: none;
-            color: white;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+    button {
+      padding: 12px 20px;
+      background-color: #f8b500;
+      border: none;
+      color: white;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 48%;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #d99900;
+    }
 
-        canvas {
-            margin-top: 20px;
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            touch-action: none;
-        }
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      background-color: #fff;
+    }
 
-        .valor-container {
-            margin-top: 15px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
+    /* Campo valor abaixo da descrição, com estilo elegante */
+    .valor-wrapper {
+      margin-top: 15px;
+      text-align: center;
+    }
 
-        .color-picker-group {
-            margin-top: 15px;
-            text-align: left;
-        }
-        .color-picker-group label {
-            font-weight: 600;
-            font-size: 14px;
-            margin-right: 8px;
-        }
+    #valor {
+      width: 80%;
+      max-width: 250px;
+      font-size: 24px;
+      padding: 10px 15px;
+      border-radius: 12px;
+      border: 2px solid #f8b500;
+      text-align: center;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      color: #f8b500;
+      background-color: #fff8dc;
+      transition: border-color 0.3s ease;
+      outline: none;
+    }
 
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 20px;
-            }
-            .valor-container {
-                font-size: 18px;
-                padding: 8px 16px;
-            }
-            button {
-                font-size: 13px;
-                padding: 10px;
-            }
-            textarea {
-                height: 70px;
-            }
-        }
-    </style>
+    #valor:focus {
+      border-color: #d99900;
+      background-color: #fff5b1;
+    }
+
+    /* Logo upload */
+    .logo-upload {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .logo-upload p {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      textarea {
+        height: 70px;
+      }
+
+      #valor {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="card">
-        <h2>🍔 Night Food</h2>
-        <p>Adicione sua imagem personalizada:</p>
+  <div class="card">
+    <h2>🍔 Night Food</h2>
 
-        <input type="file" id="upload" accept="image/*" />
-        <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
+    <p>Adicione sua imagem personalizada:</p>
+    <input type="file" id="upload" accept="image/*" />
 
-        <div class="buttons">
-            <button onclick="copyDescription()">📋 Copiar</button>
-            <button onclick="clearDescription()">🧹 Limpar</button>
-        </div>
-
-        <div class="valor-container">
-            <label for="valor">Valor</label><br />
-            <input type="number" id="valor" placeholder="Digite o valor" />
-        </div>
-
-        <p>Upload da sua logo (PNG):</p>
-        <input type="file" id="logoUpload" accept="image/png" />
-
-        <div class="color-picker-group">
-            <label for="fundoCor">Cor da faixa:</label>
-            <input type="color" id="fundoCor" value="#000000" />
-        </div>
-
-        <div class="color-picker-group">
-            <label for="descCor">Cor da descrição:</label>
-            <input type="color" id="descCor" value="#FFFFFF" />
-        </div>
-
-        <div class="color-picker-group">
-            <label for="valorCor">Cor do valor:</label>
-            <input type="color" id="valorCor" value="#f8b500" />
-        </div>
-
-        <canvas id="canvas"></canvas>
-        <button id="downloadBtn">📥 Baixar Imagem</button>
+    <!-- Descrição -->
+    <div class="description-section">
+      <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
+      <div class="buttons">
+        <button onclick="copyDescription()">📋 Copiar</button>
+        <button onclick="clearDescription()">🧹 Limpar</button>
+      </div>
     </div>
 
-    <script>
-        const upload = document.getElementById('upload');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const descriptionInput = document.getElementById('description');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const valorInput = document.getElementById('valor');
-        const logoUpload = document.getElementById('logoUpload');
-        const fundoCorInput = document.getElementById('fundoCor');
-        const descCorInput = document.getElementById('descCor');
-        const valorCorInput = document.getElementById('valorCor');
+    <!-- Campo Valor abaixo da descrição -->
+    <div class="valor-wrapper">
+      <label for="valor">Valor</label><br />
+      <input type="number" id="valor" name="valor" placeholder="Digite o valor" />
+    </div>
 
-        let img = new Image();
-        let logoImg = null;
+    <!-- Logo upload -->
+    <div class="logo-upload">
+      <p>Upload da sua logo (somente PNG):</p>
+      <input type="file" id="logoUpload" accept="image/png" />
+    </div>
 
-        let descPos = { x: 500, y: 80 };
-        let valorPos = { x: 500, y: 140 };
+    <canvas id="canvas"></canvas>
 
-        let dragging = null;
-        let dragOffset = { x: 0, y: 0 };
+    <button id="downloadBtn">📥 Baixar Imagem</button>
+  </div>
 
-        function hexToRGBA(hex, alpha) {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  <script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const descriptionInput = document.getElementById('description');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const valorInput = document.getElementById('valor');
+    const logoUpload = document.getElementById('logoUpload');
+
+    let baseImage = null;
+    let logoImage = null;
+
+    // Salvar e carregar descrição do localStorage
+    window.onload = function () {
+      const savedDescription = localStorage.getItem('description');
+      if (savedDescription) {
+        descriptionInput.value = savedDescription;
+      }
+      redrawCanvas();
+    }
+
+    descriptionInput.addEventListener('input', () => {
+      localStorage.setItem('description', descriptionInput.value.trim());
+      redrawCanvas();
+    });
+
+    valorInput.addEventListener('input', () => {
+      redrawCanvas();
+    });
+
+    logoUpload.addEventListener('change', () => {
+      const file = logoUpload.files[0];
+      if (!file) {
+        logoImage = null;
+        redrawCanvas();
+        return;
+      }
+      if (file.type !== 'image/png') {
+        alert('Por favor, envie um arquivo PNG para a logo.');
+        logoUpload.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        logoImage = new Image();
+        logoImage.onload = () => redrawCanvas();
+        logoImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    upload.addEventListener('change', () => {
+      const file = upload.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        baseImage = new Image();
+        baseImage.onload = () => redrawCanvas();
+        baseImage.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!baseImage) {
+        alert('Por favor, faça upload de uma imagem primeiro.');
+        return;
+      }
+      const link = document.createElement('a');
+      link.download = 'night-food.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    function redrawCanvas() {
+      const size = 1000;
+      canvas.width = size;
+      canvas.height = size;
+      ctx.clearRect(0, 0, size, size);
+
+      if (!baseImage) {
+        // fundo cinza claro se não tiver imagem
+        ctx.fillStyle = '#eee';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#666';
+        ctx.font = 'italic 36px "Playfair Display", serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Faça upload da imagem para começar', size / 2, size / 2);
+        return;
+      }
+
+      // Desenha a imagem base centralizada e escalada
+      const scale = Math.min(size / baseImage.width, size / baseImage.height);
+      const newWidth = baseImage.width * scale;
+      const newHeight = baseImage.height * scale;
+      const xOffset = (size - newWidth) / 2;
+      const yOffset = (size - newHeight) / 2;
+      ctx.drawImage(baseImage, xOffset, yOffset, newWidth, newHeight);
+
+      // Desenha logo no topo centralizado (max 200px largura)
+      if (logoImage) {
+        const logoMaxWidth = 200;
+        const logoScale = Math.min(logoMaxWidth / logoImage.width, 1);
+        const logoWidth = logoImage.width * logoScale;
+        const logoHeight = logoImage.height * logoScale;
+        const logoX = (size - logoWidth) / 2;
+        const logoY = 20;
+        ctx.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+      }
+
+      // Sombras e estilos para texto
+      ctx.globalAlpha = 0.8;
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 6;
+
+      const centerX = size / 2;
+      const baseTextY = size - 140;
+
+      // Descrição - limita 30 chars por linha e centraliza
+      const description = descriptionInput.value.trim();
+      if (description) {
+        ctx.font = 'italic 36px "Playfair Display", serif';
+        ctx.fillStyle = 'rgba(51, 51, 51, 0.85)';
+
+        // Quebra o texto em linhas de até 30 caracteres
+        const lines = [];
+        for (let i = 0; i < description.length; i += 30) {
+          lines.push(description.substring(i, i + 30));
         }
 
-        function drawCanvas() {
-            if (!img.src) return;
+        // Desenha fundo sombra retangular atrás do texto
+        const lineHeight = 44;
+        const paddingX = 40;
+        const paddingY = 20;
+        const rectHeight = lines.length * lineHeight + paddingY;
+        const maxTextWidth = 600;
 
-            const size = 1000;
-            const scale = Math.min(size / img.width, size / img.height);
-            const newWidth = img.width * scale;
-            const newHeight = img.height * scale;
-
-            const extraHeight = 140;
-            canvas.width = size;
-            canvas.height = size + extraHeight;
-
-            const xOffset = (size - newWidth) / 2;
-            const yOffset = (size - newHeight) / 2;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
-
-            // Faixa com cor escolhida
-            ctx.globalAlpha = 1.0;
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = hexToRGBA(fundoCorInput.value, 0.8);
-            ctx.fillRect(0, size, canvas.width, extraHeight);
-
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 28px Roboto';
-            ctx.textAlign = 'center';
-            ctx.fillText('🍔 Night Food', canvas.width / 2, size + 40);
-            ctx.font = '22px Roboto';
-            ctx.fillText('Aceito Encomendas!', canvas.width / 2, size + 70);
-            ctx.font = '18px Roboto';
-            ctx.fillText('📱 WhatsApp: 21 99423-1834', canvas.width / 2, size + 95);
-            ctx.fillText('📸 Instagram: @night_food', canvas.width / 2, size + 120);
-
-            const description = descriptionInput.value.trim();
-            if (description) {
-                ctx.font = 'italic 36px "EB Garamond", serif';
-                ctx.fillStyle = descCorInput.value;
-                ctx.textAlign = 'center';
-                ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                ctx.shadowBlur = 4;
-                ctx.fillText(description, descPos.x, descPos.y);
-            }
-
-            const valor = valorInput.value.trim();
-            if (valor) {
-                ctx.font = 'bold 40px "Poppins", sans-serif';
-                ctx.fillStyle = valorCorInput.value;
-                ctx.textAlign = 'center';
-                ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
-            }
-
-            if (logoImg) {
-                const size = 120;
-                ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
-            }
-        }
-
-        upload.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        // Calcular largura do maior texto para centralizar fundo
+        let maxLineWidth = 0;
+        lines.forEach(line => {
+          const width = ctx.measureText(line).width;
+          if (width > maxLineWidth) maxLineWidth = width;
         });
+        const rectWidth = Math.min(maxLineWidth + paddingX, maxTextWidth);
+        const rectX = centerX - rectWidth / 2;
+        const rectY = baseTextY - (lines.length * lineHeight);
 
-        logoUpload.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                logoImg = new Image();
-                logoImg.onload = () => drawCanvas();
-                logoImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+        ctx.fillStyle = 'rgba(51, 51, 51, 0.85)';
+        lines.forEach((line, idx) => {
+          ctx.fillText(line.trim(), centerX, rectY + paddingY/2 + (idx + 1) * lineHeight - 10);
         });
+      }
 
-        img.onload = () => drawCanvas();
+      // Texto fixo no rodapé
+      ctx.font = 'bold 36px Roboto, sans-serif';
+      ctx.fillStyle = '#333333';
+      ctx.fillText('🍔 Night Food', centerX, baseTextY + 70);
 
-        function isInsideText(x, y, textX, textY, fontSize, text) {
-            const width = ctx.measureText(text).width;
-            const height = fontSize;
-            return (
-                x >= textX - width / 2 &&
-                x <= textX + width / 2 &&
-                y >= textY - height &&
-                y <= textY
-            );
-        }
+      ctx.font = '22px Roboto, sans-serif';
+      ctx.fillText('Aceito Encomendas!', centerX, baseTextY + 110);
 
-        function getTouchPos(canvas, evt) {
-            const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-            if (evt.touches) {
-                clientX = evt.touches[0].clientX;
-                clientY = evt.touches[0].clientY;
-            } else {
-                clientX = evt.clientX;
-                clientY = evt.clientY;
-            }
-            return {
-                x: ((clientX - rect.left) / rect.width) * canvas.width,
-                y: ((clientY - rect.top) / rect.height) * canvas.height,
-            };
-        }
+      ctx.font = '18px Roboto, sans-serif';
+      ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, baseTextY + 140);
+      ctx.fillText('📸 Instagram: @night_food', centerX, baseTextY + 170);
 
-        canvas.addEventListener('mousedown', startDrag);
-        canvas.addEventListener('touchstart', startDrag);
-        canvas.addEventListener('mousemove', drag);
-        canvas.addEventListener('touchmove', drag);
-        canvas.addEventListener('mouseup', endDrag);
-        canvas.addEventListener('mouseleave', endDrag);
-        canvas.addEventListener('touchend', endDrag);
-        canvas.addEventListener('touchcancel', endDrag);
+      // Valor centralizado, moderno
+      const valor = valorInput.value.trim();
+      if (valor) {
+        ctx.font = 'bold 64px "Poppins", sans-serif';
+        ctx.fillStyle = '#f8b500';
+        ctx.fillText(`R$ ${valor}`, centerX, baseTextY - 40);
+      }
 
-        function startDrag(evt) {
-            evt.preventDefault();
-            const pos = getTouchPos(canvas, evt);
-            const description = descriptionInput.value.trim();
-            const valor = valorInput.value.trim();
-            if (
-                description &&
-                isInsideText(pos.x, pos.y, descPos.x, descPos.y, 36, description)
-            ) {
-                dragging = 'desc';
-                dragOffset.x = pos.x - descPos.x;
-                dragOffset.y = pos.y - descPos.y;
-            } else if (
-                valor &&
-                isInsideText(pos.x, pos.y, valorPos.x, valorPos.y, 40, `R$ ${valor}`)
-            ) {
-                dragging = 'valor';
-                dragOffset.x = pos.x - valorPos.x;
-                dragOffset.y = pos.y - valorPos.y;
-            }
-        }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
 
-        function drag(evt) {
-            if (!dragging) return;
-            evt.preventDefault();
-            const pos = getTouchPos(canvas, evt);
-            if (dragging === 'desc') {
-                descPos.x = pos.x - dragOffset.x;
-                descPos.y = pos.y - dragOffset.y;
-            } else if (dragging === 'valor') {
-                valorPos.x = pos.x - dragOffset.x;
-                valorPos.y = pos.y - dragOffset.y;
-            }
-            drawCanvas();
-        }
+    function copyDescription() {
+      const description = descriptionInput.value.trim();
+      if (description) {
+        navigator.clipboard.writeText(description)
+          .then(() => alert("Descrição copiada para a área de transferência!"))
+          .catch(err => console.error("Erro ao copiar: ", err));
+      } else {
+        alert("Não há descrição para copiar.");
+      }
+    }
 
-        function endDrag(evt) {
-            dragging = null;
-        }
-
-        descriptionInput.addEventListener('input', () => drawCanvas());
-        valorInput.addEventListener('input', () => drawCanvas());
-        fundoCorInput.addEventListener('input', () => drawCanvas());
-        descCorInput.addEventListener('input', () => drawCanvas());
-        valorCorInput.addEventListener('input', () => drawCanvas());
-
-        downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'night-food.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        });
-
-        function copyDescription() {
-            const text = descriptionInput.value.trim();
-            if (text) {
-                navigator.clipboard.writeText(text).then(() => alert('Descrição copiada!'));
-            } else {
-                alert('Descrição vazia.');
-            }
-        }
-
-        function clearDescription() {
-            descriptionInput.value = '';
-            drawCanvas();
-        }
-    </script>
+    function clearDescription() {
+      descriptionInput.value = '';
+      localStorage.removeItem('description');
+      redrawCanvas();
+    }
+  </script>
 </body>
-</html>
+</html
+    
