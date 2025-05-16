@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Night Food - Personalize sua Imagem</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap"
+    rel="stylesheet"
+  />
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -21,7 +24,7 @@
     .card {
       background: white;
       border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
       padding: 20px;
       text-align: center;
       width: 100%;
@@ -33,9 +36,10 @@
       color: #333;
     }
 
-    input[type="file"],
-    input[type="number"],
-    textarea {
+    input[type='file'],
+    input[type='number'],
+    textarea,
+    input[type='color'] {
       margin-top: 10px;
       padding: 10px;
       font-size: 16px;
@@ -72,7 +76,9 @@
       margin-top: 20px;
       max-width: 100%;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      touch-action: none;
+      user-select: none;
     }
 
     .valor-container {
@@ -86,11 +92,30 @@
       text-align: center;
     }
 
+    .color-picker-container {
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
     @media (max-width: 480px) {
-      h2 { font-size: 20px; }
-      .valor-container { font-size: 18px; padding: 8px 16px; }
-      button { font-size: 13px; padding: 10px; }
-      textarea { height: 70px; }
+      h2 {
+        font-size: 20px;
+      }
+      .valor-container {
+        font-size: 18px;
+        padding: 8px 16px;
+      }
+      button {
+        font-size: 13px;
+        padding: 10px;
+      }
+      textarea {
+        height: 70px;
+      }
     }
   </style>
 </head>
@@ -99,7 +124,7 @@
     <h2>🍔 Night Food</h2>
     <p>Adicione sua imagem personalizada:</p>
 
-    <input type="file" id="upload" accept="image/*">
+    <input type="file" id="upload" accept="image/*" />
     <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
 
     <div class="buttons">
@@ -108,12 +133,17 @@
     </div>
 
     <div class="valor-container">
-      <label for="valor">Valor</label><br>
-      <input type="number" id="valor" placeholder="Digite o valor">
+      <label for="valor">Valor</label><br />
+      <input type="number" id="valor" placeholder="Digite o valor" />
+    </div>
+
+    <div class="color-picker-container">
+      <label for="faixaColor">Cor da faixa da marca d'água:</label>
+      <input type="color" id="faixaColor" value="#000000cc" />
     </div>
 
     <p>Upload da sua logo (PNG):</p>
-    <input type="file" id="logoUpload" accept="image/png">
+    <input type="file" id="logoUpload" accept="image/png" />
 
     <canvas id="canvas"></canvas>
     <button id="downloadBtn">📥 Baixar Imagem</button>
@@ -127,28 +157,63 @@
     const downloadBtn = document.getElementById('downloadBtn');
     const valorInput = document.getElementById('valor');
     const logoUpload = document.getElementById('logoUpload');
+    const faixaColorInput = document.getElementById('faixaColor');
 
-    function drawCanvas(imgSrc) {
-      const img = new Image();
-      img.onload = function () {
-        const size = 1000;
-        const scale = Math.min(size / img.width, size / img.height);
-        const newWidth = img.width * scale;
-        const newHeight = img.height * scale;
+    let img = new Image();
+    let logoImg = null;
 
-        const extraHeight = 140; // Espaço para a faixa de marca d'água
-        canvas.width = size;
-        canvas.height = size + extraHeight;
+    // Posições iniciais da descrição e valor (relativas ao canvas)
+    let descPos = { x: 500, y: 80 };
+    let valorPos = { x: 500, y: 140 };
+    let dragging = null; // "desc" ou "valor" ou null
+    let dragOffset = { x: 0, y: 0 };
 
-        const xOffset = (size - newWidth) / 2;
-        const yOffset = (size - newHeight) / 2;
+    // Carrega a logo para desenhar
+    function loadLogo(file) {
+      if (!file) {
+        logoImg = null;
+        redraw();
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const l = new Image();
+        l.onload = () => {
+          logoImg = l;
+          redraw();
+        };
+        l.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+    logoUpload.addEventListener('change', (e) => {
+      loadLogo(e.target.files[0]);
+    });
 
-        const centerX = canvas.width / 2;
-        const startY = size - 120;
+    // Redesenha tudo no canvas
+    function redraw() {
+      if (!img.src) return;
 
+      const size = 1000;
+      const scale = Math.min(size / img.width, size / img.height);
+      const newWidth = img.width * scale;
+      const newHeight = img.height * scale;
+
+      const extraHeight = 140; // altura da faixa
+
+      canvas.width = newWidth;
+      canvas.height = newHeight + extraHeight;
+
+      // Fundo transparente
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Desenha a imagem principal
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      // Desenha descrição
+      const description = descriptionInput.value.trim();
+      if (description) {
         ctx.globalAlpha = 1.0;
         ctx.textAlign = 'center';
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
@@ -156,64 +221,178 @@
         ctx.shadowOffsetY = 2;
         ctx.shadowBlur = 4;
 
-        const description = descriptionInput.value.trim();
-        if (description) {
-          ctx.font = 'italic 36px "Playfair Display", serif';
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillText(description, centerX, 80);
-        }
+        ctx.font = 'italic 36px "Playfair Display", serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillText(description, descPos.x, descPos.y);
+      }
 
-        const valor = valorInput.value.trim();
-        if (valor) {
-          ctx.font = 'bold 40px "Poppins", sans-serif';
-          ctx.fillStyle = '#f8b500';
-          ctx.fillText(`R$ ${valor}`, centerX, 140);
-        }
+      // Desenha valor
+      const valor = valorInput.value.trim();
+      if (valor) {
+        ctx.font = 'bold 40px "Poppins", sans-serif';
+        ctx.fillStyle = '#f8b500';
+        ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
+      }
 
-        // Logo (opcional)
-        const logoFile = logoUpload.files[0];
-        if (logoFile) {
-          const reader = new FileReader();
-          reader.onload = function (event) {
-            const logoImg = new Image();
-            logoImg.onload = function () {
-              const size = 120;
-              ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
-            };
-            logoImg.src = event.target.result;
-          };
-          reader.readAsDataURL(logoFile);
-        }
+      // Desenha logo (se existir)
+      if (logoImg) {
+        const logoSize = 120;
+        ctx.drawImage(logoImg, canvas.width - logoSize - 20, 20, logoSize, logoSize);
+      }
 
-        // Faixa preta com marca d'água abaixo da imagem
-        ctx.globalAlpha = 1.0;
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(0, canvas.height - extraHeight, canvas.width, extraHeight);
+      // Desenha faixa marca d'água com cor selecionada e largura igual à imagem
+      const faixaHeight = extraHeight;
+      let faixaColor = faixaColorInput.value;
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = faixaColor;
+      ctx.fillRect(0, newHeight, newWidth, faixaHeight);
 
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 28px Roboto';
-        ctx.fillText('🍔 Night Food', centerX, canvas.height - 100);
-        ctx.font = '22px Roboto';
-        ctx.fillText('Aceito Encomendas!', centerX, canvas.height - 70);
-        ctx.font = '18px Roboto';
-        ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, canvas.height - 45);
-        ctx.fillText('📸 Instagram: @night_food', centerX, canvas.height - 20);
-      };
-      img.src = imgSrc;
+      const centerX = newWidth / 2;
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 28px Roboto';
+      ctx.textAlign = 'center';
+      ctx.fillText('🍔 Night Food', centerX, newHeight + 40);
+      ctx.font = '22px Roboto';
+      ctx.fillText('Aceito Encomendas!', centerX, newHeight + 70);
+      ctx.font = '18px Roboto';
+      ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, newHeight + 95);
+      ctx.fillText('📸 Instagram: @night_food', centerX, newHeight + 120);
     }
 
+    // Função para verificar se clicou em texto da descrição ou valor (para drag)
+    function isPointInText(x, y, text, posX, posY, fontSize, fontStyle = '') {
+      ctx.font = `${fontStyle} ${fontSize}px ${
+        fontStyle.includes('italic') ? '"Playfair Display", serif' : '"Poppins", sans-serif'
+      }`;
+      const width = ctx.measureText(text).width;
+      const height = fontSize; // aproximado
+      // Considerando o ponto (posX, posY) como baseline do texto centralizado:
+      // Verifica se o clique está dentro da caixa delimitadora do texto
+      return x >= posX - width / 2 && x <= posX + width / 2 && y >= posY - height && y <= posY;
+    }
+
+    // Eventos de mouse para arrastar texto
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const description = descriptionInput.value.trim();
+      const valor = valorInput.value.trim();
+
+      if (description && isPointInText(x, y, description, descPos.x, descPos.y, 36, 'italic')) {
+        dragging = 'desc';
+        dragOffset.x = x - descPos.x;
+        dragOffset.y = y - descPos.y;
+      } else if (valor && isPointInText(x, y, `R$ ${valor}`, valorPos.x, valorPos.y, 40)) {
+        dragging = 'valor';
+        dragOffset.x = x - valorPos.x;
+        dragOffset.y = y - valorPos.y;
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (dragging === 'desc') {
+        descPos.x = x - dragOffset.x;
+        descPos.y = y - dragOffset.y;
+        redraw();
+      } else if (dragging === 'valor') {
+        valorPos.x = x - dragOffset.x;
+        valorPos.y = y - dragOffset.y;
+        redraw();
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      dragging = null;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      dragging = null;
+    });
+
+    // Para suporte mobile: toque
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      const description = descriptionInput.value.trim();
+      const valor = valorInput.value.trim();
+
+      if (description && isPointInText(x, y, description, descPos.x, descPos.y, 36, 'italic')) {
+        dragging = 'desc';
+        dragOffset.x = x - descPos.x;
+        dragOffset.y = y - descPos.y;
+        e.preventDefault();
+      } else if (valor && isPointInText(x, y, `R$ ${valor}`, valorPos.x, valorPos.y, 40)) {
+        dragging = 'valor';
+        dragOffset.x = x - valorPos.x;
+        dragOffset.y = y - valorPos.y;
+        e.preventDefault();
+      }
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!dragging || e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      if (dragging === 'desc') {
+        descPos.x = x - dragOffset.x;
+        descPos.y = y - dragOffset.y;
+        redraw();
+        e.preventDefault();
+      } else if (dragging === 'valor') {
+        valorPos.x = x - dragOffset.x;
+        valorPos.y = y - dragOffset.y;
+        redraw();
+        e.preventDefault();
+      }
+    });
+
+    canvas.addEventListener('touchend', () => {
+      dragging = null;
+    });
+
+    // Atualiza a imagem principal e redesenha
     upload.addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function (e) {
-        drawCanvas(e.target.result);
+        img = new Image();
+        img.onload = function () {
+          // Reset posições para centro padrão quando trocar imagem
+          descPos = { x: canvas.width / 2 || 500, y: 80 };
+          valorPos = { x: canvas.width / 2 || 500, y: 140 };
+          redraw();
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
 
+    // Sempre que mudar descrição, valor ou cor da faixa, redesenha
+    descriptionInput.addEventListener('input', redraw);
+    valorInput.addEventListener('input', redraw);
+    faixaColorInput.addEventListener('input', redraw);
+
     downloadBtn.addEventListener('click', function () {
+      if (!img.src) {
+        alert('Por favor, carregue uma imagem primeiro.');
+        return;
+      }
       const link = document.createElement('a');
       link.download = 'night-food.png';
       link.href = canvas.toDataURL('image/png');
@@ -223,15 +402,15 @@
     function copyDescription() {
       const text = descriptionInput.value.trim();
       if (text) {
-        navigator.clipboard.writeText(text)
-          .then(() => alert("Descrição copiada!"));
+        navigator.clipboard.writeText(text).then(() => alert('Descrição copiada!'));
       } else {
-        alert("Descrição vazia.");
+        alert('Descrição vazia.');
       }
     }
 
     function clearDescription() {
       descriptionInput.value = '';
+      redraw();
     }
   </script>
 </body>
