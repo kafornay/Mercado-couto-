@@ -1,170 +1,237 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Editor de Imagens</title>
+  <meta charset="UTF-8">
+  <title>Night Food - Personalize sua Imagem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
+      font-family: 'Roboto', sans-serif;
+      background: #fceabb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
       padding: 20px;
     }
-    canvas {
-      max-width: 100%;
-      border: 1px solid #ccc;
-      margin-top: 20px;
-    }
-    input, button {
-      margin: 10px 0;
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
       width: 100%;
-      padding: 10px;
+      max-width: 500px;
     }
-    img.preview {
-      max-width: 100%;
+
+    h2 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    input[type="file"],
+    input[type="number"],
+    textarea {
       margin-top: 10px;
-      display: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 80px;
+      resize: none;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      background-color: #f8b500;
+      border: none;
+      color: white;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .valor-container {
+      margin-top: 15px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      h2 { font-size: 20px; }
+      .valor-container { font-size: 18px; padding: 8px 16px; }
+      button { font-size: 13px; padding: 10px; }
+      textarea { height: 70px; }
     }
   </style>
 </head>
 <body>
+  <div class="card">
+    <h2>🍔 Night Food</h2>
+    <p>Adicione sua imagem personalizada:</p>
 
-  <h2>Editor de Imagem com Marca d'Água</h2>
+    <input type="file" id="upload" accept="image/*">
+    <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
 
-  <label>Imagem principal:</label>
-  <input type="file" id="upload" accept="image/*" />
+    <div class="buttons">
+      <button onclick="copyDescription()">📋 Copiar</button>
+      <button onclick="clearDescription()">🧹 Limpar</button>
+    </div>
 
-  <img id="previewImg" class="preview" />
+    <div class="valor-container">
+      <label for="valor">Valor</label><br>
+      <input type="number" id="valor" placeholder="Digite o valor">
+    </div>
 
-  <label>Logo (opcional):</label>
-  <input type="file" id="logoUpload" accept="image/*" />
-  <img id="previewLogo" class="preview" />
+    <p>Upload da sua logo (PNG):</p>
+    <input type="file" id="logoUpload" accept="image/png">
 
-  <label>Descrição:</label>
-  <input type="text" id="description" placeholder="Ex: Celular Samsung 128GB" />
-
-  <label>Valor:</label>
-  <input type="text" id="value" placeholder="Ex: 1.299,99" />
-
-  <button onclick="generateImage()">Gerar Imagem com Marca d'Água</button>
-  <button onclick="copyDescription()">📋 Copiar Descrição</button>
-
-  <canvas id="canvas"></canvas>
+    <canvas id="canvas"></canvas>
+    <button id="downloadBtn">📥 Baixar Imagem</button>
+  </div>
 
   <script>
     const upload = document.getElementById('upload');
-    const logoUpload = document.getElementById('logoUpload');
-    const previewImg = document.getElementById('previewImg');
-    const previewLogo = document.getElementById('previewLogo');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const descriptionInput = document.getElementById('description');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const valorInput = document.getElementById('valor');
+    const logoUpload = document.getElementById('logoUpload');
+
+    function drawCanvas(imgSrc) {
+      const img = new Image();
+      img.onload = function () {
+        const size = 1000;
+        const scale = Math.min(size / img.width, size / img.height);
+        const newWidth = img.width * scale;
+        const newHeight = img.height * scale;
+
+        const extraHeight = 140; // Espaço para a faixa de marca d'água
+        canvas.width = size;
+        canvas.height = size + extraHeight;
+
+        const xOffset = (size - newWidth) / 2;
+        const yOffset = (size - newHeight) / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+
+        const centerX = canvas.width / 2;
+        const startY = size - 120;
+
+        ctx.globalAlpha = 1.0;
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.shadowBlur = 4;
+
+        const description = descriptionInput.value.trim();
+        if (description) {
+          ctx.font = 'italic 36px "Playfair Display", serif';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.fillText(description, centerX, 80);
+        }
+
+        const valor = valorInput.value.trim();
+        if (valor) {
+          ctx.font = 'bold 40px "Poppins", sans-serif';
+          ctx.fillStyle = '#f8b500';
+          ctx.fillText(`R$ ${valor}`, centerX, 140);
+        }
+
+        // Logo (opcional)
+        const logoFile = logoUpload.files[0];
+        if (logoFile) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const logoImg = new Image();
+            logoImg.onload = function () {
+              const size = 120;
+              ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
+            };
+            logoImg.src = event.target.result;
+          };
+          reader.readAsDataURL(logoFile);
+        }
+
+        // Faixa preta com marca d'água abaixo da imagem
+        ctx.globalAlpha = 1.0;
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(0, canvas.height - extraHeight, canvas.width, extraHeight);
+
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 28px Roboto';
+        ctx.fillText('🍔 Night Food', centerX, canvas.height - 100);
+        ctx.font = '22px Roboto';
+        ctx.fillText('Aceito Encomendas!', centerX, canvas.height - 70);
+        ctx.font = '18px Roboto';
+        ctx.fillText('📱 WhatsApp: 21 99423-1834', centerX, canvas.height - 45);
+        ctx.fillText('📸 Instagram: @night_food', centerX, canvas.height - 20);
+      };
+      img.src = imgSrc;
+    }
 
     upload.addEventListener('change', function () {
       const file = this.files[0];
-      if (!file || !file.type.startsWith('image/')) {
-        alert('Por favor, selecione uma imagem válida.');
-        return;
-      }
-
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        previewImg.style.display = 'block';
+        drawCanvas(e.target.result);
       };
       reader.readAsDataURL(file);
     });
 
-    logoUpload.addEventListener('change', function () {
-      const file = this.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          previewLogo.src = e.target.result;
-          previewLogo.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
+    downloadBtn.addEventListener('click', function () {
+      const link = document.createElement('a');
+      link.download = 'night-food.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     });
-
-    function generateImage() {
-      const description = document.getElementById('description').value.trim();
-      const valor = document.getElementById('value').value.trim();
-
-      const file = upload.files[0];
-      if (!file) {
-        alert('Selecione uma imagem antes de gerar.');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = new Image();
-        img.onload = function () {
-          const extraHeight = 60;
-          canvas.width = img.width;
-          canvas.height = img.height + extraHeight;
-
-          ctx.drawImage(img, 0, 0);
-
-          // Logo (se houver)
-          const logoFile = logoUpload.files[0];
-          if (logoFile) {
-            const logoReader = new FileReader();
-            logoReader.onload = function (event) {
-              const logoImg = new Image();
-              logoImg.onload = function () {
-                const size = 100;
-                ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
-              };
-              logoImg.src = event.target.result;
-            };
-            logoReader.readAsDataURL(logoFile);
-          }
-
-          // Descrição e valor (sobre a imagem)
-          ctx.font = 'bold 40px Poppins, sans-serif';
-          ctx.fillStyle = '#f8b500';
-          ctx.textAlign = 'center';
-
-          const centerX = canvas.width / 2;
-          const startY = 80;
-
-          if (description) {
-            ctx.fillText(description, centerX, startY);
-          }
-
-          if (valor) {
-            ctx.fillStyle = '#28a745';
-            ctx.fillText(`R$ ${valor}`, centerX, startY + 50);
-          }
-
-          // Faixa inferior para marca d’água
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-          ctx.fillRect(0, img.height, canvas.width, extraHeight);
-
-          // Marca d’água
-          ctx.font = 'bold 20px Roboto';
-          ctx.fillStyle = 'white';
-          ctx.textAlign = 'center';
-          ctx.fillText('Minha Marca D\'Água', canvas.width / 2, img.height + extraHeight / 2 + 7);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
 
     function copyDescription() {
-      const text = document.getElementById('description').value.trim();
-      if (!text) {
-        alert('⚠️ Descrição vazia.');
-        return;
+      const text = descriptionInput.value.trim();
+      if (text) {
+        navigator.clipboard.writeText(text)
+          .then(() => alert("Descrição copiada!"));
+      } else {
+        alert("Descrição vazia.");
       }
-      navigator.clipboard.writeText(text)
-        .then(() => alert('✅ Descrição copiada!'))
-        .catch(err => {
-          alert('Erro ao copiar.');
-          console.error(err);
-        });
+    }
+
+    function clearDescription() {
+      descriptionInput.value = '';
     }
   </script>
 </body>
