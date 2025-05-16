@@ -10,16 +10,15 @@
   />
   <style>
     body {
-      font-family: "Roboto", sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: #fceabb;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       min-height: 100vh;
       margin: 0;
-      padding: 20px 10px 40px;
-      user-select: none;
+      padding: 20px;
     }
 
     .card {
@@ -35,13 +34,11 @@
     h2 {
       font-size: 24px;
       color: #333;
-      margin-bottom: 10px;
     }
 
-    input[type="file"],
-    input[type="number"],
-    textarea,
-    input[type="color"] {
+    input[type='file'],
+    input[type='number'],
+    textarea {
       margin-top: 10px;
       padding: 10px;
       font-size: 16px;
@@ -61,41 +58,17 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 10px;
-      justify-content: center;
     }
 
     button {
-      padding: 12px 16px;
+      flex: 1;
+      padding: 12px;
       background-color: #f8b500;
       border: none;
       color: white;
       font-size: 14px;
       border-radius: 8px;
       cursor: pointer;
-      flex: 1 1 45%;
-      max-width: 120px;
-      user-select: none;
-    }
-
-    .move-buttons {
-      display: grid;
-      grid-template-columns: 40px 40px 40px;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 15px;
-      user-select: none;
-    }
-
-    .move-buttons button {
-      padding: 8px 0;
-      font-size: 18px;
-      max-width: none;
-      flex: none;
-    }
-
-    .selected {
-      border: 2px solid #f8b500;
-      border-radius: 8px;
     }
 
     canvas {
@@ -103,19 +76,27 @@
       max-width: 100%;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      touch-action: none;
+      touch-action: none; /* importante para touch */
     }
 
-    label {
-      margin-top: 12px;
-      font-weight: 600;
-      display: block;
-      text-align: left;
+    .valor-container {
+      margin-top: 15px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
     }
 
     @media (max-width: 480px) {
       h2 {
         font-size: 20px;
+      }
+      .valor-container {
+        font-size: 18px;
+        padding: 8px 16px;
       }
       button {
         font-size: 13px;
@@ -123,13 +104,6 @@
       }
       textarea {
         height: 70px;
-      }
-      .move-buttons {
-        grid-template-columns: 30px 30px 30px;
-        gap: 4px;
-      }
-      .move-buttons button {
-        font-size: 16px;
       }
     }
   </style>
@@ -140,298 +114,241 @@
     <p>Adicione sua imagem personalizada:</p>
 
     <input type="file" id="upload" accept="image/*" />
-
     <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
 
-    <label for="valor">Valor</label>
-    <input type="number" id="valor" placeholder="Digite o valor" />
+    <div class="buttons">
+      <button onclick="copyDescription()">📋 Copiar</button>
+      <button onclick="clearDescription()">🧹 Limpar</button>
+    </div>
+
+    <div class="valor-container">
+      <label for="valor">Valor</label><br />
+      <input type="number" id="valor" placeholder="Digite o valor" />
+    </div>
 
     <p>Upload da sua logo (PNG):</p>
     <input type="file" id="logoUpload" accept="image/png" />
-
-    <label for="faixaColor">Cor da faixa da marca d'água:</label>
-    <input type="color" id="faixaColor" value="#000000" />
-
-    <div class="buttons">
-      <button onclick="copyDescription()">📋 Copiar descrição</button>
-      <button onclick="clearDescription()">🧹 Limpar descrição</button>
-      <button onclick="resetPositions()">🔄 Resetar posições</button>
-    </div>
-
-    <p style="margin-top:15px; font-weight:600;">Toque na descrição ou valor para selecionar e mover:</p>
-    <div class="move-buttons">
-      <button onclick="moveSelected('up')">⬆️</button>
-      <button onclick="moveSelected('left')">⬅️</button>
-      <button onclick="moveSelected('right')">➡️</button>
-      <button onclick="moveSelected('down')">⬇️</button>
-    </div>
 
     <canvas id="canvas"></canvas>
     <button id="downloadBtn">📥 Baixar Imagem</button>
   </div>
 
   <script>
-    const upload = document.getElementById("upload");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const descriptionInput = document.getElementById("description");
-    const valorInput = document.getElementById("valor");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const logoUpload = document.getElementById("logoUpload");
-    const faixaColorInput = document.getElementById("faixaColor");
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const descriptionInput = document.getElementById('description');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const valorInput = document.getElementById('valor');
+    const logoUpload = document.getElementById('logoUpload');
 
-    // Posições iniciais dos textos (relativo ao canvas)
-    let descriptionPos = { x: 500, y: 80 }; // centro superior
-    let valorPos = { x: 500, y: 140 };
-
-    // Controle da imagem
-    let baseImg = null;
+    let img = new Image();
     let logoImg = null;
 
-    // Faixa cor
-    let faixaColor = faixaColorInput.value;
+    // Posições iniciais da descrição e valor (centralizados)
+    let descPos = { x: 500, y: 80 };
+    let valorPos = { x: 500, y: 140 };
 
-    // Texto selecionado para mover: 'description', 'valor', null
-    let selectedText = null;
+    let dragging = null; // "desc" ou "valor" ou null
+    let dragOffset = { x: 0, y: 0 };
 
-    // Tamanho base canvas
-    const baseSize = 1000;
-    const extraHeight = 140;
+    function drawCanvas() {
+      if (!img.src) return;
 
-    // Atualiza a faixa ao mudar cor
-    faixaColorInput.addEventListener("input", () => {
-      faixaColor = faixaColorInput.value;
-      redrawCanvas();
-    });
+      const size = 1000;
+      const scale = Math.min(size / img.width, size / img.height);
+      const newWidth = img.width * scale;
+      const newHeight = img.height * scale;
 
-    // Atualiza quando texto mudar
-    descriptionInput.addEventListener("input", () => {
-      redrawCanvas();
-    });
-    valorInput.addEventListener("input", () => {
-      redrawCanvas();
-    });
+      const extraHeight = 140;
+      canvas.width = size;
+      canvas.height = size + extraHeight;
 
-    // Upload imagem principal
-    upload.addEventListener("change", function () {
+      const xOffset = (size - newWidth) / 2;
+      const yOffset = (size - newHeight) / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+
+      // Faixa preta com marca d'água abaixo da imagem (respeitando o tamanho real da imagem)
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(0, size, canvas.width, extraHeight);
+
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 28px Roboto';
+      ctx.textAlign = 'center';
+      ctx.fillText('🍔 Night Food', canvas.width / 2, size + 40);
+      ctx.font = '22px Roboto';
+      ctx.fillText('Aceito Encomendas!', canvas.width / 2, size + 70);
+      ctx.font = '18px Roboto';
+      ctx.fillText('📱 WhatsApp: 21 99423-1834', canvas.width / 2, size + 95);
+      ctx.fillText('📸 Instagram: @night_food', canvas.width / 2, size + 120);
+
+      // Descrição
+      const description = descriptionInput.value.trim();
+      if (description) {
+        ctx.font = 'italic 36px "Playfair Display", serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.shadowBlur = 4;
+        ctx.fillText(description, descPos.x, descPos.y);
+      }
+
+      // Valor
+      const valor = valorInput.value.trim();
+      if (valor) {
+        ctx.font = 'bold 40px "Poppins", sans-serif';
+        ctx.fillStyle = '#f8b500';
+        ctx.textAlign = 'center';
+        ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
+      }
+
+      // Logo (opcional)
+      if (logoImg) {
+        const size = 120;
+        ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
+      }
+    }
+
+    upload.addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function (e) {
-        baseImg = new Image();
-        baseImg.onload = () => {
-          redrawCanvas();
-        };
-        baseImg.src = e.target.result;
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
 
-    // Upload logo
-    logoUpload.addEventListener("change", function () {
+    logoUpload.addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function (e) {
         logoImg = new Image();
-        logoImg.onload = () => {
-          redrawCanvas();
-        };
+        logoImg.onload = () => drawCanvas();
         logoImg.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
 
-    // Selecionar texto para mover ao tocar na textarea/input
-    descriptionInput.addEventListener("focus", () => {
-      selectedText = "description";
-      highlightSelected();
-    });
-    valorInput.addEventListener("focus", () => {
-      selectedText = "valor";
-      highlightSelected();
-    });
+    img.onload = () => drawCanvas();
 
-    // Remove seleção se clicar fora
-    document.body.addEventListener("click", (e) => {
-      if (
-        e.target !== descriptionInput &&
-        e.target !== valorInput &&
-        !document.querySelector(".move-buttons").contains(e.target)
-      ) {
-        selectedText = null;
-        highlightSelected();
-      }
-    });
+    // Detectar toque ou mouse para arrastar descrição ou valor
 
-    function highlightSelected() {
-      if (selectedText === "description") {
-        descriptionInput.classList.add("selected");
-        valorInput.classList.remove("selected");
-      } else if (selectedText === "valor") {
-        valorInput.classList.add("selected");
-        descriptionInput.classList.remove("selected");
+    function isInsideText(x, y, textX, textY, fontSize, text) {
+      // Estimativa simples da área do texto (retângulo)
+      const width = ctx.measureText(text).width;
+      const height = fontSize; // aproximado
+      return (
+        x >= textX - width / 2 &&
+        x <= textX + width / 2 &&
+        y >= textY - height &&
+        y <= textY
+      );
+    }
+
+    function getTouchPos(canvas, evt) {
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+
+      if (evt.touches) {
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
       } else {
-        descriptionInput.classList.remove("selected");
-        valorInput.classList.remove("selected");
+        clientX = evt.clientX;
+        clientY = evt.clientY;
       }
+
+      return {
+        x: ((clientX - rect.left) / rect.width) * canvas.width,
+        y: ((clientY - rect.top) / rect.height) * canvas.height,
+      };
     }
 
-    // Move o texto selecionado 10px por clique
-    function moveSelected(direction) {
-      if (!selectedText) {
-        alert("Selecione a descrição ou o valor primeiro (toque no campo).");
-        return;
-      }
-      const moveAmount = 10;
-      if (selectedText === "description") {
-        switch (direction) {
-          case "up":
-            descriptionPos.y = Math.max(20, descriptionPos.y - moveAmount);
-            break;
-          case "down":
-            descriptionPos.y = Math.min(canvas.height - 160, descriptionPos.y + moveAmount);
-            break;
-          case "left":
-            descriptionPos.x = Math.max(20, descriptionPos.x - moveAmount);
-            break;
-          case "right":
-            descriptionPos.x = Math.min(canvas.width - 20, descriptionPos.x + moveAmount);
-            break;
-        }
-      } else if (selectedText === "valor") {
-        switch (direction) {
-          case "up":
-            valorPos.y = Math.max(20, valorPos.y - moveAmount);
-            break;
-          case "down":
-            valorPos.y = Math.min(canvas.height - 160, valorPos.y + moveAmount);
-            break;
-          case "left":
-            valorPos.x = Math.max(20, valorPos.x - moveAmount);
-            break;
-          case "right":
-            valorPos.x = Math.min(canvas.width - 20, valorPos.x + moveAmount);
-            break;
-        }
-      }
-      redrawCanvas();
-    }
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('touchstart', startDrag);
 
-    // Resetar posições ao padrão
-    function resetPositions() {
-      descriptionPos = { x: 500, y: 80 };
-      valorPos = { x: 500, y: 140 };
-      faixaColor = "#000000";
-      faixaColorInput.value = faixaColor;
-      redrawCanvas();
-    }
+    canvas.addEventListener('mousemove', drag);
+    canvas.addEventListener('touchmove', drag);
 
-    // Desenha tudo no canvas
-    function redrawCanvas() {
-      if (!baseImg) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
+    canvas.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('mouseleave', endDrag);
+    canvas.addEventListener('touchend', endDrag);
+    canvas.addEventListener('touchcancel', endDrag);
 
-      // Tamanho e escala para manter proporção e colocar faixa abaixo
-      const scale = Math.min(baseSize / baseImg.width, baseSize / baseImg.height);
-      const newWidth = baseImg.width * scale;
-      const newHeight = baseImg.height * scale;
+    function startDrag(evt) {
+      evt.preventDefault();
+      const pos = getTouchPos(canvas, evt);
 
-      canvas.width = baseSize;
-      canvas.height = newHeight + extraHeight;
-
-      const xOffset = (canvas.width - newWidth) / 2;
-      const yOffset = 0;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Desenha imagem base
-      ctx.drawImage(baseImg, xOffset, yOffset, newWidth, newHeight);
-
-      // Faixa da marca d'água com cor customizável
-      ctx.fillStyle = faixaColor;
-      ctx.globalAlpha = 0.8;
-      ctx.fillRect(xOffset, newHeight, newWidth, extraHeight);
-      ctx.globalAlpha = 1.0;
-
-      // Texto da faixa (centralizado na faixa)
-      ctx.fillStyle = "white";
-      ctx.font = "bold 28px Roboto";
-      ctx.textAlign = "center";
-      const centerX = canvas.width / 2;
-      ctx.fillText("🍔 Night Food", centerX, newHeight + 45);
-      ctx.font = "22px Roboto";
-      ctx.fillText("Aceito Encomendas!", centerX, newHeight + 80);
-      ctx.font = "18px Roboto";
-      ctx.fillText("📱 WhatsApp: 21 99423-1834", centerX, newHeight + 105);
-      ctx.fillText("📸 Instagram: @night_food", centerX, newHeight + 130);
-
-      // Texto descrição, com sombra, na posição atual
       const description = descriptionInput.value.trim();
-      if (description) {
-        ctx.font = 'italic 36px "Playfair Display", serif';
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.shadowColor = "rgba(0,0,0,0.6)";
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        ctx.shadowBlur = 4;
-        ctx.textAlign = "center";
-        ctx.fillText(description, descriptionPos.x, descriptionPos.y);
-        ctx.shadowBlur = 0;
-      }
-
-      // Texto valor, com sombra, na posição atual
       const valor = valorInput.value.trim();
-      if (valor) {
-        ctx.font = 'bold 40px "Poppins", sans-serif';
-        ctx.fillStyle = "#f8b500";
-        ctx.shadowColor = "rgba(0,0,0,0.6)";
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        ctx.shadowBlur = 4;
-        ctx.textAlign = "center";
-        ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
-        ctx.shadowBlur = 0;
-      }
 
-      // Desenha logo no canto superior direito (se existir)
-      if (logoImg) {
-        const logoSize = 120;
-        ctx.drawImage(logoImg, canvas.width - logoSize - 20, 20, logoSize, logoSize);
+      if (
+        description &&
+        isInsideText(pos.x, pos.y, descPos.x, descPos.y, 36, description)
+      ) {
+        dragging = 'desc';
+        dragOffset.x = pos.x - descPos.x;
+        dragOffset.y = pos.y - descPos.y;
+      } else if (
+        valor &&
+        isInsideText(pos.x, pos.y, valorPos.x, valorPos.y, 40, `R$ ${valor}`)
+      ) {
+        dragging = 'valor';
+        dragOffset.x = pos.x - valorPos.x;
+        dragOffset.y = pos.y - valorPos.y;
       }
     }
 
-    // Botão baixar
-    downloadBtn.addEventListener("click", () => {
-      if (!baseImg) {
-        alert("Por favor, envie uma imagem primeiro.");
-        return;
+    function drag(evt) {
+      if (!dragging) return;
+      evt.preventDefault();
+      const pos = getTouchPos(canvas, evt);
+      if (dragging === 'desc') {
+        descPos.x = pos.x - dragOffset.x;
+        descPos.y = pos.y - dragOffset.y;
+      } else if (dragging === 'valor') {
+        valorPos.x = pos.x - dragOffset.x;
+        valorPos.y = pos.y - dragOffset.y;
       }
-      const link = document.createElement("a");
-      link.download = "night-food.png";
-      link.href = canvas.toDataURL("image/png");
+      drawCanvas();
+    }
+
+    function endDrag(evt) {
+      dragging = null;
+    }
+
+    // Atualizar canvas quando o texto mudar
+    descriptionInput.addEventListener('input', () => drawCanvas());
+    valorInput.addEventListener('input', () => drawCanvas());
+
+    // Download da imagem
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'night-food.png';
+      link.href = canvas.toDataURL('image/png');
       link.click();
     });
 
-    // Funções para copiar e limpar descrição
     function copyDescription() {
       const text = descriptionInput.value.trim();
       if (text) {
-        navigator.clipboard.writeText(text).then(() => alert("Descrição copiada!"));
+        navigator.clipboard.writeText(text).then(() => alert('Descrição copiada!'));
       } else {
-        alert("Descrição vazia.");
+        alert('Descrição vazia.');
       }
     }
 
     function clearDescription() {
-      descriptionInput.value = "";
-      redrawCanvas();
+      descriptionInput.value = '';
+      drawCanvas();
     }
-
-    // Inicializa canvas vazio
-    redrawCanvas();
   </script>
 </body>
 </html>
