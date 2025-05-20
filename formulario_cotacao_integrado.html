@@ -147,6 +147,11 @@
     </div>
 
     <div class="field">
+      <label for="valorMinimo">Valor mínimo de pedido (R$):</label>
+      <input type="number" id="valorMinimo" step="0.01" placeholder="Ex: 100.00" required />
+    </div>
+
+    <div class="field">
       <label for="dataEntrega">Data de Entrega:</label>
       <input type="date" id="dataEntrega" required />
     </div>
@@ -267,13 +272,14 @@
     sendDataBtn.addEventListener("click", () => {
       const empresa = document.getElementById("empresa").value;
       const dataEntrega = document.getElementById("dataEntrega").value;
+      const valorMinimo = document.getElementById("valorMinimo").value;
 
-      if (!empresa || !dataEntrega || itens.length === 0) {
-        alert("Informe o nome da empresa, a data de entrega e adicione ao menos um item.");
+      if (!empresa || !dataEntrega || !valorMinimo || itens.length === 0) {
+        alert("Preencha todos os campos e adicione ao menos um item.");
         return;
       }
 
-      let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n\n`;
+      let mensagem = `🛒 *Cotação Mercado Couto*\n\n*Empresa:* ${empresa}\n*Entrega:* ${dataEntrega}\n*Valor mínimo:* R$ ${parseFloat(valorMinimo).toFixed(2)}\n\n`;
       let total = 0;
 
       itens.forEach(item => {
