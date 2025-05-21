@@ -138,6 +138,7 @@
 
   <script>
     const cotacoes = [];
+    let todosPrecos = {}; // Armazena todos os preços por produto (alterado de const para let)
 
     document.getElementById('adicionarBtn').addEventListener('click', adicionarCotacao);
 
@@ -158,7 +159,8 @@
 
     function filtrarMelhoresPrecos() {
       const precosMap = new Map();
-      const fornecedores = {};
+      const fornecedoresMap = {};
+      todosPrecos = {}; // Reinicializa para a nova filtragem
 
       cotacoes.forEach(txt => {
         const empresaMatch = txt.match(/\*Empresa:\* (.+)/);
@@ -172,29 +174,173 @@
           const valorMatch = linhas.find(l => l.includes('Valor unitário'))?.match(/R\$\s*([\d,\.]+)/);
           const valor = valorMatch ? parseFloat(valorMatch[1].replace(',', '.')) : Infinity;
           if (!nome) return;
-          if (!precosMap.has(nome) || precosMap.get(nome).valor > valor) {
+
+          if (!todosPrecos[nome]) {
+            todosPrecos[nome] = [];
+          }
+          todosPrecos[nome].push({ empresa, valor, texto: bloco.trim() });
+
+          const melhor = precosMap.get(nome);
+          if (!melhor || melhor.valor > valor) {
             precosMap.set(nome, { valor, empresa, texto: bloco.trim() });
           }
         });
       });
 
-      const resultadoDiv = document.getElementById('resultado');
-      resultadoDiv.innerHTML = '';
-      const fornecedoresMap = {};
-      precosMap.forEach(({ empresa, texto }) => {
-        if (!fornecedoresMap[empresa]) fornecedoresMap[empresa] = [];
-        fornecedoresMap[empresa].push(texto);
+      precosMap.forEach(({ empresa, texto }, nome) => {
+        if (!fornecedoresMap[empresa]) {
+          fornecedoresMap[empresa] = [];
+        }
+        fornecedoresMap[empresa].push({ nome, texto }); // Guarda o nome do produto também
       });
 
-      for (let [empresa, itens] of Object.entries(fornecedoresMap)) {
+      renderFornecedores(fornecedoresMap);
+    }
+
+    function renderFornecedores(fornecedoresMap) {
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = ''; // Limpa resultados anteriores
+
+      Object.entries(fornecedoresMap).forEach(([empresa, itens]) => {
         const div = document.createElement('div');
         div.className = 'fornecedor';
-        div.innerHTML = `<h3>${empresa}</h3><ul>${itens.map(i => `<li>${i.replace(/\n/g, '<br>')}</li>`).join('')}</ul>`;
-        const msg = encodeURIComponent(`Pedido ${empresa}:\n` + itens.join('\n\n'));
-        div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msg}' target='_blank'>Compartilhar via WhatsApp</a>`;
+        div.setAttribute('data-empresa', empresa);
+
+        // Mapeia os itens para HTML, incluindo o botão de remover
+        const itensHtml = itens.map(({ nome, texto }) => `
+          <li data-produto="${nome.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
+            ${texto.replace(/\n/g, '<br>')}
+            <br><button onclick="removerItem('${empresa.replace(/'/g, "\\'")}', '${nome.replace(/'/g, "\\'")}')">Remover item</button>
+          </li>`).join('');
+        
+        div.innerHTML = `<h3>${empresa}</h3><ul>${itensHtml}</ul>`;
+
+        // Atualiza a mensagem do WhatsApp para incluir apenas os textos dos itens atuais
+        const msgWhatsapp = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i => i.texto).join('\n\n'));
+        div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msgWhatsapp}' target='_blank'>Compartilhar via WhatsApp</a>`;
         resultadoDiv.appendChild(div);
+      });
+
+      // Cria a seção para itens sem alternativa, se não existir
+      if (!document.getElementById('semAlternativa')) {
+        const altDiv = document.createElement('div');
+        altDiv.id = 'semAlternativa';
+        altDiv.className = 'fornecedor'; // Reutiliza a classe para consistência de estilo
+        altDiv.innerHTML = `<h3>Itens sem fornecedor alternativo (após remoção):</h3><ul></ul>`;
+        resultadoDiv.appendChild(altDiv); // Adiciona ao final da div de resultados
+      } else {
+        // Limpa a lista de itens sem alternativa se já existir, para não acumular de execuções anteriores
+         document.querySelector('#semAlternativa ul').innerHTML = '';
       }
     }
+
+    function removerItem(empresaOriginal, nomeProduto) {
+      const blocoItem = document.querySelector(`.fornecedor[data-empresa='${empresaOriginal}'] li[data-produto='${nomeProduto.replace(/'/g, "\\'").replace(/"/g, "&quot;")}']`);
+      if (!blocoItem) return;
+
+      const fornecedorDivOriginal = blocoItem.closest('.fornecedor');
+      blocoItem.remove(); // Remove o item da lista do fornecedor original
+
+      // Atualizar link do WhatsApp do fornecedor original
+      const itensRestantesOriginal = fornecedorDivOriginal.querySelectorAll('li');
+      if (itensRestantesOriginal.length === 0) {
+        fornecedorDivOriginal.remove(); // Remove o card do fornecedor se não tiver mais itens
+      } else {
+        const textosRestantes = Array.from(itensRestantesOriginal).map(li => {
+            // Extrai o texto original do item, precisa ser cuidadoso aqui para pegar o texto correto antes do botão
+            // Esta é uma simplificação. Idealmente, o 'texto' original do item seria armazenado de forma mais robusta.
+            // Para este exemplo, vamos assumir que o texto do item é o conteúdo do li antes do <br><button>
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = li.innerHTML;
+            tempDiv.querySelector('button')?.remove(); // Remove o botão
+            tempDiv.querySelector('br')?.remove(); // Remove o <br> antes do botão
+            return tempDiv.innerText.trim(); 
+        });
+        const novaMsgWhatsapp = encodeURIComponent(`Pedido ${empresaOriginal}:\n` + textosRestantes.join('\n\n'));
+        const waLinkOriginal = fornecedorDivOriginal.querySelector('.whatsapp');
+        if (waLinkOriginal) waLinkOriginal.href = `https://wa.me/?text=${novaMsgWhatsapp}`;
+      }
+
+      // Tenta realocar o item
+      const alternativas = (todosPrecos[nomeProduto] || [])
+                            .filter(p => p.empresa !== empresaOriginal)
+                            .sort((a, b) => a.valor - b.valor);
+
+      if (alternativas.length > 0) {
+        const novaMelhorAlternativa = alternativas[0];
+        let divFornecedorAlternativo = document.querySelector(`.fornecedor[data-empresa='${novaMelhorAlternativa.empresa}']`);
+
+        if (!divFornecedorAlternativo) { // Se o fornecedor alternativo não tem um card ainda
+          divFornecedorAlternativo = document.createElement('div');
+          divFornecedorAlternativo.className = 'fornecedor';
+          divFornecedorAlternativo.setAttribute('data-empresa', novaMelhorAlternativa.empresa);
+          divFornecedorAlternativo.innerHTML = `<h3>${novaMelhorAlternativa.empresa}</h3><ul></ul><a class='whatsapp' href='https://wa.me/?text=' target='_blank'>Compartilhar via WhatsApp</a>`;
+          document.getElementById('resultado').insertBefore(divFornecedorAlternativo, document.getElementById('semAlternativa'));
+        }
+
+        const ulAlternativo = divFornecedorAlternativo.querySelector('ul');
+        const novoItemHtml = `
+          <li data-produto="${nomeProduto.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
+            ${novaMelhorAlternativa.texto.replace(/\n/g, '<br>')}
+            <br><button onclick="removerItem('${novaMelhorAlternativa.empresa.replace(/'/g, "\\'")}', '${nomeProduto.replace(/'/g, "\\'")}')">Remover item</button>
+          </li>`;
+        ulAlternativo.innerHTML += novoItemHtml;
+
+        // Atualizar link do WhatsApp do fornecedor alternativo
+        const itensFornecedorAlternativo = divFornecedorAlternativo.querySelectorAll('li');
+        const textosAlternativos = Array.from(itensFornecedorAlternativo).map(li => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = li.innerHTML;
+            tempDiv.querySelector('button')?.remove();
+            tempDiv.querySelector('br')?.remove();
+            return tempDiv.innerText.trim();
+        });
+        const msgWhatsappAlternativo = encodeURIComponent(`Pedido ${novaMelhorAlternativa.empresa}:\n` + textosAlternativos.join('\n\n'));
+        const waLinkAlternativo = divFornecedorAlternativo.querySelector('.whatsapp');
+        if (waLinkAlternativo) waLinkAlternativo.href = `https://wa.me/?text=${msgWhatsappAlternativo}`;
+
+      } else {
+        // Adiciona à lista de "sem alternativa"
+        const semAltUl = document.querySelector('#semAlternativa ul');
+        if (semAltUl) { // Verifica se a ul existe
+            // Evitar duplicados na lista de "sem alternativa"
+            const existente = Array.from(semAltUl.querySelectorAll('li')).some(li => li.textContent === nomeProduto);
+            if (!existente) {
+                semAltUl.innerHTML += `<li>${nomeProduto}</li>`;
+            }
+        }
+      }
+    }
+
+    // Esta função não é usada diretamente pelo fluxo de removerItem no código fornecido,
+    // mas pode ser útil para outros propósitos ou se a lógica de renderização for centralizada.
+    // No momento, `removerItem` manipula o DOM diretamente ou cria novos elementos de fornecedor.
+    /*
+    function getFornecedoresMap() {
+      const map = {};
+      document.querySelectorAll('.fornecedor[data-empresa]').forEach(fornecedorDiv => {
+        const empresa = fornecedorDiv.getAttribute('data-empresa');
+        if (!empresa) return; // Pula se for o div "semAlternativa" sem data-empresa
+        
+        map[empresa] = [];
+        const itensLi = fornecedorDiv.querySelectorAll('li');
+        itensLi.forEach(li => {
+          const nomeProduto = li.getAttribute('data-produto');
+          // Recriar o 'texto' do item pode ser complexo se ele foi modificado
+          // Esta é uma simplificação e pode não pegar o 'texto' original completo.
+          let textoItem = li.innerHTML; 
+          const btnIndex = textoItem.indexOf('<br><button');
+          if (btnIndex !== -1) {
+            textoItem = textoItem.substring(0, btnIndex);
+          }
+          textoItem = textoItem.replace(/<br>/g, '\n').trim(); // Reverte <br> para \n para consistência com dados originais
+
+          map[empresa].push({ nome: nomeProduto, texto: textoItem });
+        });
+      });
+      return map;
+    }
+    */
 
     async function verificarFaltantes() {
       const faltandoDiv = document.getElementById('faltando');
@@ -213,7 +359,6 @@
         const response = await fetch("https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec");
         const dados = await response.json();
         const esperados = dados.map(item => item.produto?.toLowerCase().trim()).filter(Boolean);
-
         const naoRespondidos = esperados.filter(prod => !nomesCotados.has(prod));
 
         faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul>${naoRespondidos.map(n => `<li>${n}</li>`).join('') || '<li>Todos os itens foram respondidos!</li>'}</ul>`;
