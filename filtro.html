@@ -4,118 +4,182 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Filtro de Melhores Preços</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      background: #f4f6f8;
+      background: #f0f2f5; /* Tom de cinza mais claro e moderno para o fundo */
       color: #333;
+      line-height: 1.6;
     }
     .container {
       max-width: 960px;
-      margin: 20px auto;
+      margin: 30px auto; /* Aumentado margem superior/inferior */
       background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 25px; /* Levemente aumentado o padding */
+      border-radius: 10px; /* Bordas mais arredondadas */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Sombra mais suave */
     }
     h2 {
-      color: #2c3e50;
+      color: #1a2533; /* Tom mais escuro para o título principal */
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      font-weight: 700;
     }
     textarea {
-      width: calc(100% - 20px);
+      width: calc(100% - 22px); /* Ajustado para o padding */
       height: 150px;
       padding: 10px;
       font-size: 16px;
       border-radius: 6px;
-      border: 1px solid #ccc;
+      border: 1px solid #ced4da; /* Borda mais suave */
       resize: vertical;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    textarea:focus {
+      border-color: #007bff; /* Destaque azul ao focar */
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+      outline: none;
     }
     .input-actions {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 20px; /* Aumentado espaçamento */
     }
     .input-actions button {
-      background-color: #6c757d;
+      background-color: #6c757d; /* Cinza para ações secundárias */
       color: white;
-      padding: 8px 12px;
+      padding: 10px 15px; /* Ajuste no padding */
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 14px;
-      transition: background-color 0.3s ease;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
     }
     .input-actions button:hover {
       background-color: #5a6268;
     }
+    /* Estilo principal dos botões */
     button {
       display: inline-block;
       padding: 12px 24px;
       margin: 5px;
       border: none;
       border-radius: 6px;
-      background: #2c3e50;
+      background: #007bff; /* Azul primário moderno */
       color: white;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease;
+      font-weight: 500;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     button:hover {
-      background-color: #1a2533;
+      background-color: #0056b3; /* Tom mais escuro do azul no hover */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    #listaCotacoes, #faltando {
-      margin-top: 15px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background-color: #f9f9f9;
+    /* Botões de ação específicos podem herdar ou ter leves modificações */
+    #adicionarBtn {
+        /* Já usa o estilo padrão de button */
+    }
+    button[onclick^="filtrarMelhoresPrecos"],
+    button[onclick^="verificarFaltantes"] {
+      background-color: #28a745; /* Verde para ações de resultado/verificação */
+    }
+    button[onclick^="filtrarMelhoresPrecos"]:hover,
+    button[onclick^="verificarFaltantes"]:hover {
+      background-color: #1e7e34; /* Verde mais escuro no hover */
+    }
+
+    #listaCotacoes, #faltando, #resultado { /* Incluído #resultado para consistência */
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #e9ecef; /* Borda muito suave */
+      border-radius: 8px;
+      background-color: #f8f9fa; /* Fundo levemente acinzentado para destaque */
     }
     .item-card {
-      background: #e6ffe6;
-      border-left: 5px solid #27ae60;
-      padding: 12px;
-      margin-bottom: 8px;
-      border-radius: 4px;
+      background: #e9f7ef; /* Verde bem claro para cotação adicionada */
+      border-left: 4px solid #28a745; /* Borda verde indicativa */
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
       font-size: 15px;
+      color: #155724; /* Texto verde escuro para contraste */
     }
     .fornecedor {
-      background: #f8f8f8;
-      border: 1px solid #eee;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 6px;
+      background: #ffffff; /* Fundo branco para card de fornecedor */
+      border: 1px solid #dee2e6; /* Borda suave */
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra discreta */
     }
     .fornecedor h3 {
       margin-top: 0;
-      color: #27ae60;
-      margin-bottom: 10px;
+      color: #007bff; /* Azul para o nome do fornecedor, conectando com botões primários */
+      margin-bottom: 15px;
+      font-weight: 500;
+      border-bottom: 1px solid #eee; /* Linha separadora sutil */
+      padding-bottom: 10px;
     }
     .fornecedor ul {
-      padding-left: 20px;
-      list-style-type: disc;
+      padding-left: 0; /* Removido padding padrão da ul */
+      list-style-type: none; /* Removido marcadores padrão */
     }
     .fornecedor li {
-      margin-bottom: 5px;
+      padding: 10px 0; /* Espaçamento vertical nos itens */
+      border-bottom: 1px dashed #e0e0e0; /* Linha tracejada entre itens */
       font-size: 15px;
+      line-height: 1.5;
     }
+    .fornecedor li:last-child {
+      border-bottom: none; /* Remove a borda do último item */
+    }
+    .fornecedor li button { /* Estilo para o botão de remover item dentro do card */
+        background-color: #dc3545; /* Vermelho para ação de remover */
+        color: white;
+        padding: 6px 10px;
+        font-size: 13px;
+        margin-top: 8px; /* Espaçamento acima do botão */
+        border-radius: 4px;
+    }
+    .fornecedor li button:hover {
+        background-color: #c82333;
+    }
+
     .whatsapp {
       display: inline-block;
       margin-top: 15px;
       background: #25d366;
       color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
+      padding: 10px 18px;
+      border-radius: 20px; /* Mais arredondado para o botão do WhatsApp */
       text-decoration: none;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
     .whatsapp:hover {
-      background-color: #128c7e;
+      background-color: #1da851; /* Tom mais escuro do verde WhatsApp */
+      transform: translateY(-2px); /* Leve efeito de elevação */
+    }
+    hr {
+        border: none;
+        border-top: 1px solid #dee2e6;
+        margin: 25px 0;
+    }
+    /* Estilo para a seção "semAlternativa" */
+    #semAlternativa h3 {
+        color: #dc3545; /* Vermelho para indicar itens sem alternativa */
+        font-size: 1.1em;
+    }
+    #semAlternativa ul li {
+        color: #555;
+        padding: 8px 0;
     }
   </style>
 </head>
@@ -127,7 +191,7 @@
       <button onclick="document.getElementById('cotacao').value = ''">Limpar</button>
       <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text).catch(err => console.error('Erro ao colar: ', err));">Colar</button>
     </div>
-    <button id="adicionarBtn">Adicionar</button>
+    <button id="adicionarBtn">Adicionar Cotação</button>
     <div id="listaCotacoes"></div>
     <hr />
     <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
@@ -222,15 +286,18 @@
       });
 
       // Cria a seção para itens sem alternativa, se não existir
-      if (!document.getElementById('semAlternativa')) {
-        const altDiv = document.createElement('div');
+      let altDiv = document.getElementById('semAlternativa'); // alterado para let para permitir reatribuição
+      if (!altDiv) {
+        altDiv = document.createElement('div');
         altDiv.id = 'semAlternativa';
         altDiv.className = 'fornecedor'; // Reutiliza a classe para consistência de estilo
         altDiv.innerHTML = `<h3>Itens sem fornecedor alternativo (após remoção):</h3><ul></ul>`;
         resultadoDiv.appendChild(altDiv); // Adiciona ao final da div de resultados
-      } else {
-        // Limpa a lista de itens sem alternativa se já existir, para não acumular de execuções anteriores
-         document.querySelector('#semAlternativa ul').innerHTML = '';
+      }
+      // Limpa a lista de itens sem alternativa se já existir, para não acumular de execuções anteriores
+      const ulSemAlternativa = altDiv.querySelector('ul');
+      if (ulSemAlternativa) {
+          ulSemAlternativa.innerHTML = '';
       }
     }
 
@@ -247,14 +314,11 @@
         fornecedorDivOriginal.remove(); // Remove o card do fornecedor se não tiver mais itens
       } else {
         const textosRestantes = Array.from(itensRestantesOriginal).map(li => {
-            // Extrai o texto original do item, precisa ser cuidadoso aqui para pegar o texto correto antes do botão
-            // Esta é uma simplificação. Idealmente, o 'texto' original do item seria armazenado de forma mais robusta.
-            // Para este exemplo, vamos assumir que o texto do item é o conteúdo do li antes do <br><button>
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = li.innerHTML;
-            tempDiv.querySelector('button')?.remove(); // Remove o botão
-            tempDiv.querySelector('br')?.remove(); // Remove o <br> antes do botão
-            return tempDiv.innerText.trim(); 
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = li.innerHTML;
+          tempDiv.querySelector('button')?.remove(); 
+          Array.from(tempDiv.querySelectorAll('br')).forEach(br => br.remove()); // Remove todos os <br>
+          return tempDiv.innerText.trim().replace(/\n\s*\n/g, '\n').replace(/\s*Remover item\s*/,'').trim(); // Limpeza adicional
         });
         const novaMsgWhatsapp = encodeURIComponent(`Pedido ${empresaOriginal}:\n` + textosRestantes.join('\n\n'));
         const waLinkOriginal = fornecedorDivOriginal.querySelector('.whatsapp');
@@ -263,19 +327,25 @@
 
       // Tenta realocar o item
       const alternativas = (todosPrecos[nomeProduto] || [])
-                            .filter(p => p.empresa !== empresaOriginal)
-                            .sort((a, b) => a.valor - b.valor);
+                              .filter(p => p.empresa !== empresaOriginal)
+                              .sort((a, b) => a.valor - b.valor);
 
       if (alternativas.length > 0) {
         const novaMelhorAlternativa = alternativas[0];
         let divFornecedorAlternativo = document.querySelector(`.fornecedor[data-empresa='${novaMelhorAlternativa.empresa}']`);
 
-        if (!divFornecedorAlternativo) { // Se o fornecedor alternativo não tem um card ainda
+        if (!divFornecedorAlternativo) { 
           divFornecedorAlternativo = document.createElement('div');
           divFornecedorAlternativo.className = 'fornecedor';
           divFornecedorAlternativo.setAttribute('data-empresa', novaMelhorAlternativa.empresa);
           divFornecedorAlternativo.innerHTML = `<h3>${novaMelhorAlternativa.empresa}</h3><ul></ul><a class='whatsapp' href='https://wa.me/?text=' target='_blank'>Compartilhar via WhatsApp</a>`;
-          document.getElementById('resultado').insertBefore(divFornecedorAlternativo, document.getElementById('semAlternativa'));
+          
+          const semAlternativaDiv = document.getElementById('semAlternativa');
+          if (semAlternativaDiv) {
+              document.getElementById('resultado').insertBefore(divFornecedorAlternativo, semAlternativaDiv);
+          } else {
+              document.getElementById('resultado').appendChild(divFornecedorAlternativo);
+          }
         }
 
         const ulAlternativo = divFornecedorAlternativo.querySelector('ul');
@@ -289,11 +359,11 @@
         // Atualizar link do WhatsApp do fornecedor alternativo
         const itensFornecedorAlternativo = divFornecedorAlternativo.querySelectorAll('li');
         const textosAlternativos = Array.from(itensFornecedorAlternativo).map(li => {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = li.innerHTML;
-            tempDiv.querySelector('button')?.remove();
-            tempDiv.querySelector('br')?.remove();
-            return tempDiv.innerText.trim();
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = li.innerHTML;
+          tempDiv.querySelector('button')?.remove();
+          Array.from(tempDiv.querySelectorAll('br')).forEach(br => br.remove()); // Remove todos os <br>
+          return tempDiv.innerText.trim().replace(/\n\s*\n/g, '\n').replace(/\s*Remover item\s*/,'').trim(); // Limpeza adicional
         });
         const msgWhatsappAlternativo = encodeURIComponent(`Pedido ${novaMelhorAlternativa.empresa}:\n` + textosAlternativos.join('\n\n'));
         const waLinkAlternativo = divFornecedorAlternativo.querySelector('.whatsapp');
@@ -302,45 +372,71 @@
       } else {
         // Adiciona à lista de "sem alternativa"
         const semAltUl = document.querySelector('#semAlternativa ul');
-        if (semAltUl) { // Verifica se a ul existe
-            // Evitar duplicados na lista de "sem alternativa"
-            const existente = Array.from(semAltUl.querySelectorAll('li')).some(li => li.textContent === nomeProduto);
-            if (!existente) {
-                semAltUl.innerHTML += `<li>${nomeProduto}</li>`;
-            }
+        if (semAltUl) { 
+            const itemOriginalTextoCompleto = todosPrecos[nomeProduto]?.find(p => p.empresa === empresaOriginal)?.texto || nomeProduto;
+            // Adiciona o texto original do item que ficou sem alternativa
+            const itemLi = document.createElement('li');
+            itemLi.innerHTML = `${itemOriginalTextoCompleto.replace(/\n/g, '<br>')} <i>(Originalmente com ${empresaOriginal})</i>`;
+            semAltUl.appendChild(itemLi);
         }
       }
+      // Certifique-se que a seção "semAlternativa" só apareça se tiver itens
+      const semAlternativaDiv = document.getElementById('semAlternativa');
+      if(semAlternativaDiv && semAlternativaDiv.querySelector('ul li') === null){
+        semAlternativaDiv.style.display = 'none';
+      } else if (semAlternativaDiv) {
+        semAlternativaDiv.style.display = 'block';
+      }
+    }
+    
+    // Garante que a seção 'semAlternativa' seja criada e esteja inicialmente vazia (e oculta) no renderFornecedores
+    // e após a filtragem inicial.
+    function inicializarOuLimparSemAlternativa() {
+        let altDiv = document.getElementById('semAlternativa');
+        const resultadoDiv = document.getElementById('resultado');
+        if (!altDiv && resultadoDiv) { // Só cria se resultadoDiv existir
+            altDiv = document.createElement('div');
+            altDiv.id = 'semAlternativa';
+            altDiv.className = 'fornecedor'; 
+            altDiv.innerHTML = `<h3>Itens sem fornecedor alternativo:</h3><ul></ul>`;
+            altDiv.style.display = 'none'; // Começa oculto
+            resultadoDiv.appendChild(altDiv);
+        } else if (altDiv) {
+            const ul = altDiv.querySelector('ul');
+            if (ul) ul.innerHTML = ''; // Limpa
+            altDiv.style.display = 'none'; // Garante que está oculto se vazio
+        }
     }
 
-    // Esta função não é usada diretamente pelo fluxo de removerItem no código fornecido,
-    // mas pode ser útil para outros propósitos ou se a lógica de renderização for centralizada.
-    // No momento, `removerItem` manipula o DOM diretamente ou cria novos elementos de fornecedor.
-    /*
-    function getFornecedoresMap() {
-      const map = {};
-      document.querySelectorAll('.fornecedor[data-empresa]').forEach(fornecedorDiv => {
-        const empresa = fornecedorDiv.getAttribute('data-empresa');
-        if (!empresa) return; // Pula se for o div "semAlternativa" sem data-empresa
-        
-        map[empresa] = [];
-        const itensLi = fornecedorDiv.querySelectorAll('li');
-        itensLi.forEach(li => {
-          const nomeProduto = li.getAttribute('data-produto');
-          // Recriar o 'texto' do item pode ser complexo se ele foi modificado
-          // Esta é uma simplificação e pode não pegar o 'texto' original completo.
-          let textoItem = li.innerHTML; 
-          const btnIndex = textoItem.indexOf('<br><button');
-          if (btnIndex !== -1) {
-            textoItem = textoItem.substring(0, btnIndex);
-          }
-          textoItem = textoItem.replace(/<br>/g, '\n').trim(); // Reverte <br> para \n para consistência com dados originais
+    // Ajuste na renderFornecedores para chamar a inicialização
+    // A função renderFornecedores original já tinha uma lógica parecida,
+    // esta apenas refina e garante que a seção 'semAlternativa' comece oculta.
+    function renderFornecedores(fornecedoresMap) {
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML = ''; 
 
-          map[empresa].push({ nome: nomeProduto, texto: textoItem });
+        Object.entries(fornecedoresMap).forEach(([empresa, itens]) => {
+            // ... (código de renderização dos fornecedores normais permanece o mesmo) ...
+            const div = document.createElement('div');
+            div.className = 'fornecedor';
+            div.setAttribute('data-empresa', empresa);
+
+            const itensHtml = itens.map(({ nome, texto }) => `
+            <li data-produto="${nome.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
+                ${texto.replace(/\n/g, '<br>')}
+                <br><button onclick="removerItem('${empresa.replace(/'/g, "\\'")}', '${nome.replace(/'/g, "\\'")}')">Remover item</button>
+            </li>`).join('');
+            
+            div.innerHTML = `<h3>${empresa}</h3><ul>${itensHtml}</ul>`;
+
+            const msgWhatsapp = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i => i.texto).join('\n\n'));
+            div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msgWhatsapp}' target='_blank'>Compartilhar via WhatsApp</a>`;
+            resultadoDiv.appendChild(div);
         });
-      });
-      return map;
+
+        inicializarOuLimparSemAlternativa(); // Chama aqui para garantir que a seção existe e está limpa/oculta
     }
-    */
+
 
     async function verificarFaltantes() {
       const faltandoDiv = document.getElementById('faltando');
@@ -361,12 +457,26 @@
         const esperados = dados.map(item => item.produto?.toLowerCase().trim()).filter(Boolean);
         const naoRespondidos = esperados.filter(prod => !nomesCotados.has(prod));
 
-        faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul>${naoRespondidos.map(n => `<li>${n}</li>`).join('') || '<li>Todos os itens foram respondidos!</li>'}</ul>`;
+        if (naoRespondidos.length > 0) {
+            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul>${naoRespondidos.map(n => `<li>${n}</li>`).join('')}</ul>`;
+        } else {
+            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul><li>🎉 Todos os itens da lista de referência foram respondidos!</li></ul>`;
+        }
       } catch (e) {
-        faltandoDiv.innerHTML = '<p>Erro ao buscar dados da planilha.</p>';
+        faltandoDiv.innerHTML = '<p>Erro ao buscar dados da planilha de referência.</p>';
         console.error(e);
       }
     }
+
+    // Inicializa a seção semAlternativa no carregamento da página, se o resultadoDiv já estiver no DOM
+    // Pode ser chamado após o DOM estar completamente carregado se necessário.
+    document.addEventListener('DOMContentLoaded', () => {
+        const resultadoDiv = document.getElementById('resultado');
+        if (resultadoDiv && !document.getElementById('semAlternativa')) {
+            inicializarOuLimparSemAlternativa();
+        }
+    });
+
   </script>
 </body>
 </html>
