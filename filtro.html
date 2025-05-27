@@ -180,6 +180,7 @@
     #semAlternativa ul li {
         color: #555;
         padding: 8px 0;
+        /* Herda a maioria dos estilos de .fornecedor li */
     }
   </style>
 </head>
@@ -202,7 +203,7 @@
 
   <script>
     const cotacoes = [];
-    let todosPrecos = {}; // Armazena todos os preços por produto (alterado de const para let)
+    let todosPrecos = {}; // Armazena todos os preços por produto
 
     document.getElementById('adicionarBtn').addEventListener('click', adicionarCotacao);
 
@@ -235,8 +236,9 @@
           const linhas = bloco.trim().split('\n');
           const nomeMatch = linhas[0].match(/\*(.+)\*/);
           const nome = nomeMatch ? nomeMatch[1].toLowerCase().trim() : '';
-          const valorMatch = linhas.find(l => l.includes('Valor unitário'))?.match(/R\$\s*([\d,\.]+)/);
-          const valor = valorMatch ? parseFloat(valorMatch[1].replace(',', '.')) : Infinity;
+          const valorMatch = linhas.find(l => l.includes('Valor unitário'))?.match(/R\$\s*([\d,.]+)/);
+          // Correção no parseFloat: remover pontos de milhar antes de trocar vírgula por ponto decimal
+          const valor = valorMatch ? parseFloat(valorMatch[1].replace(/\./g, '').replace(',', '.')) : Infinity;
           if (!nome) return;
 
           if (!todosPrecos[nome]) {
@@ -255,10 +257,27 @@
         if (!fornecedoresMap[empresa]) {
           fornecedoresMap[empresa] = [];
         }
-        fornecedoresMap[empresa].push({ nome, texto }); // Guarda o nome do produto também
+        fornecedoresMap[empresa].push({ nome, texto });
       });
 
       renderFornecedores(fornecedoresMap);
+    }
+    
+    function inicializarOuLimparSemAlternativa() {
+        let altDiv = document.getElementById('semAlternativa');
+        const resultadoDiv = document.getElementById('resultado');
+        if (!altDiv && resultadoDiv) { 
+            altDiv = document.createElement('div');
+            altDiv.id = 'semAlternativa';
+            altDiv.className = 'fornecedor'; // Reutiliza classe para estilo base
+            altDiv.innerHTML = `<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>`;
+            altDiv.style.display = 'none'; 
+            resultadoDiv.appendChild(altDiv);
+        } else if (altDiv) {
+            const ul = altDiv.querySelector('ul');
+            if (ul) ul.innerHTML = ''; 
+            altDiv.style.display = 'none'; 
+        }
     }
 
     function renderFornecedores(fornecedoresMap) {
@@ -270,7 +289,6 @@
         div.className = 'fornecedor';
         div.setAttribute('data-empresa', empresa);
 
-        // Mapeia os itens para HTML, incluindo o botão de remover
         const itensHtml = itens.map(({ nome, texto }) => `
           <li data-produto="${nome.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
             ${texto.replace(/\n/g, '<br>')}
@@ -279,47 +297,47 @@
         
         div.innerHTML = `<h3>${empresa}</h3><ul>${itensHtml}</ul>`;
 
-        // Atualiza a mensagem do WhatsApp para incluir apenas os textos dos itens atuais
         const msgWhatsapp = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i => i.texto).join('\n\n'));
         div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msgWhatsapp}' target='_blank'>Compartilhar via WhatsApp</a>`;
         resultadoDiv.appendChild(div);
       });
-
-      // Cria a seção para itens sem alternativa, se não existir
-      let altDiv = document.getElementById('semAlternativa'); // alterado para let para permitir reatribuição
-      if (!altDiv) {
-        altDiv = document.createElement('div');
-        altDiv.id = 'semAlternativa';
-        altDiv.className = 'fornecedor'; // Reutiliza a classe para consistência de estilo
-        altDiv.innerHTML = `<h3>Itens sem fornecedor alternativo (após remoção):</h3><ul></ul>`;
-        resultadoDiv.appendChild(altDiv); // Adiciona ao final da div de resultados
-      }
-      // Limpa a lista de itens sem alternativa se já existir, para não acumular de execuções anteriores
-      const ulSemAlternativa = altDiv.querySelector('ul');
-      if (ulSemAlternativa) {
-          ulSemAlternativa.innerHTML = '';
-      }
+      
+      inicializarOuLimparSemAlternativa(); // Garante que a seção existe e está limpa/oculta
     }
 
+    function getTextFromLiForWhatsapp(liElement) {
+        let itemTextContent = "";
+        for (let i = 0; i < liElement.childNodes.length; i++) {
+            const node = liElement.childNodes[i];
+            // Parar antes do botão "Remover item"
+            if (node.nodeName === 'BUTTON') break;
+            // Parar antes do <br> que precede imediatamente o botão
+            if (node.nodeName === 'BR' && liElement.childNodes[i+1] && liElement.childNodes[i+1].nodeName === 'BUTTON') break;
+
+            if (node.nodeType === Node.TEXT_NODE) {
+                itemTextContent += node.textContent;
+            } else if (node.nodeName === 'BR') {
+                itemTextContent += '\n';
+            }
+        }
+        return itemTextContent.trim().replace(/\n\s*\n/g, '\n'); // Limpa e consolida newlines
+    }
+
+
     function removerItem(empresaOriginal, nomeProduto) {
-      const blocoItem = document.querySelector(`.fornecedor[data-empresa='${empresaOriginal}'] li[data-produto='${nomeProduto.replace(/'/g, "\\'").replace(/"/g, "&quot;")}']`);
+      const nomeProdutoEscapado = nomeProduto.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+      const blocoItem = document.querySelector(`.fornecedor[data-empresa='${empresaOriginal}'] li[data-produto='${nomeProdutoEscapado}']`);
       if (!blocoItem) return;
 
       const fornecedorDivOriginal = blocoItem.closest('.fornecedor');
-      blocoItem.remove(); // Remove o item da lista do fornecedor original
+      blocoItem.remove(); 
 
       // Atualizar link do WhatsApp do fornecedor original
       const itensRestantesOriginal = fornecedorDivOriginal.querySelectorAll('li');
       if (itensRestantesOriginal.length === 0) {
-        fornecedorDivOriginal.remove(); // Remove o card do fornecedor se não tiver mais itens
+        fornecedorDivOriginal.remove(); 
       } else {
-        const textosRestantes = Array.from(itensRestantesOriginal).map(li => {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = li.innerHTML;
-          tempDiv.querySelector('button')?.remove(); 
-          Array.from(tempDiv.querySelectorAll('br')).forEach(br => br.remove()); // Remove todos os <br>
-          return tempDiv.innerText.trim().replace(/\n\s*\n/g, '\n').replace(/\s*Remover item\s*/,'').trim(); // Limpeza adicional
-        });
+        const textosRestantes = Array.from(itensRestantesOriginal).map(li => getTextFromLiForWhatsapp(li));
         const novaMsgWhatsapp = encodeURIComponent(`Pedido ${empresaOriginal}:\n` + textosRestantes.join('\n\n'));
         const waLinkOriginal = fornecedorDivOriginal.querySelector('.whatsapp');
         if (waLinkOriginal) waLinkOriginal.href = `https://wa.me/?text=${novaMsgWhatsapp}`;
@@ -334,37 +352,34 @@
         const novaMelhorAlternativa = alternativas[0];
         let divFornecedorAlternativo = document.querySelector(`.fornecedor[data-empresa='${novaMelhorAlternativa.empresa}']`);
 
-        if (!divFornecedorAlternativo) { 
+        if (!divFornecedorAlternativo) {  
           divFornecedorAlternativo = document.createElement('div');
           divFornecedorAlternativo.className = 'fornecedor';
           divFornecedorAlternativo.setAttribute('data-empresa', novaMelhorAlternativa.empresa);
           divFornecedorAlternativo.innerHTML = `<h3>${novaMelhorAlternativa.empresa}</h3><ul></ul><a class='whatsapp' href='https://wa.me/?text=' target='_blank'>Compartilhar via WhatsApp</a>`;
           
-          const semAlternativaDiv = document.getElementById('semAlternativa');
-          if (semAlternativaDiv) {
-              document.getElementById('resultado').insertBefore(divFornecedorAlternativo, semAlternativaDiv);
+          const semAlternativaDivCheck = document.getElementById('semAlternativa'); // Renomeada variável local
+          if (semAlternativaDivCheck) {
+              document.getElementById('resultado').insertBefore(divFornecedorAlternativo, semAlternativaDivCheck);
           } else {
               document.getElementById('resultado').appendChild(divFornecedorAlternativo);
           }
         }
 
         const ulAlternativo = divFornecedorAlternativo.querySelector('ul');
+        const nomeProdutoAlternativoEscapado = nomeProduto.replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+        const empresaAlternativaEscapada = novaMelhorAlternativa.empresa.replace(/'/g, "\\'");
+
         const novoItemHtml = `
-          <li data-produto="${nomeProduto.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
+          <li data-produto="${nomeProdutoAlternativoEscapado}">
             ${novaMelhorAlternativa.texto.replace(/\n/g, '<br>')}
-            <br><button onclick="removerItem('${novaMelhorAlternativa.empresa.replace(/'/g, "\\'")}', '${nomeProduto.replace(/'/g, "\\'")}')">Remover item</button>
+            <br><button onclick="removerItem('${empresaAlternativaEscapada}', '${nomeProduto.replace(/'/g, "\\'")}')">Remover item</button>
           </li>`;
         ulAlternativo.innerHTML += novoItemHtml;
 
         // Atualizar link do WhatsApp do fornecedor alternativo
         const itensFornecedorAlternativo = divFornecedorAlternativo.querySelectorAll('li');
-        const textosAlternativos = Array.from(itensFornecedorAlternativo).map(li => {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = li.innerHTML;
-          tempDiv.querySelector('button')?.remove();
-          Array.from(tempDiv.querySelectorAll('br')).forEach(br => br.remove()); // Remove todos os <br>
-          return tempDiv.innerText.trim().replace(/\n\s*\n/g, '\n').replace(/\s*Remover item\s*/,'').trim(); // Limpeza adicional
-        });
+        const textosAlternativos = Array.from(itensFornecedorAlternativo).map(li => getTextFromLiForWhatsapp(li));
         const msgWhatsappAlternativo = encodeURIComponent(`Pedido ${novaMelhorAlternativa.empresa}:\n` + textosAlternativos.join('\n\n'));
         const waLinkAlternativo = divFornecedorAlternativo.querySelector('.whatsapp');
         if (waLinkAlternativo) waLinkAlternativo.href = `https://wa.me/?text=${msgWhatsappAlternativo}`;
@@ -372,15 +387,16 @@
       } else {
         // Adiciona à lista de "sem alternativa"
         const semAltUl = document.querySelector('#semAlternativa ul');
-        if (semAltUl) { 
-            const itemOriginalTextoCompleto = todosPrecos[nomeProduto]?.find(p => p.empresa === empresaOriginal)?.texto || nomeProduto;
-            // Adiciona o texto original do item que ficou sem alternativa
+        if (semAltUl) {  
+            const itemOriginalDados = todosPrecos[nomeProduto]?.find(p => p.empresa === empresaOriginal);
+            const itemOriginalTextoCompleto = itemOriginalDados ? itemOriginalDados.texto : nomeProduto;
+            
             const itemLi = document.createElement('li');
-            itemLi.innerHTML = `${itemOriginalTextoCompleto.replace(/\n/g, '<br>')} <i>(Originalmente com ${empresaOriginal})</i>`;
+            itemLi.innerHTML = `${itemOriginalTextoCompleto.replace(/\n/g, '<br>')} <i>(Originalmente com ${empresaOriginal}, sem alternativa encontrada)</i>`;
             semAltUl.appendChild(itemLi);
         }
       }
-      // Certifique-se que a seção "semAlternativa" só apareça se tiver itens
+      
       const semAlternativaDiv = document.getElementById('semAlternativa');
       if(semAlternativaDiv && semAlternativaDiv.querySelector('ul li') === null){
         semAlternativaDiv.style.display = 'none';
@@ -389,55 +405,6 @@
       }
     }
     
-    // Garante que a seção 'semAlternativa' seja criada e esteja inicialmente vazia (e oculta) no renderFornecedores
-    // e após a filtragem inicial.
-    function inicializarOuLimparSemAlternativa() {
-        let altDiv = document.getElementById('semAlternativa');
-        const resultadoDiv = document.getElementById('resultado');
-        if (!altDiv && resultadoDiv) { // Só cria se resultadoDiv existir
-            altDiv = document.createElement('div');
-            altDiv.id = 'semAlternativa';
-            altDiv.className = 'fornecedor'; 
-            altDiv.innerHTML = `<h3>Itens sem fornecedor alternativo:</h3><ul></ul>`;
-            altDiv.style.display = 'none'; // Começa oculto
-            resultadoDiv.appendChild(altDiv);
-        } else if (altDiv) {
-            const ul = altDiv.querySelector('ul');
-            if (ul) ul.innerHTML = ''; // Limpa
-            altDiv.style.display = 'none'; // Garante que está oculto se vazio
-        }
-    }
-
-    // Ajuste na renderFornecedores para chamar a inicialização
-    // A função renderFornecedores original já tinha uma lógica parecida,
-    // esta apenas refina e garante que a seção 'semAlternativa' comece oculta.
-    function renderFornecedores(fornecedoresMap) {
-        const resultadoDiv = document.getElementById('resultado');
-        resultadoDiv.innerHTML = ''; 
-
-        Object.entries(fornecedoresMap).forEach(([empresa, itens]) => {
-            // ... (código de renderização dos fornecedores normais permanece o mesmo) ...
-            const div = document.createElement('div');
-            div.className = 'fornecedor';
-            div.setAttribute('data-empresa', empresa);
-
-            const itensHtml = itens.map(({ nome, texto }) => `
-            <li data-produto="${nome.replace(/"/g, "&quot;").replace(/'/g, "&apos;")}">
-                ${texto.replace(/\n/g, '<br>')}
-                <br><button onclick="removerItem('${empresa.replace(/'/g, "\\'")}', '${nome.replace(/'/g, "\\'")}')">Remover item</button>
-            </li>`).join('');
-            
-            div.innerHTML = `<h3>${empresa}</h3><ul>${itensHtml}</ul>`;
-
-            const msgWhatsapp = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i => i.texto).join('\n\n'));
-            div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msgWhatsapp}' target='_blank'>Compartilhar via WhatsApp</a>`;
-            resultadoDiv.appendChild(div);
-        });
-
-        inicializarOuLimparSemAlternativa(); // Chama aqui para garantir que a seção existe e está limpa/oculta
-    }
-
-
     async function verificarFaltantes() {
       const faltandoDiv = document.getElementById('faltando');
       faltandoDiv.innerHTML = '<p>Verificando itens faltantes...</p>';
@@ -458,9 +425,9 @@
         const naoRespondidos = esperados.filter(prod => !nomesCotados.has(prod));
 
         if (naoRespondidos.length > 0) {
-            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul>${naoRespondidos.map(n => `<li>${n}</li>`).join('')}</ul>`;
+            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados (da lista de referência):</h3><ul>${naoRespondidos.map(n => `<li>${n}</li>`).join('')}</ul>`;
         } else {
-            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados:</h3><ul><li>🎉 Todos os itens da lista de referência foram respondidos!</li></ul>`;
+            faltandoDiv.innerHTML = `<h3>Itens ainda não cotados (da lista de referência):</h3><ul><li>🎉 Todos os itens da lista de referência foram respondidos!</li></ul>`;
         }
       } catch (e) {
         faltandoDiv.innerHTML = '<p>Erro ao buscar dados da planilha de referência.</p>';
@@ -468,8 +435,6 @@
       }
     }
 
-    // Inicializa a seção semAlternativa no carregamento da página, se o resultadoDiv já estiver no DOM
-    // Pode ser chamado após o DOM estar completamente carregado se necessário.
     document.addEventListener('DOMContentLoaded', () => {
         const resultadoDiv = document.getElementById('resultado');
         if (resultadoDiv && !document.getElementById('semAlternativa')) {
