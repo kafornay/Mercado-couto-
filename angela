@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Night Food - Personalize sua Imagem</title>
+    <title>Angela maia  - Personalize sua Imagem</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=EB+Garamond:ital@1&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
     <style>
@@ -371,12 +371,12 @@
             ctx.fillStyle = faixaTextoCorInput.value;
             ctx.font = 'bold 28px Roboto';
             ctx.textAlign = 'center';
-            ctx.fillText('🍔 Night Food', canvas.width / 2, size + 40);
+            ctx.fillText('🍔 Angela Maia ', canvas.width / 2, size + 40);
             ctx.font = '22px Roboto';
             ctx.fillText('Aceito Encomendas!', canvas.width / 2, size + 70);
             ctx.font = '18px Roboto';
-            ctx.fillText('📱 WhatsApp: 21 99423-1834', canvas.width / 2, size + 95);
-            ctx.fillText('📸 Instagram: @night_food', canvas.width / 2, size + 120);
+            ctx.fillText('📱 WhatsApp: 21 97221-7122', canvas.width / 2, size + 95);
+            ctx.fillText('📸 Instagram: @Angela Maia ', canvas.width / 2, size + 120);
 
             const description = descriptionInput.value.trim();
             if (description) {
