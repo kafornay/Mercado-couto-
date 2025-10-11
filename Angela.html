@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Angela maia  - Personalize sua Imagem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=EB+Garamond:ital@1&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #fceabb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type='file'],
+        input[type='number'],
+        input[type='color'],
+        textarea,
+        select {
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 80px;
+            resize: none;
+            white-space: pre-line;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center; /* Centraliza os botões */
+            gap: 15px; /* Aumenta o espaço entre os botões */
+            margin-top: 20px; /* Aumenta o espaço acima dos botões */
+            flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha em telas menores */
+        }
+
+        button {
+            padding: 12px 24px; /* Aumenta o padding horizontal para deixar os botões maiores */
+            background-color: #f8b500;
+            border: none;
+            color: white;
+            font-size: 16px; /* Aumenta o tamanho da fonte dos botões */
+            border-radius: 8px;
+            cursor: pointer;
+            min-width: 150px; /* Define uma largura mínima para os botões */
+            box-sizing: border-box;
+            transition: background-color 0.3s ease; /* Adiciona uma transição suave na cor de fundo */
+        }
+
+        button:hover {
+            background-color: #e0a400; /* Escurece o botão no hover para feedback visual */
+        }
+
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            touch-action: none;
+            box-sizing: border-box;
+        }
+
+        .valor-container {
+            margin-top: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+
+        .valor-container label {
+            width: 100%;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .color-picker-group {
+            margin-top: 15px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+        .color-picker-group label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
+            box-sizing: border-box;
+        }
+
+        #resetZoomBtn {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f8b500;
+            border: none;
+            color: white;
+            font-size: 16px; /* Aumenta o tamanho da fonte do botão Reset */
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease; /* Adiciona transição ao botão Reset */
+        }
+
+        #resetZoomBtn:hover {
+            background-color: #e0a400; /* Escurece no hover também */
+        }
+
+        .font-size-group {
+            margin-top: 15px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+
+        .font-family-group {
+            margin-top: 15px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+
+        .slide-group {
+            margin-top: 15px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+        .slide-group label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+            .valor-container {
+                font-size: 18px;
+                padding: 12px 16px;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px 20px; /* Ajusta o padding para telas menores */
+                min-width: auto; /* Remove a largura mínima para melhor adaptação em telas pequenas */
+                flex: 1; /* Permite que os botões se expandam para preencher a largura disponível */
+            }
+            textarea {
+                height: 70px;
+            }
+            #resetZoomBtn {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .color-picker-group,
+            .font-size-group,
+            .font-family-group,
+            .slide-group {
+                align-items: center;
+            }
+            input[type='file'],
+            input[type='number'],
+            input[type='color'],
+            textarea,
+            select {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .valor-container {
+                align-items: center;
+            }
+            .buttons {
+                gap: 10px; /* Reduz o gap em telas menores */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🍔 Night Food</h2>
+        <p>Adicione sua imagem personalizada:</p>
+
+        <input type="file" id="upload" accept="image/*" />
+        <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
+
+        <div class="buttons">
+            <button onclick="copyDescription()">📋 Copiar</button>
+            <button onclick="clearDescription()">🧹 Limpar</button>
+        </div>
+
+        <div class="valor-container">
+            <label for="valor">Valor</label><br />
+            <input type="number" id="valor" placeholder="Digite o valor" />
+            <label for="valorFontSize">Tamanho da Fonte do Valor:</label>
+            <input type="number" id="valorFontSize" value="40" min="12" max="72">
+        </div>
+
+        <p>Upload da sua logo (PNG):</p>
+        <input type="file" id="logoUpload" accept="image/png" />
+
+        <div class="color-picker-group">
+            <label for="fundoCor">Cor da faixa:</label>
+            <input type="color" id="fundoCor" value="#000000" />
+        </div>
+        <div class="color-picker-group">
+            <label for="faixaTextoCor">Cor do texto da faixa:</label>
+            <input type="color" id="faixaTextoCor" value="#ffffff" />
+        </div>
+
+        <div class="color-picker-group">
+            <label for="descCor">Cor da descrição:</label>
+            <input type="color" id="descCor" value="#FFFFFF" />
+        </div>
+
+        <div class="color-picker-group">
+            <label for="valorCor">Cor do valor:</label>
+            <input type="color" id="valorCor" value="#f8b500" />
+        </div>
+
+        <div class="font-size-group">
+            <label for="descFontSize">Tamanho da Fonte:</label>
+            <input type="number" id="descFontSize" value="36" min="12" max="72">
+        </div>
+
+        <div class="slide-group">
+            <label for="faixaWidth">Largura da Faixa:</label>
+            <input type="range" id="faixaWidth" min="0" max="100" value="100">
+        </div>
+        <div class="slide-group">
+            <label for="descriptionWidthPercentage">Largura da Descrição:</label>
+            <input type="range" id="descriptionWidthPercentage" min="10" max="100" value="80">
+        </div>
+
+        <div class="font-family-group">
+            <label for="descFontFamily">Fonte da Descrição:</label>
+            <select id="descFontFamily">
+                <option value="EB Garamond">EB Garamond</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+        </div>
+
+        <canvas id="canvas"></canvas>
+        <button id="downloadBtn">📥 Baixar Imagem</button>
+    </div>
+
+    <script>
+        const upload = document.getElementById('upload');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const descriptionInput = document.getElementById('description');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const valorInput = document.getElementById('valor');
+        const logoUpload = document.getElementById('logoUpload');
+        const fundoCorInput = document.getElementById('fundoCor');
+        const faixaTextoCorInput = document.getElementById('faixaTextoCor');
+        const descCorInput = document.getElementById('descCor');
+        const valorCorInput = document.getElementById('valorCor');
+        const faixaWidthInput = document.getElementById('faixaWidth');
+        const descFontSizeInput = document.getElementById('descFontSize');
+        const descFontFamilyInput = document.getElementById('descFontFamily');
+        const valorFontSizeInput = document.getElementById('valorFontSize');
+        const descriptionWidthPercentageInput = document.getElementById('descriptionWidthPercentage');
+
+        let img = new Image();
+        let logoImg = null;
+
+        let descPos = { x: 500, y: 80 };
+        let valorPos = { x: 500, y: 140 };
+        let faixaWidthPercentage = 100;
+        let descFontSize = 36;
+        let descFontFamily = 'EB Garamond';
+        let valorFontSize = 40;
+        let lines = [];
+        let maxLineWidth = 0;
+        let maxDescriptionWidthPercentage = 80;
+        let imageScale = 1;
+        const lineHeight = 1.2;
+        let calculatedMaxWidth = 0;
+        let newWidth = 0;
+        let newHeight = 0;
+
+
+        let dragging = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        function hexToRGBA(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function drawCanvas() {
+            if (!img.src) return;
+
+            const size = 1000;
+            const scale = Math.min(size / img.width, size / img.height);
+            imageScale = scale;
+            newWidth = img.width * scale;
+            newHeight = img.height * scale;
+
+            const extraHeight = 140;
+            canvas.width = size;
+            canvas.height = size + extraHeight;
+
+            const xOffset = (size - newWidth) / 2;
+            const yOffset = (size - newHeight) / 2;
+            const faixaWidth = newWidth * (faixaWidthPercentage / 100);
+            calculatedMaxWidth = newWidth * (maxDescriptionWidthPercentage / 100);
+
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+
+            ctx.globalAlpha = 1.0;
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = hexToRGBA(fundoCorInput.value, 0.8);
+            ctx.fillRect(xOffset + (newWidth - faixaWidth)/2, size, faixaWidth, extraHeight);
+
+            ctx.fillStyle = faixaTextoCorInput.value;
+            ctx.font = 'bold 28px Roboto';
+            ctx.textAlign = 'center';
+            ctx.fillText('🍔 Angela Maia ', canvas.width / 2, size + 40);
+            ctx.font = '22px Roboto';
+            ctx.fillText('Aceito Encomendas!', canvas.width / 2, size + 70);
+            ctx.font = '18px Roboto';
+            ctx.fillText('📱 WhatsApp: 21 97221-7122', canvas.width / 2, size + 95);
+            ctx.fillText('📸 Instagram: @Angela Maia ', canvas.width / 2, size + 120);
+
+            const description = descriptionInput.value.trim();
+            if (description) {
+                const words = description.split(' ');
+                let line = '';
+                lines = [];
+                const maxWidth = calculatedMaxWidth;
+                maxLineWidth = 0;
+
+                ctx.font = `italic ${descFontSize}px "${descFontFamily}", serif`;
+                ctx.fillStyle = descCorInput.value;
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.shadowBlur = 4;
+
+                words.forEach(word => {
+                    const width = ctx.measureText(line + word).width;
+                    if (width < maxWidth) {
+                        line += word + ' ';
+                    } else {
+                        lines.push(line.trim());
+                        line = word + ' ';
+                    }
+                });
+                lines.push(line.trim());
+
+                let y = descPos.y;
+                lines.forEach((text, index) => {
+                    ctx.fillText(text, descPos.x, y);
+                    const textWidth = ctx.measureText(text).width;
+                    if (textWidth > maxLineWidth) {
+                        maxLineWidth = textWidth;
+                    }
+                    y += descFontSize * lineHeight;
+                });
+            }
+
+            const valor = valorInput.value.trim();
+            if (valor) {
+                ctx.font = `bold ${valorFontSize}px "Poppins", sans-serif`;
+                ctx.fillStyle = valorCorInput.value;
+                ctx.textAlign = 'center';
+                ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
+            }
+
+            if (logoImg) {
+                const size = 120;
+                ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
+            }
+        }
+
+        upload.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        logoUpload.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                logoImg = new Image();
+                logoImg.onload = () => drawCanvas();
+                logoImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        img.onload = () => drawCanvas();
+
+        function isInsideText(x, y, textX, textY, fontSize, text) {
+            const width = ctx.measureText(text).width;
+            const height = fontSize * lineHeight;
+            return (
+                x >= textX - width / 2 &&
+                x <= textX + width / 2 &&
+                y >= textY - height &&
+                y <= textY
+            );
+        }
+
+        function getTouchPos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (evt.touches) {
+                clientX = evt.touches[0].clientX;
+                clientY = evt.touches[0].clientY;
+            } else {
+                clientX = evt.clientX;
+                clientY = evt.clientY;
+            }
+            return {
+                x: ((clientX - rect.left) / rect.width) * canvas.width,
+                y: ((clientY - rect.top) / rect.height) * canvas.height,
+            };
+        }
+
+        canvas.addEventListener('mousedown', startDrag);
+        canvas.addEventListener('touchstart', startDrag);
+        canvas.addEventListener('mousemove', drag);
+        canvas.addEventListener('touchmove', drag);
+        canvas.addEventListener('mouseup', endDrag);
+        canvas.addEventListener('mouseleave', endDrag);
+        canvas.addEventListener('touchend', endDrag);
+        canvas.addEventListener('touchcancel', endDrag);
+
+        function startDrag(evt) {
+            evt.preventDefault();
+            const pos = getTouchPos(canvas, evt);
+            const description = descriptionInput.value.trim();
+            const valor = valorInput.value.trim();
+            let i = 0;
+            if (lines.length > 0) {
+                let y = descPos.y;
+                for (i = 0; i < lines.length; i++) {
+                    let textWidth = ctx.measureText(lines[i]).width;
+                    let textXStart = descPos.x - textWidth / 2;
+                    let textXEnd = descPos.x + textWidth / 2;
+                    let textYStart = y - descFontSize * lineHeight;
+                    let textYEnd = y;
+                    if (pos.x >= textXStart && pos.x <= textXEnd && pos.y >= textYStart && pos.y <= textYEnd) {
+                        dragging = 'desc';
+                        dragOffset.x = pos.x - descPos.x;
+                        dragOffset.y = pos.y - y;
+                        break;
+                    }
+                    y += descFontSize * lineHeight;
+                }
+            }
+            if (dragging !== 'desc' && valor && isInsideText(pos.x, pos.y, valorPos.x, valorPos.y, 40, `R$ ${valor}`)) {
+                dragging = 'valor';
+                dragOffset.x = pos.x - valorPos.x;
+                dragOffset.y = pos.y - valorPos.y;
+            }
+        }
+
+        function drag(evt) {
+            if (!dragging) return;
+            evt.preventDefault();
+            const pos = getTouchPos(canvas, evt);
+            if (dragging === 'desc') {
+                descPos.x = pos.x - dragOffset.x;
+                descPos.y = pos.y - dragOffset.y;
+            } else if (dragging === 'valor') {
+                valorPos.x = pos.x - dragOffset.x;
+                valorPos.y = pos.y - dragOffset.y;
+            }
+            drawCanvas();
+        }
+
+        function endDrag(evt) {
+            dragging = null;
+        }
+
+        descriptionInput.addEventListener('input', () => drawCanvas());
+        valorInput.addEventListener('input', () => drawCanvas());
+        fundoCorInput.addEventListener('input', () => drawCanvas());
+        faixaTextoCorInput.addEventListener('input', () => drawCanvas());
+        descCorInput.addEventListener('input', () => drawCanvas());
+        valorCorInput.addEventListener('input', () => drawCanvas());
+        faixaWidthInput.addEventListener('input', () => {
+            faixaWidthPercentage = parseInt(faixaWidthInput.value);
+            calculatedMaxWidth = newWidth * (faixaWidthPercentage / 100);
+            drawCanvas();
+        });
+        descFontSizeInput.addEventListener('input', () => {
+            descFontSize = parseInt(descFontSizeInput.value);
+            drawCanvas()
