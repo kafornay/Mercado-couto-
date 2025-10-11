@@ -2,293 +2,187 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Angela maia  - Personalize sua Imagem</title>
+    <title>Angela Maia - Personalize sua Imagem</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=EB+Garamond:ital@1&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #CFA5E6;
+            --primary-dark: #B47CD6;
+            --background-light: #F6F0FA;
+            --card-background: #FFFFFF;
+            --text-dark: #222222;
+            --text-medium: #666666;
+            --text-light: #FFFFFF;
+            --border-color: #D8B7E2;
+            --focus-shadow: rgba(207, 165, 230, 0.4);
+            --card-shadow: rgba(0, 0, 0, 0.08);
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background: #fceabb;
+            background: var(--background-light);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
+            color: var(--text-dark);
+            box-sizing: border-box;
+            line-height: 1.6;
         }
 
         .card {
-            background: white;
+            background: var(--card-background);
             border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
+            box-shadow: 0 6px 18px var(--card-shadow);
+            padding: 25px;
+            width: 95%;
+            max-width: 650px;
             display: flex;
             flex-direction: column;
+            gap: 22px;
             box-sizing: border-box;
+            border: 1px solid var(--border-color);
         }
 
         h2 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        input[type='file'],
-        input[type='number'],
-        input[type='color'],
-        textarea,
-        select {
-            margin-top: 10px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            width: calc(100% - 24px);
-            box-sizing: border-box;
-        }
-
-        textarea {
-            height: 80px;
-            resize: none;
-            white-space: pre-line;
-        }
-
-        .buttons {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
             display: flex;
-            justify-content: center; /* Centraliza os botões */
-            gap: 15px; /* Aumenta o espaço entre os botões */
-            margin-top: 20px; /* Aumenta o espaço acima dos botões */
-            flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha em telas menores */
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
         }
 
-        button {
-            padding: 12px 24px; /* Aumenta o padding horizontal para deixar os botões maiores */
-            background-color: #f8b500;
-            border: none;
-            color: white;
-            font-size: 16px; /* Aumenta o tamanho da fonte dos botões */
-            border-radius: 8px;
-            cursor: pointer;
-            min-width: 150px; /* Define uma largura mínima para os botões */
-            box-sizing: border-box;
-            transition: background-color 0.3s ease; /* Adiciona uma transição suave na cor de fundo */
+        h2 .diamond-icon {
+            font-size: 36px;
+            color: var(--primary-color);
+            line-height: 1;
         }
 
-        button:hover {
-            background-color: #e0a400; /* Escurece o botão no hover para feedback visual */
-        }
-
-        canvas {
-            margin-top: 20px;
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            touch-action: none;
-            box-sizing: border-box;
-        }
-
-        .valor-container {
-            margin-top: 15px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-sizing: border-box;
-        }
-
-        .valor-container label {
-            width: 100%;
-            text-align: left;
-            box-sizing: border-box;
-        }
-
-        .color-picker-group {
-            margin-top: 15px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-sizing: border-box;
-        }
-        .color-picker-group label {
+        h3 {
+            font-family: 'Roboto', sans-serif;
             font-weight: 600;
-            font-size: 14px;
-            margin-right: 8px;
-            box-sizing: border-box;
+            font-size: 18px;
+            color: var(--text-dark);
+            margin-top: 18px;
+            margin-bottom: 10px;
+            text-align: left;
+            width: 100%;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
         }
 
-        #resetZoomBtn {
-            margin-top: 15px;
-            padding: 12px;
-            background-color: #f8b500;
-            border: none;
-            color: white;
-            font-size: 16px; /* Aumenta o tamanho da fonte do botão Reset */
-            border-radius: 8px;
-            cursor: pointer;
+        p, label {
+            font-size: 14px;
+        }
+
+        input[type='file'], input[type='number'], input[type='color'], textarea, select {
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
             width: 100%;
             box-sizing: border-box;
-            transition: background-color 0.3s ease; /* Adiciona transição ao botão Reset */
         }
 
-        #resetZoomBtn:hover {
-            background-color: #e0a400; /* Escurece no hover também */
-        }
+        textarea { min-height: 80px; }
 
-        .font-size-group {
-            margin-top: 15px;
-            text-align: left;
+        .description-controls {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-sizing: border-box;
+            align-items: center;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
-        .font-family-group {
-            margin-top: 15px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-sizing: border-box;
+        .description-controls button {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 4px;
         }
 
-        .slide-group {
-            margin-top: 15px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-sizing: border-box;
-        }
-        .slide-group label {
-            font-weight: 600;
+        .valor-container { padding: 15px; font-size: 20px; gap: 10px; }
+
+        button#downloadBtn {
+            padding: 10px 15px;
             font-size: 14px;
-            margin-right: 8px;
-            box-sizing: border-box;
         }
 
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 20px;
-            }
-            .valor-container {
-                font-size: 18px;
-                padding: 12px 16px;
-            }
-            button {
-                font-size: 14px;
-                padding: 10px 20px; /* Ajusta o padding para telas menores */
-                min-width: auto; /* Remove a largura mínima para melhor adaptação em telas pequenas */
-                flex: 1; /* Permite que os botões se expandam para preencher a largura disponível */
-            }
-            textarea {
-                height: 70px;
-            }
-            #resetZoomBtn {
-                font-size: 14px;
-                padding: 10px;
-            }
-            .color-picker-group,
-            .font-size-group,
-            .font-family-group,
-            .slide-group {
-                align-items: center;
-            }
-            input[type='file'],
-            input[type='number'],
-            input[type='color'],
-            textarea,
-            select {
-                width: 100%;
-                box-sizing: border-box;
-            }
-            .valor-container {
-                align-items: center;
-            }
-            .buttons {
-                gap: 10px; /* Reduz o gap em telas menores */
-            }
+        .slide-group input[type='range'] { height: 5px; }
+
+        input[type='color'] { height: 25px; width: 40px; }
+
+        @media (min-width: 769px) {
+            body { padding: 30px; }
+            .card { padding: 40px; width: 90%; max-width: 760px; gap: 35px; }
+            h2 { font-size: 38px; margin-bottom: 25px; gap: 18px; }
+            h3 { font-size: 22px; margin-top: 25px; margin-bottom: 18px; padding-bottom: 15px; }
+            p, label { font-size: 16px; }
+            input[type='file'], input[type='number'], input[type='color'], textarea, select { font-size: 16px; padding: 12px 18px; }
+            textarea { min-height: 120px; }
+            button#downloadBtn { padding: 13px 28px; font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🍔 Night Food</h2>
-        <p>Adicione sua imagem personalizada:</p>
+        <h2><span class="diamond-icon">💎</span> Angela Maia</h2>
+        <p>Crie imagens premium para seus produtos de forma elegante e prática.</p>
 
+        <h3>1. Imagem do Produto</h3>
         <input type="file" id="upload" accept="image/*" />
-        <textarea id="description" placeholder="Adicione uma descrição personalizada..."></textarea>
 
-        <div class="buttons">
-            <button onclick="copyDescription()">📋 Copiar</button>
-            <button onclick="clearDescription()">🧹 Limpar</button>
-        </div>
-
-        <div class="valor-container">
-            <label for="valor">Valor</label><br />
-            <input type="number" id="valor" placeholder="Digite o valor" />
-            <label for="valorFontSize">Tamanho da Fonte do Valor:</label>
-            <input type="number" id="valorFontSize" value="40" min="12" max="72">
-        </div>
-
-        <p>Upload da sua logo (PNG):</p>
-        <input type="file" id="logoUpload" accept="image/png" />
-
-        <div class="color-picker-group">
-            <label for="fundoCor">Cor da faixa:</label>
-            <input type="color" id="fundoCor" value="#000000" />
-        </div>
-        <div class="color-picker-group">
-            <label for="faixaTextoCor">Cor do texto da faixa:</label>
-            <input type="color" id="faixaTextoCor" value="#ffffff" />
-        </div>
-
-        <div class="color-picker-group">
-            <label for="descCor">Cor da descrição:</label>
-            <input type="color" id="descCor" value="#FFFFFF" />
-        </div>
-
-        <div class="color-picker-group">
-            <label for="valorCor">Cor do valor:</label>
-            <input type="color" id="valorCor" value="#f8b500" />
-        </div>
-
-        <div class="font-size-group">
-            <label for="descFontSize">Tamanho da Fonte:</label>
-            <input type="number" id="descFontSize" value="36" min="12" max="72">
-        </div>
-
-        <div class="slide-group">
-            <label for="faixaWidth">Largura da Faixa:</label>
-            <input type="range" id="faixaWidth" min="0" max="100" value="100">
-        </div>
-        <div class="slide-group">
-            <label for="descriptionWidthPercentage">Largura da Descrição:</label>
-            <input type="range" id="descriptionWidthPercentage" min="10" max="100" value="80">
-        </div>
-
-        <div class="font-family-group">
-            <label for="descFontFamily">Fonte da Descrição:</label>
+        <h3>2. Descrição</h3>
+        <textarea id="description" placeholder="Descreva seu produto..."></textarea>
+        <div class="description-controls">
+            <button type="button" onclick="copyDescription()">📋 Copiar</button>
+            <button type="button" onclick="clearDescription()">🧹 Limpar</button>
+            <span>
+                <label for="descFontSize">Tam:</label>
+                <input type="number" id="descFontSize" value="36" min="12" max="72">
+            </span>
+            <span>
+                <label for="descCor">Cor:</label>
+                <input type="color" id="descCor" value="#FFFFFF">
+            </span>
             <select id="descFontFamily">
-                <option value="EB Garamond">EB Garamond</option>
+                <option value="Playfair Display">Playfair Display</option>
                 <option value="Roboto">Roboto</option>
+                <option value="Inter">Inter</option>
+                <option value="EB Garamond">EB Garamond</option>
                 <option value="Poppins">Poppins</option>
-                <option value="Arial">Arial</option>
-                <option value="Verdana">Verdana</option>
             </select>
         </div>
+
+        <h3>3. Preço e Logo</h3>
+        <div class="valor-container">
+            <label for="valor">Valor (ex: 99.99):</label>
+            <input type="number" id="valor" step="0.01">
+            <label for="valorCor">Cor:</label>
+            <input type="color" id="valorCor" value="#DAA520">
+            <label for="valorFontSize">Tam:</label>
+            <input type="number" id="valorFontSize" value="40" min="12" max="72">
+        </div>
+        <input type="file" id="logoUpload" accept="image/png">
+
+        <h3>4. Ajustes Visuais</h3>
+        <label for="fundoCor">Fundo Faixa:</label>
+        <input type="color" id="fundoCor" value="#000000">
+        <label for="faixaTextoCor">Texto Faixa:</label>
+        <input type="color" id="faixaTextoCor" value="#ffffff">
+        <label for="faixaWidth">Largura Faixa (%):</label>
+        <input type="range" id="faixaWidth" min="0" max="100" value="100">
+        <label for="descriptionWidthPercentage">Largura Descrição (%):</label>
+        <input type="range" id="descriptionWidthPercentage" min="10" max="100" value="80">
 
         <canvas id="canvas"></canvas>
         <button id="downloadBtn">📥 Baixar Imagem</button>
@@ -314,23 +208,16 @@
 
         let img = new Image();
         let logoImg = null;
-
         let descPos = { x: 500, y: 80 };
         let valorPos = { x: 500, y: 140 };
         let faixaWidthPercentage = 100;
         let descFontSize = 36;
-        let descFontFamily = 'EB Garamond';
+        let descFontFamily = 'Playfair Display';
         let valorFontSize = 40;
         let lines = [];
-        let maxLineWidth = 0;
         let maxDescriptionWidthPercentage = 80;
         let imageScale = 1;
         const lineHeight = 1.2;
-        let calculatedMaxWidth = 0;
-        let newWidth = 0;
-        let newHeight = 0;
-
-
         let dragging = null;
         let dragOffset = { x: 0, y: 0 };
 
@@ -342,213 +229,127 @@
         }
 
         function drawCanvas() {
-            if (!img.src) return;
-
-            const size = 1000;
-            const scale = Math.min(size / img.width, size / img.height);
-            imageScale = scale;
-            newWidth = img.width * scale;
-            newHeight = img.height * scale;
-
+            const baseCanvasWidth = 1000;
+            const baseCanvasHeight = 1000;
             const extraHeight = 140;
-            canvas.width = size;
-            canvas.height = size + extraHeight;
-
-            const xOffset = (size - newWidth) / 2;
-            const yOffset = (size - newHeight) / 2;
-            const faixaWidth = newWidth * (faixaWidthPercentage / 100);
-            calculatedMaxWidth = newWidth * (maxDescriptionWidthPercentage / 100);
-
-
+            canvas.width = baseCanvasWidth;
+            canvas.height = baseCanvasHeight + extraHeight;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
 
-            ctx.globalAlpha = 1.0;
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = hexToRGBA(fundoCorInput.value, 0.8);
-            ctx.fillRect(xOffset + (newWidth - faixaWidth)/2, size, faixaWidth, extraHeight);
+            if (img.src) {
+                const scale = Math.min(baseCanvasWidth / img.width, baseCanvasHeight / img.height);
+                imageScale = scale;
+                const newWidth = img.width * scale;
+                const newHeight = img.height * scale;
+                const xOffset = (baseCanvasWidth - newWidth) / 2;
+                const yOffset = (baseCanvasHeight - newHeight) / 2;
+                ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+            } else {
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, baseCanvasWidth, baseCanvasHeight);
+                ctx.fillStyle = '#cccccc';
+                ctx.font = '30px Roboto';
+                ctx.textAlign = 'center';
+                ctx.fillText('Envie uma imagem para começar!', baseCanvasWidth / 2, baseCanvasHeight / 2);
+            }
 
+            // Faixa inferior
+            const faixaWidth = baseCanvasWidth * (faixaWidthPercentage / 100);
+            const faixaX = (baseCanvasWidth - faixaWidth) / 2;
+            ctx.fillStyle = hexToRGBA(fundoCorInput.value, 0.85);
+            ctx.fillRect(faixaX, baseCanvasHeight, faixaWidth, extraHeight);
+
+            // Texto faixa
             ctx.fillStyle = faixaTextoCorInput.value;
             ctx.font = 'bold 28px Roboto';
             ctx.textAlign = 'center';
-            ctx.fillText('🍔 Angela Maia ', canvas.width / 2, size + 40);
+            ctx.fillText('💎 Angela Maia', canvas.width / 2, baseCanvasHeight + 40);
             ctx.font = '22px Roboto';
-            ctx.fillText('Aceito Encomendas!', canvas.width / 2, size + 70);
+            ctx.fillText('Aceito Encomendas!', canvas.width / 2, baseCanvasHeight + 70);
             ctx.font = '18px Roboto';
-            ctx.fillText('📱 WhatsApp: 21 97221-7122', canvas.width / 2, size + 95);
-            ctx.fillText('📸 Instagram: @Angela Maia ', canvas.width / 2, size + 120);
+            ctx.fillText('📱 WhatsApp: 21 97221-7122', canvas.width / 2, baseCanvasHeight + 95);
+            ctx.fillText('📧 Email: angela.vithyca@gmail.com', canvas.width / 2, baseCanvasHeight + 120);
 
+            // Descrição
             const description = descriptionInput.value.trim();
             if (description) {
                 const words = description.split(' ');
                 let line = '';
                 lines = [];
-                const maxWidth = calculatedMaxWidth;
-                maxLineWidth = 0;
-
-                ctx.font = `italic ${descFontSize}px "${descFontFamily}", serif`;
+                const maxWidth = 1000 * (maxDescriptionWidthPercentage / 100);
+                ctx.font = `${descFontSize}px "${descFontFamily}", serif`;
                 ctx.fillStyle = descCorInput.value;
                 ctx.textAlign = 'center';
-                ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                ctx.shadowBlur = 4;
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                ctx.shadowBlur = 2;
 
                 words.forEach(word => {
-                    const width = ctx.measureText(line + word).width;
-                    if (width < maxWidth) {
-                        line += word + ' ';
-                    } else {
-                        lines.push(line.trim());
-                        line = word + ' ';
-                    }
+                    const testLine = line + word + ' ';
+                    if (ctx.measureText(testLine).width < maxWidth) line = testLine;
+                    else { lines.push(line.trim()); line = word + ' '; }
                 });
                 lines.push(line.trim());
 
                 let y = descPos.y;
-                lines.forEach((text, index) => {
+                lines.forEach(text => {
+                    ctx.fillStyle = `rgba(0,0,0,0.08)`;
+                    const metrics = ctx.measureText(text);
+                    ctx.fillRect(descPos.x - metrics.width / 2 - 5, y - descFontSize * lineHeight + 2, metrics.width + 10, descFontSize * lineHeight - 4);
+                    ctx.fillStyle = descCorInput.value;
                     ctx.fillText(text, descPos.x, y);
-                    const textWidth = ctx.measureText(text).width;
-                    if (textWidth > maxLineWidth) {
-                        maxLineWidth = textWidth;
-                    }
                     y += descFontSize * lineHeight;
                 });
             }
 
+            // Valor
             const valor = valorInput.value.trim();
             if (valor) {
-                ctx.font = `bold ${valorFontSize}px "Poppins", sans-serif`;
+                ctx.font = `bold ${valorFontSize}px Roboto`;
                 ctx.fillStyle = valorCorInput.value;
                 ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                ctx.shadowBlur = 2;
                 ctx.fillText(`R$ ${valor}`, valorPos.x, valorPos.y);
             }
 
+            // Logo
             if (logoImg) {
-                const size = 120;
-                ctx.drawImage(logoImg, canvas.width - size - 20, 20, size, size);
+                const logoSize = 120;
+                ctx.shadowBlur = 0;
+                ctx.drawImage(logoImg, canvas.width - logoSize - 25, 25, logoSize, logoSize);
             }
         }
 
-        upload.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        upload.addEventListener('change', e => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { img.src = e.target.result; }; reader.readAsDataURL(file); });
+        logoUpload.addEventListener('change', e => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = e => { logoImg = new Image(); logoImg.onload = drawCanvas; logoImg.src = e.target.result; }; reader.readAsDataURL(file); });
+        img.onload = drawCanvas;
+        document.addEventListener('DOMContentLoaded', drawCanvas);
+
+        descriptionInput.addEventListener('input', drawCanvas);
+        valorInput.addEventListener('input', drawCanvas);
+        fundoCorInput.addEventListener('input', drawCanvas);
+        faixaTextoCorInput.addEventListener('input', drawCanvas);
+        descCorInput.addEventListener('input', drawCanvas);
+        valorCorInput.addEventListener('input', drawCanvas);
+        faixaWidthInput.addEventListener('input', () => { faixaWidthPercentage = parseInt(faixaWidthInput.value); drawCanvas(); });
+        descFontSizeInput.addEventListener('input', () => { descFontSize = parseInt(descFontSizeInput.value); drawCanvas(); });
+        descFontFamilyInput.addEventListener('change', () => { descFontFamily = descFontFamilyInput.value; drawCanvas(); });
+        valorFontSizeInput.addEventListener('input', () => { valorFontSize = parseInt(valorFontSizeInput.value); drawCanvas(); });
+        descriptionWidthPercentageInput.addEventListener('input', () => { maxDescriptionWidthPercentage = parseInt(descriptionWidthPercentageInput.value); drawCanvas(); });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'angela-maia-produto.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         });
 
-        logoUpload.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                logoImg = new Image();
-                logoImg.onload = () => drawCanvas();
-                logoImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        img.onload = () => drawCanvas();
-
-        function isInsideText(x, y, textX, textY, fontSize, text) {
-            const width = ctx.measureText(text).width;
-            const height = fontSize * lineHeight;
-            return (
-                x >= textX - width / 2 &&
-                x <= textX + width / 2 &&
-                y >= textY - height &&
-                y <= textY
-            );
-        }
-
-        function getTouchPos(canvas, evt) {
-            const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-            if (evt.touches) {
-                clientX = evt.touches[0].clientX;
-                clientY = evt.touches[0].clientY;
-            } else {
-                clientX = evt.clientX;
-                clientY = evt.clientY;
-            }
-            return {
-                x: ((clientX - rect.left) / rect.width) * canvas.width,
-                y: ((clientY - rect.top) / rect.height) * canvas.height,
-            };
-        }
-
-        canvas.addEventListener('mousedown', startDrag);
-        canvas.addEventListener('touchstart', startDrag);
-        canvas.addEventListener('mousemove', drag);
-        canvas.addEventListener('touchmove', drag);
-        canvas.addEventListener('mouseup', endDrag);
-        canvas.addEventListener('mouseleave', endDrag);
-        canvas.addEventListener('touchend', endDrag);
-        canvas.addEventListener('touchcancel', endDrag);
-
-        function startDrag(evt) {
-            evt.preventDefault();
-            const pos = getTouchPos(canvas, evt);
-            const description = descriptionInput.value.trim();
-            const valor = valorInput.value.trim();
-            let i = 0;
-            if (lines.length > 0) {
-                let y = descPos.y;
-                for (i = 0; i < lines.length; i++) {
-                    let textWidth = ctx.measureText(lines[i]).width;
-                    let textXStart = descPos.x - textWidth / 2;
-                    let textXEnd = descPos.x + textWidth / 2;
-                    let textYStart = y - descFontSize * lineHeight;
-                    let textYEnd = y;
-                    if (pos.x >= textXStart && pos.x <= textXEnd && pos.y >= textYStart && pos.y <= textYEnd) {
-                        dragging = 'desc';
-                        dragOffset.x = pos.x - descPos.x;
-                        dragOffset.y = pos.y - y;
-                        break;
-                    }
-                    y += descFontSize * lineHeight;
-                }
-            }
-            if (dragging !== 'desc' && valor && isInsideText(pos.x, pos.y, valorPos.x, valorPos.y, 40, `R$ ${valor}`)) {
-                dragging = 'valor';
-                dragOffset.x = pos.x - valorPos.x;
-                dragOffset.y = pos.y - valorPos.y;
-            }
-        }
-
-        function drag(evt) {
-            if (!dragging) return;
-            evt.preventDefault();
-            const pos = getTouchPos(canvas, evt);
-            if (dragging === 'desc') {
-                descPos.x = pos.x - dragOffset.x;
-                descPos.y = pos.y - dragOffset.y;
-            } else if (dragging === 'valor') {
-                valorPos.x = pos.x - dragOffset.x;
-                valorPos.y = pos.y - dragOffset.y;
-            }
-            drawCanvas();
-        }
-
-        function endDrag(evt) {
-            dragging = null;
-        }
-
-        descriptionInput.addEventListener('input', () => drawCanvas());
-        valorInput.addEventListener('input', () => drawCanvas());
-        fundoCorInput.addEventListener('input', () => drawCanvas());
-        faixaTextoCorInput.addEventListener('input', () => drawCanvas());
-        descCorInput.addEventListener('input', () => drawCanvas());
-        valorCorInput.addEventListener('input', () => drawCanvas());
-        faixaWidthInput.addEventListener('input', () => {
-            faixaWidthPercentage = parseInt(faixaWidthInput.value);
-            calculatedMaxWidth = newWidth * (faixaWidthPercentage / 100);
-            drawCanvas();
-        });
-        descFontSizeInput.addEventListener('input', () => {
-            descFontSize = parseInt(descFontSizeInput.value);
-            drawCanvas()
+        function copyDescription() { if(descriptionInput.value.trim()) navigator.clipboard.writeText(descriptionInput.value.trim()).then(()=>alert('Descrição copiada!')); else alert('Descrição vazia.'); }
+        function clearDescription() { descriptionInput.value=''; drawCanvas(); }
+    </script>
+</body>
+</html>
