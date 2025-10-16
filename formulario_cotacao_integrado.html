@@ -98,6 +98,10 @@
       text-align: right;
       margin-top: 10px;
       font-weight: bold;
+      font-size: 1.2rem;
+      color: #2c3e50;
+      border-top: 2px solid #eee;
+      padding-top: 10px;
     }
 
     #sendData {
@@ -207,9 +211,13 @@
 
     const apiUrl = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
 
+    // Mostra mensagem de carregamento
+    produtoSelect.innerHTML = '<option>Carregando produtos...</option>';
+
     fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
+        produtoSelect.innerHTML = ''; // Limpa antes de popular
         data.forEach(item => {
           const option = document.createElement("option");
           option.textContent = item.Produto || item.produto;
@@ -234,7 +242,7 @@
           <td>${item.produto}</td>
           <td>${item.marca}</td>
           <td>${item.quantidade}</td>
-          <td>R$ ${subtotal.toFixed(2)}</td>
+          <td>${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(subtotal)}</td>
           <td><button class="removeBtn">X</button></td>
         `;
 
@@ -245,7 +253,7 @@
         });
       });
 
-      totalDisplay.textContent = `Total: R$ ${total.toFixed(2)}`;
+      totalDisplay.textContent = `Total: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}`;
     }
 
     addItemBtn.addEventListener("click", () => {
@@ -254,8 +262,8 @@
       const quantidade = document.getElementById("quantidade").value;
       const valor = document.getElementById("valor").value;
 
-      if (!marca || !quantidade || !valor) {
-        alert("Preencha todos os campos antes de adicionar.");
+      if (!produto || !marca || quantidade <= 0 || valor <= 0) {
+        alert("Por favor, insira dados válidos para todos os campos.");
         return;
       }
 
@@ -293,6 +301,8 @@
       const numero = "5521992576333";
       const link = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
       window.open(link, "_blank");
+
+      alert("Cotação aberta no WhatsApp com sucesso!");
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
