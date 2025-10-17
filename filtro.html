@@ -226,6 +226,57 @@
   <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
   <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
 
+      async function verificarFaltantes() {
+      const faltandoDiv = document.getElementById('faltando');
+      faltandoDiv.innerHTML = '<p>🔎 Verificando itens faltantes...</p>';
+
+      // Garante que existam cotações carregadas
+      if (cotacoes.length === 0) {
+        faltandoDiv.innerHTML = '<p style="color:red;">Nenhuma cotação foi adicionada ainda.</p>';
+        return;
+      }
+
+      // Coleta todos os nomes de produtos das cotações
+      const nomesCotados = new Set();
+      cotacoes.forEach(txt => {
+        const itens = txt.split('📦').slice(1);
+        itens.forEach(bloco => {
+          const nomeMatch = bloco.match(/\*(.+)\*/);
+          if (nomeMatch) nomesCotados.add(nomeMatch[1].trim().toLowerCase());
+        });
+      });
+
+      // Faz a requisição para a planilha de referência (Google Apps Script)
+      try {
+        const url = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+
+        if (!dados || !dados.produtos) {
+          faltandoDiv.innerHTML = '<p style="color:red;">Não foi possível carregar a lista de produtos da planilha.</p>';
+          return;
+        }
+
+        const produtosPlanilha = dados.produtos.map(p => p.toLowerCase().trim());
+        const faltantes = produtosPlanilha.filter(p => !nomesCotados.has(p));
+
+        if (faltantes.length === 0) {
+          faltandoDiv.innerHTML = '<p style="color:green;">✅ Nenhum item faltando! Todas as referências foram cotadas.</p>';
+        } else {
+          faltandoDiv.innerHTML = `
+            <h4>⚠️ Itens Faltantes (${faltantes.length})</h4>
+            <ul style="columns:2; list-style:none; padding-left:0;">
+              ${faltantes.map(f => `<li>• ${f}</li>`).join('')}
+            </ul>
+          `;
+        }
+      } catch (erro) {
+        console.error("Erro ao verificar itens faltantes:", erro);
+        faltandoDiv.innerHTML = '<p style="color:red;">Erro ao conectar à planilha de produtos.</p>';
+      }
+    }
+
+
   <div id="resultado"></div>
   <div id="faltando"></div>
 
@@ -456,3 +507,4 @@ function inicializarOuLimparSemAlternativa() {
 </script>
 </body>
 </html>
+
