@@ -6,35 +6,27 @@
 <title>Filtro de Melhores Preços</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* ----- BASE ----- */
   body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     background: #f0f2f5;
     color: #333;
     line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
   }
-
   .container {
-    flex: 1;
     max-width: 960px;
-    margin: 20px auto;
+    margin: 30px auto;
     background: white;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
-
   h2 {
     color: #1a2533;
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 25px;
     font-weight: 700;
   }
-
   textarea {
     width: 100%;
     height: 150px;
@@ -43,314 +35,151 @@
     border-radius: 6px;
     border: 1px solid #ced4da;
     resize: vertical;
-    margin-bottom: 12px;
-    box-sizing: border-box;
+    margin-bottom: 15px;
   }
-
-  .input-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-  .input-actions button { flex: 1 1 auto; min-width: 120px; }
+  .input-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .input-actions button {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .input-actions button:hover { background-color: #5a6268; }
 
   button {
     display: inline-block;
-    padding: 10px 18px;
+    padding: 12px 24px;
+    margin: 5px;
     border: none;
     border-radius: 6px;
     background: #007bff;
     color: white;
     cursor: pointer;
-    font-size: 15px;
-    margin: 5px 0;
-    transition: background-color 0.18s, transform 0.08s;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
-  button:hover { background: #0056b3; transform: translateY(-1px); }
+  button:hover { background-color: #0056b3; }
 
-  #resultado, #faltando {
-    margin-top: 18px;
-    padding: 14px;
+  button[onclick^="filtrarMelhoresPrecos"],
+  button[onclick^="verificarFaltantes"] { background-color: #28a745; }
+  button[onclick^="filtrarMelhoresPrecos"]:hover,
+  button[onclick^="verificarFaltantes"]:hover { background-color: #1e7e34; }
+
+  #listaCotacoes, #resultado, #faltando {
+    margin-top: 20px;
+    padding: 15px;
     border: 1px solid #e9ecef;
     border-radius: 8px;
-    background: #f8f9fa;
+    background-color: #f8f9fa;
   }
-
+  .item-card {
+    background: #e9f7ef;
+    border-left: 4px solid #28a745;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 15px;
+    color: #155724;
+  }
   .fornecedor {
     background: #ffffff;
     border: 1px solid #dee2e6;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   }
-
   .fornecedor h3 {
-    color: #007bff;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 8px;
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
+    color: #007bff;
+    margin-bottom: 15px;
+    font-weight: 500;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
   }
-
-  .fornecedor ul { list-style: none; padding: 0; margin:0; }
+  .fornecedor ul { padding-left: 0; list-style-type: none; }
   .fornecedor li {
-    border-bottom: 1px dashed #ddd;
-    padding: 12px 0;
-    font-size: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    font-size: 15px;
+    line-height: 1.5;
   }
   .fornecedor li:last-child { border-bottom: none; }
-
   .fornecedor li button {
     background-color: #dc3545;
     color: white;
     padding: 6px 10px;
     font-size: 13px;
-    border-radius: 4px;
     margin-top: 8px;
+    border-radius: 4px;
   }
   .fornecedor li button:hover { background-color: #c82333; }
 
-  .whatsapp, .pdf {
+  .whatsapp {
     display: inline-block;
-    margin-top: 12px;
-    padding: 8px 14px;
-    border-radius: 18px;
+    margin-top: 15px;
+    background: #25d366;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
     text-decoration: none;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
   }
-  .whatsapp { background: #25d366; }
   .whatsapp:hover { background-color: #1da851; }
-  .pdf { background: #007bff; margin-left:8px; }
-  .pdf:hover { background: #0056b3; }
 
-  /* TOAST */
-  .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #28a745;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.16);
-    opacity: 0;
-    transform: translateY(-10px);
-    animation: fadeInOut 3s ease forwards;
-    z-index: 9999;
-  }
-  .toast.alert { background: #ffc107; color: #222; }
-  @keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-10px); }
-    10%, 90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-10px); }
-  }
+  hr { border: none; border-top: 1px solid #dee2e6; margin: 25px 0; }
 
-  /* SIDEBAR (mantém mesmo seletor do seu código) */
-  .sidebar {
-    width: 300px;
-    background: white;
-    box-shadow: 0 0 12px rgba(0,0,0,0.12);
-    padding: 14px;
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    transition: transform 0.28s ease;
-    z-index: 1000;
-    box-sizing: border-box;
-  }
-  .sidebar.hidden { transform: translateX(105%); }
-  .sidebar h3 {
-    margin-top: 0;
-    font-size: 18px;
-    color: #007bff;
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .sidebar ul { list-style:none; padding:0; margin-top:10px; }
-  .sidebar li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size:14px; }
-
-  /* BOTÃO FLUTUANTE (abre/fecha sidebar) */
-  #toggleSidebarBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 22px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-    cursor: pointer;
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #toggleSidebarBtn:hover { background-color: #0056b3; transform: translateY(-2px); }
-
-  /* RESPONSIVIDADE */
-  @media (max-width: 880px) {
-    .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
-    textarea { height: 130px; font-size: 15px; }
-    .input-actions { gap:6px; }
-    .input-actions button { min-width: unset; flex: 1 1 100%; }
-    button { width: 100%; margin: 8px 0; }
-    .sidebar { width: 86%; }
-  }
-
-  @media (max-width: 480px) {
-    h2 { font-size: 18px; }
-    .fornecedor h3 { font-size: 15px; }
-    .whatsapp, .pdf { font-size: 13px; padding: 8px 12px; }
-    #toggleSidebarBtn { width: 52px; height: 52px; }
-  }
+  #semAlternativa h3 { color: #dc3545; font-size: 1.1em; }
+  #semAlternativa ul li { color: #555; padding: 8px 0; }
 </style>
 </head>
 <body>
-
 <div class="container">
   <h2>Filtro de Melhores Preços</h2>
   <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea>
-  <div id="listaCotacoes"></div>
-
   <div class="input-actions">
     <button onclick="document.getElementById('cotacao').value = ''">Limpar</button>
-    <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text)">Colar</button>
-    <button id="adicionarBtn">Adicionar Cotação</button>
+    <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text).catch(err => console.error(err));">Colar</button>
   </div>
-
-  <hr style="margin: 14px 0;">
+  <button id="adicionarBtn">Adicionar Cotação</button>
+  <div id="listaCotacoes"></div>
+  <hr />
   <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
   <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
-
-      async function verificarFaltantes() {
-      const faltandoDiv = document.getElementById('faltando');
-      faltandoDiv.innerHTML = '<p>🔎 Verificando itens faltantes...</p>';
-
-      // Garante que existam cotações carregadas
-      if (cotacoes.length === 0) {
-        faltandoDiv.innerHTML = '<p style="color:red;">Nenhuma cotação foi adicionada ainda.</p>';
-        return;
-      }
-
-      // Coleta todos os nomes de produtos das cotações
-      const nomesCotados = new Set();
-      cotacoes.forEach(txt => {
-        const itens = txt.split('📦').slice(1);
-        itens.forEach(bloco => {
-          const nomeMatch = bloco.match(/\*(.+)\*/);
-          if (nomeMatch) nomesCotados.add(nomeMatch[1].trim().toLowerCase());
-        });
-      });
-
-      // Faz a requisição para a planilha de referência (Google Apps Script)
-      try {
-        const url = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
-        const resposta = await fetch(url);
-        const dados = await resposta.json();
-
-        if (!dados || !dados.produtos) {
-          faltandoDiv.innerHTML = '<p style="color:red;">Não foi possível carregar a lista de produtos da planilha.</p>';
-          return;
-        }
-
-        const produtosPlanilha = dados.produtos.map(p => p.toLowerCase().trim());
-        const faltantes = produtosPlanilha.filter(p => !nomesCotados.has(p));
-
-        if (faltantes.length === 0) {
-          faltandoDiv.innerHTML = '<p style="color:green;">✅ Nenhum item faltando! Todas as referências foram cotadas.</p>';
-        } else {
-          faltandoDiv.innerHTML = `
-            <h4>⚠️ Itens Faltantes (${faltantes.length})</h4>
-            <ul style="columns:2; list-style:none; padding-left:0;">
-              ${faltantes.map(f => `<li>• ${f}</li>`).join('')}
-            </ul>
-          `;
-        }
-      } catch (erro) {
-        console.error("Erro ao verificar itens faltantes:", erro);
-        faltandoDiv.innerHTML = '<p style="color:red;">Erro ao conectar à planilha de produtos.</p>';
-      }
-    }
-
-
   <div id="resultado"></div>
   <div id="faltando"></div>
-
-  <hr style="margin: 14px 0;">
-  <div id="outrosFornecedores" class="fornecedor hidden">
-    <h3>📦 Outros Fornecedores</h3>
-    <ul id="listaOutros"></ul>
-  </div>
 </div>
-
-<!-- Sidebar (mantém id e classes para seu JS) -->
-<div class="sidebar hidden" id="sidebar">
-  <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#007bff">✖</button></h3>
-  <ul id="listaMarcas"></ul>
-  <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
-</div>
-
-<!-- Botão flutuante -->
-<button id="toggleSidebarBtn" onclick="toggleSidebar()">👁️</button>
 
 <script>
-/* === JS ORIGINAL (preservado exatamente) === */
 const cotacoes = [];
 let todosPrecos = {};
-let marcasDetectadas = new Set();
-let indesejadasSet = new Set();
 let historicoOriginais = {};
 
-function normalizarTexto(txt) {
-  return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
-function showToast(msg, tipo = 'success') {
-  const toast = document.createElement('div');
-  toast.className = 'toast' + (tipo === 'alert' ? ' alert' : '');
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
+document.getElementById('adicionarBtn').addEventListener('click', adicionarCotacao);
 
-document.getElementById('adicionarBtn').addEventListener('click', () => {
+function adicionarCotacao() {
   const texto = document.getElementById('cotacao').value.trim();
   if (!texto) return;
   cotacoes.push(texto);
-  const empresa = (texto.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
+
+  const empresaMatch = texto.match(/\*Empresa:\* (.+)/);
+  const nomeEmpresa = empresaMatch ? empresaMatch[1].trim() : 'Empresa não identificada';
+
   const div = document.createElement('div');
-  div.textContent = `Cotação de: ${empresa}`;
+  div.className = 'item-card';
+  div.textContent = `Cotação de: ${nomeEmpresa}`;
   document.getElementById('listaCotacoes').appendChild(div);
   document.getElementById('cotacao').value = '';
-  atualizarMarcasDetectadas(texto);
-});
-
-function atualizarMarcasDetectadas(texto) {
-  const marcas = [...texto.matchAll(/Marca:\s*(.+)/gi)].map(m => m[1].trim());
-  marcas.forEach(m => marcasDetectadas.add(m));
-  renderCheckboxMarcas();
-}
-
-function renderCheckboxMarcas() {
-  const lista = document.getElementById('listaMarcas');
-  lista.innerHTML = '';
-  [...marcasDetectadas].sort().forEach(m => {
-    const li = document.createElement('li');
-    li.innerHTML = `<label><input type="checkbox" value="${m}" checked> ${m}</label>`;
-    lista.appendChild(li);
-  });
-}
-
-function aplicarFiltroMarcas() {
-  const checkboxes = document.querySelectorAll('#listaMarcas input[type="checkbox"]');
-  indesejadasSet = new Set();
-  checkboxes.forEach(cb => { if (!cb.checked) indesejadasSet.add(normalizarTexto(cb.value)) });
-  filtrarMelhoresPrecos();
-  showToast("Filtro de marcas aplicado ✅");
 }
 
 function filtrarMelhoresPrecos() {
@@ -362,149 +191,154 @@ function filtrarMelhoresPrecos() {
     const empresa = (txt.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
     const itens = txt.split('📦').slice(1);
     itens.forEach(bloco => {
-      const nome = (bloco.match(/\*(.+)\*/) || [])[1];
-      const marca = (bloco.match(/Marca:\s*(.+)/) || [])[1];
-      if (!nome || !marca) return;
-
-      const marcaNorm = normalizarTexto(marca);
-      if (indesejadasSet.has(marcaNorm)) return;
-
-      const valor = parseFloat((bloco.match(/R\$\s*([\d,.]+)/) || ['', 'Infinity'])[1].replace(/\./g, '').replace(',', '.'));
-      const qtdNaCaixaMatch = bloco.match(/(?:Qtd|Quantidade|Contém):\s*(\d+)/i);
-      const qtdNaCaixa = qtdNaCaixaMatch ? parseInt(qtdNaCaixaMatch[1]) : 1;
-
+      const nome = (bloco.match(/\*(.+)\*/) || [])[1]?.toLowerCase().trim();
+      if (!nome) return;
+      const valor = parseFloat((bloco.match(/R\$\s*([\d,.]+)/) || ['','Infinity'])[1].replace(/\./g,'').replace(',','.'));
       if (!todosPrecos[nome]) todosPrecos[nome] = [];
-      todosPrecos[nome].push({ empresa, valor, texto: bloco.trim(), marca, qtdNaCaixa });
+      todosPrecos[nome].push({ empresa, valor, texto: bloco.trim() });
 
       const melhor = precosMap.get(nome);
-      if (!melhor || valor < melhor.valor) {
-        precosMap.set(nome, { empresa, valor, texto: bloco.trim(), qtdNaCaixa });
-      }
+      if (!melhor || valor < melhor.valor) precosMap.set(nome, { empresa, valor, texto: bloco.trim() });
     });
   });
 
-  for (const nome in todosPrecos) todosPrecos[nome].sort((a, b) => a.valor - b.valor);
-
-  precosMap.forEach(({ empresa, texto, qtdNaCaixa }, nome) => {
+  precosMap.forEach(({ empresa, texto }, nome) => {
     if (!fornecedoresMap[empresa]) fornecedoresMap[empresa] = [];
-    fornecedoresMap[empresa].push({ nome, texto, qtdNaCaixa });
+    fornecedoresMap[empresa].push({ nome, texto });
   });
+
   renderFornecedores(fornecedoresMap);
 }
 
-function renderFornecedores(map) {
-  const resultado = document.getElementById('resultado');
-  resultado.innerHTML = '';
-  Object.entries(map).forEach(([empresa, itens]) => {
+function renderFornecedores(fornecedoresMap) {
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = '';
+
+  Object.entries(fornecedoresMap).forEach(([empresa, itens]) => {
     const div = document.createElement('div');
     div.className = 'fornecedor';
     div.dataset.empresa = empresa;
-    div.innerHTML = `<h3>${empresa}</h3><ul></ul>
-      <a class='whatsapp' href='#' target='_blank'>Compartilhar via WhatsApp</a>
-      <button class='pdf' onclick="gerarPDF('${empresa}')">📄 Baixar PDF</button>`;
-    resultado.appendChild(div);
-    itens.forEach(item => adicionarItemAoDOM(item, empresa));
-    atualizarLinks(empresa);
+
+    const itensHtml = itens.map(({ nome, texto }) => `
+      <li data-produto="${nome.replace(/"/g,"&quot;").replace(/'/g,"&apos;")}">
+        ${texto.replace(/\n/g,'<br>')}
+        <br><button onclick="removerItem('${empresa.replace(/'/g,"\\'")}', '${nome.replace(/'/g,"\\'")}')">Remover item</button>
+      </li>`).join('');
+
+    div.innerHTML = `<h3>${empresa}</h3><ul>${itensHtml}</ul>`;
+
+    const msgWhatsapp = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i=>i.texto).join('\n\n'));
+    div.innerHTML += `<a class='whatsapp' href='https://wa.me/?text=${msgWhatsapp}' target='_blank'>Compartilhar via WhatsApp</a>`;
+    resultadoDiv.appendChild(div);
   });
+
   inicializarOuLimparSemAlternativa();
 }
 
-function adicionarItemAoDOM(item, empresa, ehAlternativo = false) {
-  let container = document.querySelector(`.fornecedor[data-empresa='${empresa}'] ul`);
-  if (!container) return;
-
-  const li = document.createElement('li');
-  li.dataset.produto = item.nome;
-  li.dataset.qtdNaCaixa = item.qtdNaCaixa;
-  li.innerHTML = `
-    <div class="texto-produto">${item.texto.replace(/\n/g, '<br>')}</div>
-    ${ehAlternativo ? '<small style="color: #28a745;">(Alternativo)</small>' : ''}
-    <div style="margin-top: 8px;">
-      <label>Qtd. de caixas: </label>
-      <input type="number" min="1" value="1" style="width:60px;" onchange="atualizarLinks('${empresa}')">
-    </div>
-    <button onclick="removerItem(this, '${empresa}','${item.nome}')" style="margin-top:8px;">Remover item</button>
-  `;
-  container.appendChild(li);
-  atualizarLinks(empresa);
-}
-
-function removerItem(btn, empresa, nome) {
-  const li = btn.closest('li');
-  li.remove();
-  const alternativas = todosPrecos[nome]?.filter(o => o.empresa !== empresa) || [];
-  if (alternativas.length > 0) {
-    const alt = alternativas[0];
-    historicoOriginais[nome] = { empresaOriginal: empresa };
-    adicionarItemAoDOM({ nome, texto: alt.texto, qtdNaCaixa: alt.qtdNaCaixa }, alt.empresa, true);
-    showToast(`Item '${nome}' movido para fornecedor alternativo (${alt.empresa})`);
-  } else {
-    historicoOriginais[nome] = { empresaOriginal: empresa };
-    const campo = document.getElementById('outrosFornecedores');
-    campo.classList.remove('hidden');
-    const lista = document.getElementById('listaOutros');
-    const liNovo = document.createElement('li');
-    liNovo.dataset.produto = nome;
-    liNovo.innerHTML = `<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
-      <button onclick="restaurarOriginal('${nome}')">↩️ Voltar original</button>`;
-    lista.appendChild(liNovo);
-    showToast(`Item '${nome}' movido para "Outros Fornecedores"`, 'alert');
-  }
-}
-
-function restaurarOriginal(nome) {
-  const hist = historicoOriginais[nome];
-  if (!hist) return;
-  document.querySelectorAll(`li[data-produto="${nome}"]`).forEach(el => el.remove());
-  const original = todosPrecos[nome]?.find(o => o.empresa === hist.empresaOriginal);
-  if (original) {
-    adicionarItemAoDOM(original, hist.empresaOriginal, false);
-    showToast(`Item '${nome}' restaurado ao fornecedor original.`);
-  } else {
-    showToast(`Erro: fornecedor original não encontrado.`, 'alert');
-  }
-  const outros = document.getElementById('listaOutros');
-  if (outros && outros.children.length === 0) document.getElementById('outrosFornecedores').classList.add('hidden');
-}
-
-function atualizarLinks(empresa) {
-  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
-  if (!div) return;
-  const itens = div.querySelectorAll('li');
-  let textoPedido = "";
-  let totalGeral = 0;
-  itens.forEach(li => {
-    const textoOriginal = li.querySelector('.texto-produto').innerText;
-    const caixasPedidas = parseInt(li.querySelector('input[type="number"]').value) || 1;
-    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
-    const valorMatch = textoOriginal.match(/R\$\s*([\d,.]+)/);
-    const valorCaixa = valorMatch ? parseFloat(valorMatch[1].replace(/\./g, '').replace(',', '.')) : 0;
-    const subtotal = valorCaixa * caixasPedidas;
-    const totalUnidades = qtdNaCaixa * caixasPedidas;
-    totalGeral += subtotal;
-    textoPedido += `📦 ${textoOriginal.split('\n')[0]}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
-  });
-  const textoFinal = `*Pedido para ${empresa}*\n\n${textoPedido}*Total geral: R$ ${totalGeral.toFixed(2)}*`;
-  const link = div.querySelector('.whatsapp');
-  link.href = `https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
-}
-
 function inicializarOuLimparSemAlternativa() {
-  let alt = document.getElementById('semAlternativa');
-  const res = document.getElementById('resultado');
-  if (!alt) {
-    alt = document.createElement('div');
-    alt.id = 'semAlternativa';
-    alt.className = 'fornecedor';
-    alt.innerHTML = '<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>';
-    alt.style.display = 'none';
-    res.appendChild(alt);
+  let altDiv = document.getElementById('semAlternativa');
+  const resultadoDiv = document.getElementById('resultado');
+  if(!altDiv){
+    altDiv = document.createElement('div');
+    altDiv.id = 'semAlternativa';
+    altDiv.className = 'fornecedor';
+    altDiv.innerHTML = `<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>`;
+    altDiv.style.display = 'none';
+    resultadoDiv.appendChild(altDiv);
   } else {
-    alt.querySelector('ul').innerHTML = '';
-    alt.style.display = 'none';
+    altDiv.querySelector('ul').innerHTML = '';
+    altDiv.style.display = 'none';
+  }
+}
+
+function getTextFromLiForWhatsapp(liElement){
+  let txt = '';
+  liElement.childNodes.forEach(node=>{
+    if(node.nodeName==='BUTTON') return;
+    if(node.nodeName==='BR'){ txt+='\n'; return; }
+    if(node.nodeType===Node.TEXT_NODE) txt+=node.textContent;
+  });
+  return txt.trim();
+}
+
+function removerItem(empresaOriginal, nomeProduto){
+  const blocoItem = document.querySelector(`.fornecedor[data-empresa='${empresaOriginal}'] li[data-produto='${nomeProduto.replace(/"/g,"&quot;").replace(/'/g,"&apos;")}']`);
+  if(!blocoItem) return;
+  const fornecedorDivOriginal = blocoItem.closest('.fornecedor');
+  blocoItem.remove();
+
+  const itensRestantes = fornecedorDivOriginal.querySelectorAll('li');
+  if(itensRestantes.length === 0) fornecedorDivOriginal.remove();
+
+  const listaAlternativa = todosPrecos[nomeProduto] || [];
+  const proximo = listaAlternativa.find(i=>i.empresa !== empresaOriginal);
+
+  const semAltDiv = document.getElementById('semAlternativa');
+  if(proximo){
+    const divFornecedor = document.querySelector(`.fornecedor[data-empresa='${proximo.empresa}']`);
+    if(divFornecedor){
+      const ul = divFornecedor.querySelector('ul');
+      const li = document.createElement('li');
+      li.dataset.produto = nomeProduto;
+      li.innerHTML = `${proximo.texto}<br><button onclick="removerItem('${proximo.empresa.replace(/'/g,"\\'")}', '${nomeProduto.replace(/'/g,"\\'")}')">Remover item</button>`;
+      ul.appendChild(li);
+    }
+  } else {
+    const ul = semAltDiv.querySelector('ul');
+    const li = document.createElement('li');
+    li.textContent = getTextFromLiForWhatsapp(blocoItem);
+    ul.appendChild(li);
+    semAltDiv.style.display='block';
+  }
+}
+
+// Função verificar itens faltantes
+async function verificarFaltantes() {
+  const faltandoDiv = document.getElementById('faltando');
+  faltandoDiv.innerHTML = '<p>🔎 Verificando itens faltantes...</p>';
+
+  if (cotacoes.length === 0) {
+    faltandoDiv.innerHTML = '<p style="color:red;">Nenhuma cotação foi adicionada ainda.</p>';
+    return;
+  }
+
+  const nomesCotados = new Set();
+  cotacoes.forEach(txt => {
+    const itens = txt.split('📦').slice(1);
+    itens.forEach(bloco => {
+      const nomeMatch = bloco.match(/\*(.+)\*/);
+      if (nomeMatch) nomesCotados.add(nomeMatch[1].trim().toLowerCase());
+    });
+  });
+
+  try {
+    const url = "https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec";
+    const resposta = await fetch(url);
+    const dados = await resposta.json();
+
+    if (!dados || !dados.produtos) {
+      faltandoDiv.innerHTML = '<p style="color:red;">Não foi possível carregar a lista de produtos da planilha.</p>';
+      return;
+    }
+
+    const produtosPlanilha = dados.produtos.map(p => p.toLowerCase().trim());
+    const faltantes = produtosPlanilha.filter(p => !nomesCotados.has(p));
+
+    if (faltantes.length === 0) {
+      faltandoDiv.innerHTML = '<p style="color:green;">✅ Nenhum item faltando! Todas as referências foram cotadas.</p>';
+    } else {
+      faltandoDiv.innerHTML = `
+        <h4>⚠️ Itens Faltantes (${faltantes.length})</h4>
+        <ul style="columns:2; list-style:none; padding-left:0;">
+          ${faltantes.map(f => `<li>• ${f}</li>`).join('')}
+        </ul>
+      `;
+    }
+  } catch (erro) {
+    console.error("Erro ao verificar itens faltantes:", erro);
+    faltandoDiv.innerHTML = '<p style="color:red;">Erro ao conectar à planilha de produtos.</p>';
   }
 }
 </script>
 </body>
 </html>
-
