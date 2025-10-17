@@ -6,6 +6,7 @@
 <title>Filtro de Melhores Preços</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* ----- BASE ----- */
   body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -13,131 +14,125 @@
     color: #333;
     line-height: 1.6;
     display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
-  .sidebar {
-    width: 260px;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.05);
-    padding: 15px;
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-    z-index: 1000;
-  }
-  .sidebar.hidden { transform: translateX(100%); }
-  .sidebar h3 {
-    margin-top: 0;
-    font-size: 18px;
-    color: #007bff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .sidebar button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: #007bff;
-  }
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-  }
-  .sidebar li {
-    padding: 4px 0;
-    border-bottom: 1px dashed #ddd;
-    font-size: 14px;
-  }
+
   .container {
     flex: 1;
     max-width: 960px;
-    margin: 30px auto;
+    margin: 20px auto;
     background: white;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
-  h2 { color: #1a2533; text-align: center; margin-bottom: 25px; font-weight: 700; }
+
+  h2 {
+    color: #1a2533;
+    text-align: center;
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+
   textarea {
-    width: calc(100% - 22px);
+    width: 100%;
     height: 150px;
     padding: 10px;
     font-size: 16px;
     border-radius: 6px;
     border: 1px solid #ced4da;
     resize: vertical;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
   }
+
+  .input-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .input-actions button { flex: 1 1 auto; min-width: 120px; }
+
   button {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 10px 18px;
     border: none;
     border-radius: 6px;
     background: #007bff;
     color: white;
     cursor: pointer;
     font-size: 15px;
-    margin: 5px;
-    transition: background-color 0.2s;
+    margin: 5px 0;
+    transition: background-color 0.18s, transform 0.08s;
   }
-  button:hover { background: #0056b3; }
+  button:hover { background: #0056b3; transform: translateY(-1px); }
+
   #resultado, #faltando {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 18px;
+    padding: 14px;
     border: 1px solid #e9ecef;
     border-radius: 8px;
     background: #f8f9fa;
   }
+
   .fornecedor {
     background: #ffffff;
     border: 1px solid #dee2e6;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
   }
-  .fornecedor h3 { color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:0; }
-  .fornecedor ul { list-style: none; padding: 0; }
+
+  .fornecedor h3 {
+    color: #007bff;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .fornecedor ul { list-style: none; padding: 0; margin:0; }
   .fornecedor li {
     border-bottom: 1px dashed #ddd;
-    padding: 15px 0;
+    padding: 12px 0;
+    font-size: 14px;
   }
   .fornecedor li:last-child { border-bottom: none; }
+
   .fornecedor li button {
     background-color: #dc3545;
     color: white;
-    padding: 6px 12px;
+    padding: 6px 10px;
     font-size: 13px;
     border-radius: 4px;
+    margin-top: 8px;
   }
   .fornecedor li button:hover { background-color: #c82333; }
+
   .whatsapp, .pdf {
     display: inline-block;
-    margin-top: 15px;
-    padding: 10px 18px;
-    border-radius: 20px;
+    margin-top: 12px;
+    padding: 8px 14px;
+    border-radius: 18px;
     text-decoration: none;
     color: white;
     cursor: pointer;
+    font-size: 14px;
   }
   .whatsapp { background: #25d366; }
   .whatsapp:hover { background-color: #1da851; }
-  .pdf { background: #007bff; margin-left:5px; }
+  .pdf { background: #007bff; margin-left:8px; }
   .pdf:hover { background: #0056b3; }
+
+  /* TOAST */
   .toast {
     position: fixed;
     top: 20px;
     right: 20px;
     background: #28a745;
     color: white;
-    padding: 12px 20px;
+    padding: 12px 18px;
     border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.16);
     opacity: 0;
     transform: translateY(-10px);
     animation: fadeInOut 3s ease forwards;
@@ -149,8 +144,69 @@
     10%, 90% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-10px); }
   }
-  #semAlternativa h3 { color: #dc3545; }
-  #outrosFornecedores.hidden { display: none; }
+
+  /* SIDEBAR (mantém mesmo seletor do seu código) */
+  .sidebar {
+    width: 300px;
+    background: white;
+    box-shadow: 0 0 12px rgba(0,0,0,0.12);
+    padding: 14px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    transition: transform 0.28s ease;
+    z-index: 1000;
+    box-sizing: border-box;
+  }
+  .sidebar.hidden { transform: translateX(105%); }
+  .sidebar h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #007bff;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .sidebar ul { list-style:none; padding:0; margin-top:10px; }
+  .sidebar li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size:14px; }
+
+  /* BOTÃO FLUTUANTE (abre/fecha sidebar) */
+  #toggleSidebarBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    cursor: pointer;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #toggleSidebarBtn:hover { background-color: #0056b3; transform: translateY(-2px); }
+
+  /* RESPONSIVIDADE */
+  @media (max-width: 880px) {
+    .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
+    textarea { height: 130px; font-size: 15px; }
+    .input-actions { gap:6px; }
+    .input-actions button { min-width: unset; flex: 1 1 100%; }
+    button { width: 100%; margin: 8px 0; }
+    .sidebar { width: 86%; }
+  }
+
+  @media (max-width: 480px) {
+    h2 { font-size: 18px; }
+    .fornecedor h3 { font-size: 15px; }
+    .whatsapp, .pdf { font-size: 13px; padding: 8px 12px; }
+    #toggleSidebarBtn { width: 52px; height: 52px; }
+  }
 </style>
 </head>
 <body>
@@ -159,30 +215,39 @@
   <h2>Filtro de Melhores Preços</h2>
   <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea>
   <div id="listaCotacoes"></div>
+
   <div class="input-actions">
     <button onclick="document.getElementById('cotacao').value = ''">Limpar</button>
     <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text)">Colar</button>
     <button id="adicionarBtn">Adicionar Cotação</button>
   </div>
-  <hr style="margin: 20px 0;">
+
+  <hr style="margin: 14px 0;">
   <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
   <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
+
   <div id="resultado"></div>
   <div id="faltando"></div>
-  <hr>
+
+  <hr style="margin: 14px 0;">
   <div id="outrosFornecedores" class="fornecedor hidden">
     <h3>📦 Outros Fornecedores</h3>
     <ul id="listaOutros"></ul>
   </div>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()">👁️</button></h3>
+<!-- Sidebar (mantém id e classes para seu JS) -->
+<div class="sidebar hidden" id="sidebar">
+  <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#007bff">✖</button></h3>
   <ul id="listaMarcas"></ul>
   <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
 </div>
 
+<!-- Botão flutuante -->
+<button id="toggleSidebarBtn" onclick="toggleSidebar()">👁️</button>
+
 <script>
+/* === JS ORIGINAL (preservado exatamente) === */
 const cotacoes = [];
 let todosPrecos = {};
 let marcasDetectadas = new Set();
