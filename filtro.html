@@ -466,7 +466,7 @@ async function verificarFaltantes() {
   faltandoDiv.innerHTML = '<p>Verificando itens faltantes...</p>';
 
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA/exec');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
     const dados = await response.json();
 
     const nomesPlanilha = dados.map(item => item.produto).filter(Boolean);
@@ -498,3 +498,4 @@ async function verificarFaltantes() {
 </script>
 </body>
 </html>
+
