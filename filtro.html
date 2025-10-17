@@ -6,7 +6,6 @@
 <title>Filtro de Melhores Preços</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* ----- BASE ----- */
   body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -28,41 +27,21 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
 
-  h2 {
-    color: #1a2533;
-    text-align: center;
-    margin-bottom: 18px;
-    font-weight: 700;
-  }
-
+  h2 { text-align:center; margin-bottom:18px; font-weight:700; color:#1a2533; }
   textarea {
-    width: 100%;
-    height: 150px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    resize: vertical;
-    margin-bottom: 12px;
-    box-sizing: border-box;
+    width:100%; height:150px; padding:10px; font-size:16px;
+    border-radius:6px; border:1px solid #ced4da; resize:vertical; margin-bottom:12px; box-sizing:border-box;
   }
 
   .input-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-  .input-actions button { flex: 1 1 auto; min-width: 120px; }
+  .input-actions button { flex:1 1 auto; min-width:120px; }
 
   button {
-    display: inline-block;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-    font-size: 15px;
-    margin: 5px 0;
+    display:inline-block; padding:10px 18px; border:none; border-radius:6px;
+    background:#007bff; color:white; cursor:pointer; font-size:15px; margin:5px 0;
     transition: background-color 0.18s, transform 0.08s;
   }
-  button:hover { background: #0056b3; transform: translateY(-1px); }
+  button:hover { background:#0056b3; transform: translateY(-1px); }
 
   #resultado, #faltando {
     margin-top: 18px;
@@ -123,7 +102,6 @@
   .pdf { background: #007bff; margin-left:8px; }
   .pdf:hover { background: #0056b3; }
 
-  /* TOAST */
   .toast {
     position: fixed;
     top: 20px;
@@ -145,7 +123,6 @@
     100% { opacity: 0; transform: translateY(-10px); }
   }
 
-  /* SIDEBAR */
   .sidebar {
     width: 300px;
     background: white;
@@ -170,7 +147,6 @@
   .sidebar ul { list-style:none; padding:0; margin-top:10px; }
   .sidebar li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size:14px; }
 
-  /* BOTÃO FLUTUANTE */
   #toggleSidebarBtn {
     position: fixed;
     bottom: 20px;
@@ -191,7 +167,6 @@
   }
   #toggleSidebarBtn:hover { background-color: #0056b3; transform: translateY(-2px); }
 
-  /* RESPONSIVIDADE */
   @media (max-width: 880px) {
     .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
     textarea { height: 130px; font-size: 15px; }
@@ -236,37 +211,34 @@
   </div>
 </div>
 
-<!-- Sidebar -->
 <div class="sidebar hidden" id="sidebar">
   <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#007bff">✖</button></h3>
   <ul id="listaMarcas"></ul>
   <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
 </div>
 
-<!-- Botão flutuante -->
 <button id="toggleSidebarBtn" onclick="toggleSidebar()">👁️</button>
 
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
-/* === VARIÁVEIS GLOBAIS === */
 const cotacoes = [];
 let todosPrecos = {};
 let marcasDetectadas = new Set();
 let indesejadasSet = new Set();
 let historicoOriginais = {};
 
-function normalizarTexto(txt) {
-  return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
+function normalizarTexto(txt) { return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
-function showToast(msg, tipo = 'success') {
+function showToast(msg, tipo='success') {
   const toast = document.createElement('div');
-  toast.className = 'toast' + (tipo === 'alert' ? ' alert' : '');
+  toast.className = 'toast' + (tipo==='alert' ? ' alert' : '');
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
 
-/* === ADICIONAR COTAÇÃO === */
 document.getElementById('adicionarBtn').addEventListener('click', () => {
   const texto = document.getElementById('cotacao').value.trim();
   if (!texto) return;
@@ -280,7 +252,7 @@ document.getElementById('adicionarBtn').addEventListener('click', () => {
 });
 
 function atualizarMarcasDetectadas(texto) {
-  const marcas = [...texto.matchAll(/Marca:\s*(.+)/gi)].map(m => m[1].trim());
+  const marcas = [...texto.matchAll(/Marca:\s*(.+)/gi)].map(m=>m[1].trim());
   marcas.forEach(m => marcasDetectadas.add(m));
   renderCheckboxMarcas();
 }
@@ -288,7 +260,7 @@ function atualizarMarcasDetectadas(texto) {
 function renderCheckboxMarcas() {
   const lista = document.getElementById('listaMarcas');
   lista.innerHTML = '';
-  [...marcasDetectadas].sort().forEach(m => {
+  [...marcasDetectadas].sort().forEach(m=>{
     const li = document.createElement('li');
     li.innerHTML = `<label><input type="checkbox" value="${m}" checked> ${m}</label>`;
     lista.appendChild(li);
@@ -298,12 +270,11 @@ function renderCheckboxMarcas() {
 function aplicarFiltroMarcas() {
   const checkboxes = document.querySelectorAll('#listaMarcas input[type="checkbox"]');
   indesejadasSet = new Set();
-  checkboxes.forEach(cb => { if (!cb.checked) indesejadasSet.add(normalizarTexto(cb.value)) });
+  checkboxes.forEach(cb => { if(!cb.checked) indesejadasSet.add(normalizarTexto(cb.value)) });
   filtrarMelhoresPrecos();
   showToast("Filtro de marcas aplicado ✅");
 }
 
-/* === FILTRAR MELHORES PREÇOS === */
 function filtrarMelhoresPrecos() {
   const precosMap = new Map();
   const fornecedoresMap = {};
@@ -315,187 +286,185 @@ function filtrarMelhoresPrecos() {
     itens.forEach(bloco => {
       const nome = (bloco.match(/\*(.+)\*/) || [])[1];
       const marca = (bloco.match(/Marca:\s*(.+)/) || [])[1];
-      if (!nome || !marca) return;
-
+      if(!nome || !marca) return;
       const marcaNorm = normalizarTexto(marca);
-      if (indesejadasSet.has(marcaNorm)) return;
+      if(indesejadasSet.has(marcaNorm)) return;
 
-      const valor = parseFloat((bloco.match(/R\$\s*([\d,.]+)/) || ['', 'Infinity'])[1].replace(/\./g, '').replace(',', '.'));
+      const valor = parseFloat((bloco.match(/R\$\s*([\d,.]+)/)||['','Infinity'])[1].replace(/\./g,'').replace(',','.'));
       const qtdNaCaixaMatch = bloco.match(/(?:Qtd|Quantidade|Contém):\s*(\d+)/i);
       const qtdNaCaixa = qtdNaCaixaMatch ? parseInt(qtdNaCaixaMatch[1]) : 1;
 
-      if (!todosPrecos[nome]) todosPrecos[nome] = [];
-      todosPrecos[nome].push({ empresa, valor, texto: bloco.trim(), marca, qtdNaCaixa });
+      if(!todosPrecos[nome]) todosPrecos[nome]=[];
+      todosPrecos[nome].push({empresa, valor, texto:bloco.trim(), marca, qtdNaCaixa});
 
       const melhor = precosMap.get(nome);
-      if (!melhor || valor < melhor.valor) {
-        precosMap.set(nome, { empresa, valor, texto: bloco.trim(), qtdNaCaixa });
-      }
+      if(!melhor || valor<melhor.valor) precosMap.set(nome, {empresa, valor, texto:bloco.trim(), qtdNaCaixa});
     });
   });
 
-  for (const nome in todosPrecos) todosPrecos[nome].sort((a, b) => a.valor - b.valor);
+  for(const nome in todosPrecos) todosPrecos[nome].sort((a,b)=>a.valor-b.valor);
 
-  precosMap.forEach(({ empresa, texto, qtdNaCaixa }, nome) => {
-    if (!fornecedoresMap[empresa]) fornecedoresMap[empresa] = [];
-    fornecedoresMap[empresa].push({ nome, texto, qtdNaCaixa });
+  precosMap.forEach(({empresa, texto, qtdNaCaixa}, nome)=>{
+    if(!fornecedoresMap[empresa]) fornecedoresMap[empresa]=[];
+    fornecedoresMap[empresa].push({nome, texto, qtdNaCaixa});
   });
   renderFornecedores(fornecedoresMap);
 }
 
 function renderFornecedores(map) {
   const resultado = document.getElementById('resultado');
-  resultado.innerHTML = '';
-  Object.entries(map).forEach(([empresa, itens]) => {
-    const div = document.createElement('div');
-    div.className = 'fornecedor';
-    div.dataset.empresa = empresa;
+  resultado.innerHTML='';
+  Object.entries(map).forEach(([empresa,itens])=>{
+    const div=document.createElement('div');
+    div.className='fornecedor';
+    div.dataset.empresa=empresa;
     div.innerHTML = `<h3>${empresa}</h3><ul></ul>
       <a class='whatsapp' href='#' target='_blank'>Compartilhar via WhatsApp</a>
       <button class='pdf' onclick="gerarPDF('${empresa}')">📄 Baixar PDF</button>`;
     resultado.appendChild(div);
-    itens.forEach(item => adicionarItemAoDOM(item, empresa));
+    itens.forEach(item=>adicionarItemAoDOM(item, empresa));
     atualizarLinks(empresa);
   });
   inicializarOuLimparSemAlternativa();
 }
 
-/* === ADICIONAR ITEM AO DOM === */
-function adicionarItemAoDOM(item, empresa, ehAlternativo = false) {
-  let container = document.querySelector(`.fornecedor[data-empresa='${empresa}'] ul`);
-  if (!container) return;
-
-  const li = document.createElement('li');
-  li.dataset.produto = item.nome;
-  li.dataset.qtdNaCaixa = item.qtdNaCaixa;
-  li.innerHTML = `
-    <div class="texto-produto">${item.texto.replace(/\n/g, '<br>')}</div>
-    ${ehAlternativo ? '<small style="color: #28a745;">(Alternativo)</small>' : ''}
-    <div style="margin-top: 8px;">
+function adicionarItemAoDOM(item, empresa, ehAlternativo=false){
+  let container=document.querySelector(`.fornecedor[data-empresa='${empresa}'] ul`);
+  if(!container) return;
+  const li=document.createElement('li');
+  li.dataset.produto=item.nome;
+  li.dataset.qtdNaCaixa=item.qtdNaCaixa;
+  li.innerHTML=`<div class="texto-produto">${item.texto.replace(/\n/g,'<br>')}</div>
+    ${ehAlternativo?'<small style="color: #28a745;">(Alternativo)</small>':''}
+    <div style="margin-top:8px;">
       <label>Qtd. de caixas: </label>
       <input type="number" min="1" value="1" style="width:60px;" onchange="atualizarLinks('${empresa}')">
     </div>
-    <button onclick="removerItem(this, '${empresa}','${item.nome}')" style="margin-top:8px;">Remover item</button>
-  `;
+    <button onclick="removerItem(this,'${empresa}','${item.nome}')">Remover item</button>`;
   container.appendChild(li);
   atualizarLinks(empresa);
 }
 
-/* === REMOVER ITEM === */
-function removerItem(btn, empresa, nome) {
-  const li = btn.closest('li');
-  li.remove();
-  const alternativas = todosPrecos[nome]?.filter(o => o.empresa !== empresa) || [];
-  if (alternativas.length > 0) {
-    const alt = alternativas[0];
-    historicoOriginais[nome] = { empresaOriginal: empresa };
-    adicionarItemAoDOM({ nome, texto: alt.texto, qtdNaCaixa: alt.qtdNaCaixa }, alt.empresa, true);
+function removerItem(btn, empresa, nome){
+  const li=btn.closest('li'); li.remove();
+  const alternativas = todosPrecos[nome]?.filter(o=>o.empresa!==empresa)||[];
+  if(alternativas.length>0){
+    const alt=alternativas[0];
+    historicoOriginais[nome]={empresaOriginal:empresa};
+    adicionarItemAoDOM({nome, texto:alt.texto, qtdNaCaixa:alt.qtdNaCaixa}, alt.empresa,true);
     showToast(`Item '${nome}' movido para fornecedor alternativo (${alt.empresa})`);
-  } else {
-    historicoOriginais[nome] = { empresaOriginal: empresa };
-    const campo = document.getElementById('outrosFornecedores');
+  }else{
+    historicoOriginais[nome]={empresaOriginal:empresa};
+    const campo=document.getElementById('outrosFornecedores');
     campo.classList.remove('hidden');
-    const lista = document.getElementById('listaOutros');
-    const liNovo = document.createElement('li');
-    liNovo.dataset.produto = nome;
-    liNovo.innerHTML = `<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
+    const lista=document.getElementById('listaOutros');
+    const liNovo=document.createElement('li');
+    liNovo.dataset.produto=nome;
+    liNovo.innerHTML=`<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
       <button onclick="restaurarOriginal('${nome}')">↩️ Voltar original</button>`;
     lista.appendChild(liNovo);
     showToast(`Item '${nome}' movido para "Outros Fornecedores"`, 'alert');
   }
 }
 
-function restaurarOriginal(nome) {
-  const hist = historicoOriginais[nome];
-  if (!hist) return;
-  document.querySelectorAll(`li[data-produto="${nome}"]`).forEach(el => el.remove());
-  const original = todosPrecos[nome]?.find(o => o.empresa === hist.empresaOriginal);
-  if (original) {
-    adicionarItemAoDOM(original, hist.empresaOriginal, false);
-    showToast(`Item '${nome}' restaurado ao fornecedor original.`);
-  } else {
-    showToast(`Erro: fornecedor original não encontrado.`, 'alert');
-  }
-  const outros = document.getElementById('listaOutros');
-  if (outros && outros.children.length === 0) document.getElementById('outrosFornecedores').classList.add('hidden');
+function restaurarOriginal(nome){
+  const hist=historicoOriginais[nome]; if(!hist) return;
+  document.querySelectorAll(`li[data-produto='${nome}']`).forEach(el=>el.remove());
+  const original=todosPrecos[nome]?.find(o=>o.empresa===hist.empresaOriginal);
+  if(original) adicionarItemAoDOM(original, hist.empresaOriginal,false);
+  const outros=document.getElementById('listaOutros');
+  if(outros && outros.children.length===0) document.getElementById('outrosFornecedores').classList.add('hidden');
 }
 
-/* === ATUALIZAR LINKS WHATSAPP === */
-function atualizarLinks(empresa) {
-  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
-  if (!div) return;
-  const itens = div.querySelectorAll('li');
-  let textoPedido = "";
-  let totalGeral = 0;
-  itens.forEach(li => {
-    const textoOriginal = li.querySelector('.texto-produto').innerText;
-    const caixasPedidas = parseInt(li.querySelector('input[type="number"]').value) || 1;
-    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
-    const valorMatch = textoOriginal.match(/R\$\s*([\d,.]+)/);
-    const valorCaixa = valorMatch ? parseFloat(valorMatch[1].replace(/\./g, '').replace(',', '.')) : 0;
-    const subtotal = valorCaixa * caixasPedidas;
-    const totalUnidades = qtdNaCaixa * caixasPedidas;
-    totalGeral += subtotal;
-    textoPedido += `📦 ${textoOriginal.split('\n')[0]}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\nSubtotal: R$ ${subtotal.toFixed(2)}\n\n`;
+function atualizarLinks(empresa){
+  const div=document.querySelector(`.fornecedor[data-empresa='${empresa}']`); if(!div) return;
+  const itens=div.querySelectorAll('li');
+  let textoPedido="";
+  itens.forEach(li=>{
+    const textoOriginal=li.querySelector('.texto-produto').innerText;
+    const caixasPedidas=parseInt(li.querySelector('input[type="number"]').value)||1;
+    const qtdNaCaixa=parseInt(li.dataset.qtdNaCaixa)||1;
+    const totalUnidades = caixasPedidas * qtdNaCaixa;
+    textoPedido+=`📦 ${textoOriginal.split('\n')[0]}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\n\n`;
   });
-  const textoFinal = `*Pedido para ${empresa}*\n\n${textoPedido}*Total geral: R$ ${totalGeral.toFixed(2)}*`;
-  const link = div.querySelector('.whatsapp');
-  link.href = `https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
+  const textoFinal=`*Pedido para ${empresa}*\n\n${textoPedido}`;
+  const link=div.querySelector('.whatsapp');
+  link.href=`https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
 }
 
-/* === INICIALIZA OU LIMPA "SEM ALTERNATIVA" === */
-function inicializarOuLimparSemAlternativa() {
-  let alt = document.getElementById('semAlternativa');
-  const res = document.getElementById('resultado');
-  if (!alt) {
-    alt = document.createElement('div');
-    alt.id = 'semAlternativa';
-    alt.className = 'fornecedor';
-    alt.innerHTML = '<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>';
-    alt.style.display = 'none';
+function inicializarOuLimparSemAlternativa(){
+  let alt=document.getElementById('semAlternativa');
+  const res=document.getElementById('resultado');
+  if(!alt){
+    alt=document.createElement('div');
+    alt.id='semAlternativa';
+    alt.className='fornecedor';
+    alt.innerHTML='<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>';
+    alt.style.display='none';
     res.appendChild(alt);
-  } else {
-    alt.querySelector('ul').innerHTML = '';
-    alt.style.display = 'none';
+  }else{
+    alt.querySelector('ul').innerHTML='';
+    alt.style.display='none';
   }
 }
 
-/* === NOVA FUNÇÃO VERIFICAR ITENS FALTANTES COM GOOGLE SHEETS === */
-async function verificarFaltantes() {
-  const faltandoDiv = document.getElementById('faltando');
-  faltandoDiv.innerHTML = '<p>Verificando itens faltantes...</p>';
-
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
-    const dados = await response.json();
-
-    const nomesPlanilha = dados.map(item => item.produto).filter(Boolean);
-    const presentesNoDOM = new Set();
-    document.querySelectorAll('#resultado li[data-produto]').forEach(li => {
-      presentesNoDOM.add(li.dataset.produto);
-    });
-
-    const faltantes = nomesPlanilha.filter(nome => !presentesNoDOM.has(nome));
-
-    if (faltantes.length === 0) {
-      faltandoDiv.innerHTML = '<p>Todos os itens possuem pelo menos um fornecedor.</p>';
+async function verificarFaltantes(){
+  const faltandoDiv=document.getElementById('faltando');
+  faltandoDiv.innerHTML='<p>Verificando itens faltantes...</p>';
+  try{
+    const response=await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
+    const dados=await response.json();
+    const nomesPlanilha=dados.map(item=>item.produto).filter(Boolean);
+    const presentesNoDOM=new Set();
+    document.querySelectorAll('#resultado li[data-produto]').forEach(li=>presentesNoDOM.add(li.dataset.produto));
+    const faltantes=nomesPlanilha.filter(nome=>!presentesNoDOM.has(nome));
+    if(faltantes.length===0){
+      faltandoDiv.innerHTML='<p>Todos os itens possuem pelo menos um fornecedor.</p>';
       return;
     }
-
-    const ul = document.createElement('ul');
-    faltantes.forEach(nome => {
-      const li = document.createElement('li');
-      li.textContent = nome;
+    const ul=document.createElement('ul');
+    faltantes.forEach(nome=>{
+      const li=document.createElement('li');
+      li.textContent=nome;
       ul.appendChild(li);
     });
-    faltandoDiv.innerHTML = '<h4>Itens faltantes:</h4>';
+    faltandoDiv.innerHTML='<h4>Itens faltantes:</h4>';
     faltandoDiv.appendChild(ul);
-
-  } catch (err) {
-    faltandoDiv.innerHTML = `<p style="color:red">Erro ao consultar planilha: ${err.message}</p>`;
+  }catch(err){
+    faltandoDiv.innerHTML=`<p style="color:red">Erro ao consultar planilha: ${err.message}</p>`;
   }
 }
+
+/* === NOVA FUNÇÃO PDF SIMPLIFICADA === */
+async function gerarPDF(empresa){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const div=document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
+  if(!div) return showToast('Erro: fornecedor não encontrado','alert');
+
+  let y=10;
+  doc.setFontSize(16);
+  doc.text(`Pedido para ${empresa}`,10,y);
+  y+=10;
+  doc.setFontSize(12);
+
+  const itens=div.querySelectorAll('li');
+  itens.forEach(li=>{
+    const texto=li.querySelector('.texto-produto').innerText;
+    const caixas=parseInt(li.querySelector('input[type="number"]').value)||1;
+    const qtdNaCaixa=parseInt(li.dataset.qtdNaCaixa)||1;
+    const totalUnidades=caixas*qtdNaCaixa;
+
+    const itemText=`📦 ${texto.split('\n')[0]}\nPedido: ${caixas} cx (${totalUnidades} un)`;
+    const lines=doc.splitTextToSize(itemText,180);
+    doc.text(lines,10,y);
+    y+=lines.length*6+4;
+    if(y>270){ doc.addPage(); y=10; }
+  });
+
+  doc.save(`${empresa}_pedido.pdf`);
+}
 </script>
+
 </body>
 </html>
-
