@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -74,18 +74,24 @@
     border-bottom: 1px dashed #ddd;
     padding: 12px 0;
     font-size: 14px;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:flex-start;
   }
   .fornecedor li:last-child { border-bottom: none; }
 
-  .fornecedor li button {
+  .item-left { flex: 1 1 auto; }
+  .item-actions { width: 220px; flex: 0 0 auto; display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+
+  .fornecedor li button.small {
     background-color: #dc3545;
     color: white;
     padding: 6px 10px;
     font-size: 13px;
     border-radius: 4px;
-    margin-top: 8px;
   }
-  .fornecedor li button:hover { background-color: #c82333; }
+  .fornecedor li button.small:hover { background-color: #c82333; }
 
   .whatsapp, .pdf {
     display: inline-block;
@@ -167,16 +173,6 @@
   }
   #toggleSidebarBtn:hover { background-color: #0056b3; transform: translateY(-2px); }
 
-  .preco-sugestao {
-    display: none; /* escondido por padrão; será mostrado depois do filtro */
-    margin-top: 8px;
-    padding: 10px;
-    background: #f4fff4;
-    border: 1px solid #d6f5d8;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-
   @media (max-width: 880px) {
     .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
     textarea { height: 130px; font-size: 15px; }
@@ -184,6 +180,7 @@
     .input-actions button { min-width: unset; flex: 1 1 100%; }
     button { width: 100%; margin: 8px 0; }
     .sidebar { width: 86%; }
+    .item-actions { width: 160px; }
   }
 
   @media (max-width: 480px) {
@@ -208,8 +205,12 @@
   </div>
 
   <hr style="margin: 14px 0;">
-  <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
-  <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
+    <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
+    <button onclick="gerarPDFAll()">📄 Baixar PDF (Todos)</button>
+    <button onclick="enviarWhatsApp()">📲 Enviar resumo WhatsApp</button>
+  </div>
 
   <div id="resultado"></div>
   <div id="faltando"></div>
@@ -224,7 +225,9 @@
 <div class="sidebar hidden" id="sidebar">
   <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#007bff">✖</button></h3>
   <ul id="listaMarcas"></ul>
-  <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
+  <div style="margin-top:12px;">
+    <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
+  </div>
 </div>
 
 <button id="toggleSidebarBtn" onclick="toggleSidebar()">👁️</button>
@@ -233,14 +236,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+/* =========================
+   Dados e estruturas
+   ========================= */
 const cotacoes = [];
-let todosPrecos = {};
+let todosPrecos = {}; // { produto: [ {empresa, valor, texto, marca, qtdNaCaixa}, ... ] }
 let marcasDetectadas = new Set();
 let indesejadasSet = new Set();
-let historicoOriginais = {};
+let historicoOriginais = {}; // { produto: [empresa1, empresa2...] }
 
-/* normaliza texto para comparação */
-function normalizarTexto(txt) { return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+/* =========================
+   Helpers
+   ========================= */
+function normalizarTexto(txt = '') {
+  return txt.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
 function showToast(msg, tipo='success') {
   const toast = document.createElement('div');
@@ -250,24 +260,34 @@ function showToast(msg, tipo='success') {
   setTimeout(() => toast.remove(), 3000);
 }
 
+/* =========================
+   Adicionar cotação (raw)
+   ========================= */
 document.getElementById('adicionarBtn').addEventListener('click', () => {
   const texto = document.getElementById('cotacao').value.trim();
-  if (!texto) return;
+  if (!texto) { showToast('Cole uma cotação antes de adicionar','alert'); return; }
   cotacoes.push(texto);
+
+  // mostra lista simples
   const empresa = (texto.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
   const div = document.createElement('div');
-  div.textContent = `Cotação de: ${empresa}`;
+  div.textContent = `Cotação adicionada: ${empresa}`;
   document.getElementById('listaCotacoes').appendChild(div);
+
+  // limpar campo e atualizar marcas
   document.getElementById('cotacao').value = '';
   atualizarMarcasDetectadas(texto);
+  showToast('Cotação adicionada ✅');
 });
 
+/* =========================
+   Detectar marcas e renderizar sidebar
+   ========================= */
 function atualizarMarcasDetectadas(texto) {
-  const marcas = [...texto.matchAll(/Marca:\s*(.+)/gi)].map(m=>m[1].trim());
+  const marcas = [...texto.matchAll(/Marca:\s*([^\n\r]+)/gi)].map(m=>m[1].trim());
   marcas.forEach(m => marcasDetectadas.add(m));
   renderCheckboxMarcas();
 }
-
 function renderCheckboxMarcas() {
   const lista = document.getElementById('listaMarcas');
   lista.innerHTML = '';
@@ -277,7 +297,6 @@ function renderCheckboxMarcas() {
     lista.appendChild(li);
   });
 }
-
 function aplicarFiltroMarcas() {
   const checkboxes = document.querySelectorAll('#listaMarcas input[type="checkbox"]');
   indesejadasSet = new Set();
@@ -286,253 +305,386 @@ function aplicarFiltroMarcas() {
   showToast("Filtro de marcas aplicado ✅");
 }
 
+/* =========================
+   Parsing e filtragem
+   ========================= */
 function filtrarMelhoresPrecos() {
-  const precosMap = new Map();
-  const fornecedoresMap = {};
+  const precosMap = new Map(); // melhor por produto
+  const fornecedoresMap = {};  // { empresa: [ {nome, texto, qtdNaCaixa} ] }
   todosPrecos = {};
 
   cotacoes.forEach(txt => {
     const empresa = (txt.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
+    // split por emoji caixa, cada bloco representa um item (dependendo do formato)
     const itens = txt.split('📦').slice(1);
     itens.forEach(bloco => {
       const nome = (bloco.match(/\*(.+)\*/) || [])[1];
-      const marca = (bloco.match(/Marca:\s*(.+)/) || [])[1];
+      const marca = (bloco.match(/Marca:\s*([^\n\r]+)/) || [])[1];
       if(!nome || !marca) return;
       const marcaNorm = normalizarTexto(marca);
       if(indesejadasSet.has(marcaNorm)) return;
 
-      const valor = parseFloat((bloco.match(/R\$\s*([\d,.]+)/)||['','Infinity'])[1].replace(/\./g,'').replace(',','.'));
+      const valorMatch = (bloco.match(/R\$\s*([\d.,]+)/) || [])[1];
+      const valor = valorMatch ? parseFloat(valorMatch.replace(/\./g,'').replace(',','.')) : Infinity;
       const qtdNaCaixaMatch = bloco.match(/(?:Qtd|Quantidade|Contém):\s*(\d+)/i);
       const qtdNaCaixa = qtdNaCaixaMatch ? parseInt(qtdNaCaixaMatch[1]) : 1;
 
-      if(!todosPrecos[nome]) todosPrecos[nome]=[];
-      todosPrecos[nome].push({empresa, valor, texto:bloco.trim(), marca, qtdNaCaixa});
+      if(!todosPrecos[nome]) todosPrecos[nome] = [];
+      todosPrecos[nome].push({empresa, valor, texto: bloco.trim(), marca, qtdNaCaixa});
 
       const melhor = precosMap.get(nome);
-      if(!melhor || valor<melhor.valor) precosMap.set(nome, {empresa, valor, texto:bloco.trim(), qtdNaCaixa});
+      if(!melhor || valor < melhor.valor) {
+        precosMap.set(nome, {empresa, valor, texto: bloco.trim(), qtdNaCaixa});
+      }
     });
   });
 
-  // Ordena todos os preços por produto (menor -> maior)
+  // ordenar listas de todosPrecos por valor
   for(const nome in todosPrecos) {
-    todosPrecos[nome].sort((a,b)=>a.valor-b.valor);
-
-    // === CALCULA MÉDIA e SUGESTÃO entre o menor e o maior ===
-    const lista = todosPrecos[nome];
-    if (lista.length >= 2) {
-      const menor = lista[0].valor;
-      const maior = lista[lista.length - 1].valor;
-      const media = (menor + maior) / 2;
-      const sugestao = media * 1.40; // margem 40%
-      // salva os valores para uso posterior
-      lista._meta = { menor, maior, media, sugestao };
-    } else if (lista.length === 1) {
-      const valor = lista[0].valor;
-      const media = valor;
-      const sugestao = media * 1.40;
-      lista._meta = { menor: valor, maior: valor, media, sugestao };
-    } else {
-      lista._meta = { menor: 0, maior: 0, media: 0, sugestao: 0 };
-    }
+    todosPrecos[nome].sort((a,b)=>a.valor - b.valor);
   }
 
-  // Agrupa por fornecedor (mesma lógica original)
-  precosMap.forEach(({empresa, texto, qtdNaCaixa}, nome)=>{
+  // construir fornecedoresMap com os melhores itens por empresa
+  precosMap.forEach(({empresa, texto, qtdNaCaixa}, nome) => {
     if(!fornecedoresMap[empresa]) fornecedoresMap[empresa]=[];
     fornecedoresMap[empresa].push({nome, texto, qtdNaCaixa});
   });
 
   renderFornecedores(fornecedoresMap);
-
-  // Depois que renderiza os fornecedores (ou seja, após o filtro), mostramos as sugestões ocultas
-  mostrarSugestoesAposFiltro();
+  showToast('Filtro aplicado — melhores preços exibidos ✅');
 }
 
+/* =========================
+   Renderização UI
+   ========================= */
 function renderFornecedores(map) {
   const resultado = document.getElementById('resultado');
-  resultado.innerHTML='';
-  Object.entries(map).forEach(([empresa,itens])=>{
-    const div=document.createElement('div');
-    div.className='fornecedor';
-    div.dataset.empresa=empresa;
-    div.innerHTML = `<h3>${empresa}</h3><ul></ul>
-      <a class='whatsapp' href='#' target='_blank'>Compartilhar via WhatsApp</a>
-      <button class='pdf' onclick="gerarPDF('${empresa}')">📄 Baixar PDF</button>`;
+  resultado.innerHTML = '';
+
+  // para cada fornecedor, criar bloco
+  Object.keys(map).forEach(empresa => {
+    const div = document.createElement('div');
+    div.className = 'fornecedor';
+    div.dataset.empresa = empresa;
+
+    const header = document.createElement('div');
+    header.innerHTML = `<h3>${empresa}</h3>`;
+    div.appendChild(header);
+
+    const ul = document.createElement('ul');
+    map[empresa].forEach(item => {
+      const li = document.createElement('li');
+      const left = document.createElement('div');
+      left.className = 'item-left';
+      left.innerHTML = `<strong>${item.nome}</strong><br><div class="texto-produto">${item.texto.replace(/\n/g,'<br>')}</div>`;
+
+      const actions = document.createElement('div');
+      actions.className = 'item-actions';
+      actions.innerHTML = `
+        <div>
+          <label style="font-size:13px">Qtd. caixas:</label>
+          <input type="number" min="1" value="1" style="width:70px; margin-left:8px;" />
+        </div>
+        <div>
+          <button class="small" onclick="removerItemFromUI(this, '${empresa.replace(/'/g,"\\'")}', '${item.nome.replace(/'/g,"\\'")}')">Remover</button>
+        </div>
+      `;
+
+      li.appendChild(left);
+      li.appendChild(actions);
+
+      // armazenar atributos para uso posterior
+      li.dataset.produto = item.nome;
+      li.dataset.qtdNaCaixa = item.qtdNaCaixa || 1;
+
+      ul.appendChild(li);
+    });
+
+    div.appendChild(ul);
+
+    // links (atualizados por atualizarLinks)
+    const whatsapp = document.createElement('a');
+    whatsapp.className = 'whatsapp';
+    whatsapp.href = '#';
+    whatsapp.target = '_blank';
+    whatsapp.textContent = 'Compartilhar via WhatsApp';
+
+    const pdfBtn = document.createElement('button');
+    pdfBtn.className = 'pdf';
+    pdfBtn.textContent = '📄 Baixar PDF';
+    pdfBtn.addEventListener('click', ()=> gerarPDF(empresa));
+
+    const controls = document.createElement('div');
+    controls.style.marginTop = '12px';
+    controls.appendChild(whatsapp);
+    controls.appendChild(pdfBtn);
+
+    div.appendChild(controls);
+
     resultado.appendChild(div);
-    itens.forEach(item=>adicionarItemAoDOM(item, empresa));
+
     atualizarLinks(empresa);
   });
+
   inicializarOuLimparSemAlternativa();
 }
 
-function adicionarItemAoDOM(item, empresa, ehAlternativo=false){
-  let container=document.querySelector(`.fornecedor[data-empresa='${empresa}'] ul`);
-  if(!container) return;
-  const li=document.createElement('li');
-  li.dataset.produto=item.nome;
-  li.dataset.qtdNaCaixa=item.qtdNaCaixa;
+/* =========================
+   Ações sobre items na UI
+   ========================= */
+function removerItemFromUI(btnEl, empresa, nome) {
+  // remover li
+  const li = btnEl.closest('li');
+  if (li) li.remove();
 
-  // texto do produto (o que vai pro whatsapp / pdf)
-  const textoProdutoHTML = `<div class="texto-produto">${item.texto.replace(/\n/g,'<br>')}</div>`;
+  // buscar alternativas em todosPrecos[nome] excluindo empresa
+  const alternativas = (todosPrecos[nome] || []).filter(o=>o.empresa !== empresa);
 
-  // monta o bloco oculto de sugestão com base nos metadados calculados
-  let metaHTML = '';
-  const meta = (todosPrecos[item.nome] && todosPrecos[item.nome]._meta) ? todosPrecos[item.nome]._meta : null;
-  if (meta) {
-    metaHTML = `
-      <div class="preco-sugestao" aria-hidden="true">
-        <strong>🔎 Preços & Sugestão (apenas para você)</strong><br>
-        Menor: R$ ${meta.menor.toFixed(2)}<br>
-        Maior: R$ ${meta.maior.toFixed(2)}<br>
-        Média (min+max)/2: R$ ${meta.media.toFixed(2)}<br>
-        <strong>Sugestão venda (40%): R$ ${meta.sugestao.toFixed(2)}</strong>
-      </div>
-    `;
-  }
-
-  li.innerHTML = textoProdutoHTML
-    + (ehAlternativo?'<small style="color: #28a745;">(Alternativo)</small>':'')
-    + `<div style="margin-top:8px;">
-        <label>Qtd. de caixas: </label>
-        <input type="number" min="1" value="1" style="width:60px;" onchange="atualizarLinks('${empresa}')">
-      </div>
-      <button onclick="removerItem(this,'${empresa}','${item.nome}')">Remover item</button>`
-    + metaHTML;
-
-  container.appendChild(li);
-  // atualizarLinks chama o link do whatsapp com base no texto-produto apenas (meta não é incluída)
-  atualizarLinks(empresa);
-}
-
-function removerItem(btn, empresa, nome){
-  const li=btn.closest('li'); li.remove();
-  const alternativas = todosPrecos[nome]?.filter(o=>o.empresa!==empresa)||[];
-  if(alternativas.length>0){
-    const alt=alternativas[0];
-    historicoOriginais[nome]={empresaOriginal:empresa};
-    adicionarItemAoDOM({nome, texto:alt.texto, qtdNaCaixa:alt.qtdNaCaixa}, alt.empresa,true);
+  if(alternativas.length > 0) {
+    // pega melhor alternativa (já ordenado)
+    const alt = alternativas[0];
+    // encontra ou cria bloco do fornecedor alternativo e adiciona item como alternativo
+    adicionarItemAoDOM(alt, alt.empresa, true);
+    historicoOriginais[nome] = historicoOriginais[nome] || [];
+    historicoOriginais[nome].push(empresa);
     showToast(`Item '${nome}' movido para fornecedor alternativo (${alt.empresa})`);
-  }else{
-    historicoOriginais[nome]={empresaOriginal:empresa};
-    const campo=document.getElementById('outrosFornecedores');
-    campo.classList.remove('hidden');
-    const lista=document.getElementById('listaOutros');
-    const liNovo=document.createElement('li');
-    liNovo.dataset.produto=nome;
-    liNovo.innerHTML=`<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
-      <button onclick="restaurarOriginal('${nome}')">↩️ Voltar original</button>`;
-    lista.appendChild(liNovo);
+  } else {
+    // sem alternativa -> adicionar em outrosFornecedores
+    historicoOriginais[nome] = historicoOriginais[nome] || [];
+    historicoOriginais[nome].push(empresa);
+    adicionarAListaSemAlternativa(nome);
     showToast(`Item '${nome}' movido para "Outros Fornecedores"`, 'alert');
   }
 }
 
-function restaurarOriginal(nome){
-  const hist=historicoOriginais[nome]; if(!hist) return;
-  document.querySelectorAll(`li[data-produto='${nome}']`).forEach(el=>el.remove());
-  const original=todosPrecos[nome]?.find(o=>o.empresa===hist.empresaOriginal);
-  if(original) adicionarItemAoDOM(original, hist.empresaOriginal,false);
-  const outros=document.getElementById('listaOutros');
-  if(outros && outros.children.length===0) document.getElementById('outrosFornecedores').classList.add('hidden');
-}
-
-function atualizarLinks(empresa){
-  const div=document.querySelector(`.fornecedor[data-empresa='${empresa}']`); if(!div) return;
-  const itens=div.querySelectorAll('li');
-  let textoPedido="";
-  itens.forEach(li=>{
-    const textoOriginal=li.querySelector('.texto-produto').innerText;
-    const caixasPedidas=parseInt(li.querySelector('input[type="number"]').value)||1;
-    const qtdNaCaixa=parseInt(li.dataset.qtdNaCaixa)||1;
-    const totalUnidades = caixasPedidas * qtdNaCaixa;
-    textoPedido+=`📦 ${textoOriginal.split('\n')[0]}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\n\n`;
-  });
-  const textoFinal=`*Pedido para ${empresa}*\n\n${textoPedido}`;
-  const link=div.querySelector('.whatsapp');
-  link.href=`https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
-}
-
-function inicializarOuLimparSemAlternativa(){
-  let alt=document.getElementById('semAlternativa');
-  const res=document.getElementById('resultado');
-  if(!alt){
-    alt=document.createElement('div');
-    alt.id='semAlternativa';
-    alt.className='fornecedor';
-    alt.innerHTML='<h3>Itens sem Fornecedor Alternativo</h3><ul></ul>';
-    alt.style.display='none';
-    res.appendChild(alt);
-  }else{
-    alt.querySelector('ul').innerHTML='';
-    alt.style.display='none';
+function adicionarItemAoDOM(item, empresa, ehAlternativo=false) {
+  // procura fornecedor existente no DOM
+  let fornecedorDiv = document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
+  if(!fornecedorDiv) {
+    // se não existir, cria o bloco
+    const resultado = document.getElementById('resultado');
+    fornecedorDiv = document.createElement('div');
+    fornecedorDiv.className = 'fornecedor';
+    fornecedorDiv.dataset.empresa = empresa;
+    fornecedorDiv.innerHTML = `<h3>${empresa}</h3><ul></ul>
+      <a class='whatsapp' href='#' target='_blank'>Compartilhar via WhatsApp</a>
+      <button class='pdf' onclick="gerarPDF('${empresa.replace(/'/g,"\\'")}')">📄 Baixar PDF</button>`;
+    resultado.appendChild(fornecedorDiv);
   }
+
+  const ul = fornecedorDiv.querySelector('ul');
+  const li = document.createElement('li');
+
+  li.dataset.produto = item.nome;
+  li.dataset.qtdNaCaixa = item.qtdNaCaixa || 1;
+
+  li.innerHTML = `
+    <div class="item-left"><strong>${item.nome}</strong><br><div class="texto-produto">${item.texto.replace(/\n/g,'<br>')}</div>
+    ${ehAlternativo?'<small style="color: #28a745;">(Alternativo)</small>':''}</div>
+    <div class="item-actions">
+      <div>
+        <label style="font-size:13px">Qtd. caixas:</label>
+        <input type="number" min="1" value="1" style="width:70px; margin-left:8px;" />
+      </div>
+      <div>
+        <button class="small" onclick="removerItemFromUI(this, '${empresa.replace(/'/g,"\\'")}', '${item.nome.replace(/'/g,"\\'")}')">Remover</button>
+      </div>
+    </div>
+  `;
+
+  ul.appendChild(li);
+  atualizarLinks(empresa);
 }
 
+/* =========================
+   Restaurar original
+   ========================= */
+function restaurarOriginal(nome){
+  const hist = historicoOriginais[nome];
+  if(!hist || hist.length===0) {
+    showToast('Nenhum histórico para restaurar','alert');
+    return;
+  }
+  const empresaOriginal = hist[0];
+  // remove todas as ocorrências visuais
+  document.querySelectorAll(`li[data-produto='${nome}']`).forEach(el=>el.remove());
+  // encontra original em todosPrecos e adiciona
+  const original = (todosPrecos[nome] || []).find(o=>o.empresa === empresaOriginal);
+  if(original) adicionarItemAoDOM(original, empresaOriginal, false);
+
+  // remover do "outros" se presente
+  const listaOutros = document.getElementById('listaOutros');
+  const itens = Array.from(listaOutros.children);
+  itens.forEach(li=>{
+    if(li.dataset.produto === nome) li.remove();
+  });
+  if(listaOutros.children.length===0) document.getElementById('outrosFornecedores').classList.add('hidden');
+
+  showToast(`Restaurado ${nome} para ${empresaOriginal}`);
+}
+
+/* =========================
+   Links (WhatsApp) e atualização
+   ========================= */
+function atualizarLinks(empresa){
+  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`); if(!div) return;
+  const itens = div.querySelectorAll('li');
+  let textoPedido = "";
+  itens.forEach(li=> {
+    const textoOriginal = li.querySelector('.texto-produto')?.innerText || '';
+    const caixasPedidas = parseInt(li.querySelector('input[type="number"]')?.value) || 1;
+    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
+    const totalUnidades = caixasPedidas * qtdNaCaixa;
+    const titulo = textoOriginal.split('\n')[0] || li.dataset.produto;
+    textoPedido += `📦 ${titulo}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\n\n`;
+  });
+  const textoFinal = `*Pedido para ${empresa}*\n\n${textoPedido}`;
+  const link = div.querySelector('.whatsapp');
+  if(link) link.href = `https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
+}
+
+/* =========================
+   Outros Fornecedores / Sem alternativa
+   ========================= */
+function adicionarAListaSemAlternativa(nome) {
+  const lista = document.getElementById('listaOutros');
+  const li = document.createElement('li');
+  li.dataset.produto = nome;
+  li.innerHTML = `<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
+    <button onclick="restaurarOriginal('${nome.replace(/'/g,"\\'")}')">↩️ Voltar original</button>`;
+  lista.appendChild(li);
+  document.getElementById('outrosFornecedores').classList.remove('hidden');
+}
+
+/* =========================
+   Inicializar/limpar seção sem alternativa
+   ========================= */
+function inicializarOuLimparSemAlternativa(){
+  const campo = document.getElementById('outrosFornecedores');
+  const lista = document.getElementById('listaOutros');
+  lista.innerHTML = '';
+  campo.classList.add('hidden');
+}
+
+/* =========================
+   Verificar faltantes via Google Sheets
+   ========================= */
 async function verificarFaltantes(){
-  const faltandoDiv=document.getElementById('faltando');
-  faltandoDiv.innerHTML='<p>Verificando itens faltantes...</p>';
+  const faltandoDiv = document.getElementById('faltando');
+  faltandoDiv.innerHTML = '<p>Verificando itens faltantes...</p>';
   try{
-    const response=await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
-    const dados=await response.json();
-    const nomesPlanilha=dados.map(item=>item.produto).filter(Boolean);
-    const presentesNoDOM=new Set();
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
+    const dados = await response.json();
+    const nomesPlanilha = dados.map(item=>item.produto).filter(Boolean);
+    const presentesNoDOM = new Set();
     document.querySelectorAll('#resultado li[data-produto]').forEach(li=>presentesNoDOM.add(li.dataset.produto));
-    const faltantes=nomesPlanilha.filter(nome=>!presentesNoDOM.has(nome));
+    const faltantes = nomesPlanilha.filter(nome=>!presentesNoDOM.has(nome));
     if(faltantes.length===0){
-      faltandoDiv.innerHTML='<p>Todos os itens possuem pelo menos um fornecedor.</p>';
+      faltandoDiv.innerHTML = '<p>Todos os itens possuem pelo menos um fornecedor.</p>';
       return;
     }
-    const ul=document.createElement('ul');
+    const ul = document.createElement('ul');
     faltantes.forEach(nome=>{
-      const li=document.createElement('li');
-      li.textContent=nome;
+      const li = document.createElement('li');
+      li.textContent = nome;
       ul.appendChild(li);
     });
-    faltandoDiv.innerHTML='<h4>Itens faltantes:</h4>';
+    faltandoDiv.innerHTML = '<h4>Itens faltantes:</h4>';
     faltandoDiv.appendChild(ul);
   }catch(err){
-    faltandoDiv.innerHTML=`<p style="color:red">Erro ao consultar planilha: ${err.message}</p>`;
+    faltandoDiv.innerHTML = `<p style="color:red">Erro ao consultar planilha: ${err.message}</p>`;
   }
 }
 
-/* === NOVA FUNÇÃO PDF SIMPLIFICADA === */
+/* =========================
+   PDF (por fornecedor) e PDF global
+   ========================= */
 async function gerarPDF(empresa){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  const div=document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
+  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
   if(!div) return showToast('Erro: fornecedor não encontrado','alert');
 
-  let y=10;
+  let y = 10;
   doc.setFontSize(16);
-  doc.text(`Pedido para ${empresa}`,10,y);
-  y+=10;
+  doc.text(`Pedido para ${empresa}`, 10, y);
+  y += 8;
   doc.setFontSize(12);
 
-  const itens=div.querySelectorAll('li');
+  const itens = div.querySelectorAll('li');
   itens.forEach(li=>{
-    const texto=li.querySelector('.texto-produto').innerText;
-    const caixas=parseInt(li.querySelector('input[type="number"]').value)||1;
-    const qtdNaCaixa=parseInt(li.dataset.qtdNaCaixa)||1;
-    const totalUnidades=caixas*qtdNaCaixa;
+    const texto = li.querySelector('.texto-produto')?.innerText || li.dataset.produto;
+    const caixas = parseInt(li.querySelector('input[type="number"]')?.value) || 1;
+    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
+    const totalUnidades = caixas * qtdNaCaixa;
 
-    const itemText=`📦 ${texto.split('\n')[0]}\nPedido: ${caixas} cx (${totalUnidades} un)`;
-    const lines=doc.splitTextToSize(itemText,180);
-    doc.text(lines,10,y);
-    y+=lines.length*6+4;
-    if(y>270){ doc.addPage(); y=10; }
+    const itemText = `📦 ${texto.split('\n')[0]}\nPedido: ${caixas} cx (${totalUnidades} un)`;
+    const lines = doc.splitTextToSize(itemText, 180);
+    doc.text(lines, 10, y);
+    y += lines.length * 6 + 4;
+    if(y > 270){ doc.addPage(); y = 10; }
   });
 
   doc.save(`${empresa}_pedido.pdf`);
 }
 
-/* === Mostra as sugestões (antes estavam escondidas) somente após o filtro ser executado === */
-function mostrarSugestoesAposFiltro(){
-  // espera um pequeno tempo para garantir que o DOM foi preenchido
-  setTimeout(()=>{
-    document.querySelectorAll('.preco-sugestao').forEach(el=>{
-      el.style.display = 'block';
-    });
-  }, 120);
+function gerarPDFAll(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text("Relatório de Melhores Preços", 10, 10);
+  let y = 20;
+  const produtos = Object.keys(todosPrecos).sort();
+  if(produtos.length === 0) {
+    showToast('Nenhum produto para gerar relatório','alert');
+    return;
+  }
+  produtos.forEach(prod => {
+    const melhor = todosPrecos[prod][0];
+    const linha = `${prod} - ${melhor.empresa} - R$ ${Number(melhor.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+    const lines = doc.splitTextToSize(linha, 180);
+    doc.text(lines, 10, y);
+    y += lines.length * 6 + 4;
+    if(y > 270){ doc.addPage(); y = 10; }
+  });
+  doc.save('melhores_precos.pdf');
+  showToast('PDF gerado ✅');
 }
+
+/* =========================
+   Enviar resumo por WhatsApp (fixo)
+   ========================= */
+function enviarWhatsApp(){
+  if(Object.keys(todosPrecos).length === 0) { showToast('Nada a enviar — filtre primeiro','alert'); return; }
+  let msg = "Melhores preços:\n\n";
+  Object.keys(todosPrecos).forEach(prod => {
+    const melhor = todosPrecos[prod][0];
+    msg += `${prod} - ${melhor.empresa} - R$ ${Number(melhor.valor).toLocaleString('pt-BR')}\n`;
+  });
+  const phone = "5521992576333"; // número fixo (pode alterar)
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+/* =========================
+   Inicializações eventuais
+   ========================= */
+document.addEventListener('click', (e) => {
+  // se clicou em inputs de quantidade dentro de fornecedor, atualizar link
+  const target = e.target;
+  if(target.tagName === 'INPUT' && target.closest('.fornecedor')) {
+    const fornecedor = target.closest('.fornecedor').dataset.empresa;
+    setTimeout(()=> atualizarLinks(fornecedor), 50);
+  }
+});
+
+// opcional: atualizar links periodicamente (pequeno listener)
+setInterval(()=>{
+  document.querySelectorAll('.fornecedor').forEach(div=>{
+    const emp = div.dataset.empresa;
+    if(emp) atualizarLinks(emp);
+  });
+}, 2000);
 </script>
 
 </body>
