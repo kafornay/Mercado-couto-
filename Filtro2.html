@@ -1,309 +1,274 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Filtro de Melhores Preços</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Filtro de Melhores Preços — Corrigido</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    background: #f0f2f5;
-    color: #333;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .container {
-    flex: 1;
-    max-width: 960px;
-    margin: 20px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  h2 { text-align:center; margin-bottom:18px; font-weight:700; color:#1a2533; }
-  textarea {
-    width:100%; height:150px; padding:10px; font-size:16px;
-    border-radius:6px; border:1px solid #ced4da; resize:vertical; margin-bottom:12px; box-sizing:border-box;
-  }
-
-  .input-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-  .input-actions button { flex:1 1 auto; min-width:120px; }
-
-  button {
-    display:inline-block; padding:10px 18px; border:none; border-radius:6px;
-    background:#007bff; color:white; cursor:pointer; font-size:15px; margin:5px 0;
-    transition: background-color 0.18s, transform 0.08s;
-  }
-  button:hover { background:#0056b3; transform: translateY(-1px); }
-
-  #resultado, #faltando {
-    margin-top: 18px;
-    padding: 14px;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    background: #f8f9fa;
-  }
-
-  .fornecedor {
-    background: #ffffff;
-    border: 1px solid #dee2e6;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-  }
-
-  .fornecedor h3 {
-    color: #007bff;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 8px;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-
-  .fornecedor ul { list-style: none; padding: 0; margin:0; }
-  .fornecedor li {
-    border-bottom: 1px dashed #ddd;
-    padding: 12px 0;
-    font-size: 14px;
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:flex-start;
-  }
-  .fornecedor li:last-child { border-bottom: none; }
-
-  .item-left { flex: 1 1 auto; }
-  .item-actions { width: 220px; flex: 0 0 auto; display:flex; gap:8px; align-items:center; justify-content:flex-end; }
-
-  .fornecedor li button.small {
-    background-color: #dc3545;
-    color: white;
-    padding: 6px 10px;
-    font-size: 13px;
-    border-radius: 4px;
-  }
-  .fornecedor li button.small:hover { background-color: #c82333; }
-
-  .whatsapp, .pdf {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 8px 14px;
-    border-radius: 18px;
-    text-decoration: none;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .whatsapp { background: #25d366; }
-  .pdf { background: #007bff; }
-
-  .sidebar {
-    width: 300px;
-    background: white;
-    box-shadow: 0 0 12px rgba(0,0,0,0.12);
-    padding: 14px;
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    transition: transform 0.28s ease;
-    z-index: 1000;
-    box-sizing: border-box;
-  }
-  .sidebar.hidden { transform: translateX(105%); }
-
-  @media (max-width: 880px) {
-    .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
-    textarea { height: 130px; font-size: 15px; }
-    button { width: 100%; margin: 8px 0; }
-    .sidebar { width: 86%; }
-  }
+  body{font-family:Roboto,system-ui,-apple-system,Segoe UI,Arial; margin:0; background:#f0f2f5; color:#222}
+  .container{max-width:960px;margin:22px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+  h2{text-align:center;color:#1a2533;margin:0 0 14px;font-weight:700}
+  textarea{width:100%;height:130px;padding:10px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
+  .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  button{background:#007bff;color:#fff;border:0;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:600}
+  button.secondary{background:#6c757d}
+  #listaCotacoes div{padding:8px;border-bottom:1px dashed #eee;font-size:13px}
+  #resultado{margin-top:18px;padding:12px;border-radius:8px;border:1px solid #e9ecef;background:#fbfcfd}
+  .produto{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px dashed #e6e6e6}
+  .produto:last-child{border-bottom:none}
+  .produto-left{flex:1}
+  .produto-actions{display:flex;gap:8px;align-items:center}
+  .small-btn{background:#dc3545;padding:6px 9px;border-radius:6px;color:#fff;border:0;cursor:pointer}
+  .hidden{display:none}
+  .outros{margin-top:12px;padding:10px;border-radius:8px;border:1px solid #f0ad4e;background:#fff9f0}
+  .muted{color:#666;font-size:13px}
+  pre.small{background:#f7f7f7;padding:8px;border-radius:6px;overflow:auto}
 </style>
 </head>
-
 <body>
+  <div class="container">
+    <h2>Filtro de Melhores Preços — Corrigido</h2>
 
-<div class="container">
-  <h2>Filtro de Melhores Preços</h2>
+    <label for="cotacao"><strong>Colar cotação (formato exemplo abaixo):</strong></label>
+    <pre class="small">*Empresa:* Loja A
+📦 *Arroz*
+Marca: BomGrão
+Qtd: 5
+Valor: R$ 50,00
 
-  <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea>
+📦 *Arroz*
+Marca: Outro
+Qtd: 10
+Valor: R$ 45,00
+</pre>
 
-  <div class="input-actions">
-    <button onclick="document.getElementById('cotacao').value = ''">Limpar</button>
-    <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text)">Colar</button>
-    <button id="adicionarBtn">Adicionar Cotação</button>
+    <textarea id="cotacao" placeholder="Cole aqui as cotações (pode colar várias cotações)."></textarea>
+
+    <div class="row" style="margin-top:10px">
+      <button id="btnAdd">Adicionar Cotação</button>
+      <button id="btnLimpar" class="secondary">Limpar campo</button>
+      <button id="btnFiltrar" style="margin-left:auto">Filtrar Melhores Preços</button>
+    </div>
+
+    <div id="listaCotacoes" style="margin-top:12px"></div>
+
+    <div id="resultado" class="hidden"></div>
+
+    <div id="outrosContainer" class="outros hidden">
+      <strong>Outros Fornecedores (itens sem alternativa):</strong>
+      <ul id="listaOutros" style="margin:8px 0 0 14px"></ul>
+    </div>
   </div>
-
-  <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
-
-  <div id="resultado"></div>
-  <div id="outrosFornecedores" class="fornecedor hidden">
-    <h3>📦 Outros Fornecedores</h3>
-    <ul id="listaOutros"></ul>
-  </div>
-</div>
 
 <script>
-let cotacoes = [];
-let todasMarcas = new Set();
-let todosPrecos = {};   // { produto: [ {empresa, marca, valor, texto} ] }
-let melhores = {};      // Resultado principal
-let alternativos = {};  // Segundo fornecedor
-let semAlternativa = {}; 
+/*
+  Estrutura simples e robusta:
+  - cotacoes: array raw (texto)
+  - todosPrecos: { produto: [ {empresa, marca, qtd, valor, texto} ] }
+  - melhor: primeiro elemento de todosPrecos[produto] (após sort)
+  - removerItem(produto, empresa): remove o fornecedor da lista, reatribui 1º e 2º
+*/
 
-/* =========================
- ADD Cotação
-========================= */
-document.getElementById("adicionarBtn").onclick = () => {
-  const txt = document.getElementById("cotacao").value.trim();
-  if (!txt) return alert("Cole uma cotação antes!");
+const cotacoes = [];
+let todosPrecos = {}; // produto -> array de ofertas ordenadas por valor asc
 
-  cotacoes.push(txt);
-  document.getElementById("cotacao").value = "";
+const el = {
+  cotacao: document.getElementById('cotacao'),
+  listaCotacoes: document.getElementById('listaCotacoes'),
+  resultado: document.getElementById('resultado'),
+  listaOutros: document.getElementById('listaOutros'),
+  outrosContainer: document.getElementById('outrosContainer'),
+  btnAdd: document.getElementById('btnAdd'),
+  btnLimpar: document.getElementById('btnLimpar'),
+  btnFiltrar: document.getElementById('btnFiltrar')
 };
 
-/* =========================
- FILTRAR MELHORES PREÇOS
-========================= */
-function filtrarMelhoresPrecos() {
-  todosPrecos = {};
-  melhores = {};
-  alternativos = {};
-  semAlternativa = {};
+function normalizar(n){ return n? n.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim() : '' }
 
-  cotacoes.forEach(txt => {
-    const empresa = (txt.match(/\*Empresa:\* (.+)/) || [])[1] || "Desconhecido";
-    const itens = txt.split("📦").slice(1);
+// adiciona cotação raw
+el.btnAdd.addEventListener('click', ()=>{
+  const txt = el.cotacao.value.trim();
+  if(!txt){ alert('Cole a cotação antes de adicionar'); return; }
+  cotacoes.push(txt);
+  renderListaCotacoes();
+  el.cotacao.value = '';
+});
 
-    itens.forEach(b => {
-      const nome = (b.match(/\*(.+)\*/) || [])[1] || "";
-      const marca = (b.match(/Marca:\s*([^\n]+)/i) || [])[1] || "";
-      const valor = parseFloat((b.match(/Valor:\s*R\$\s*([\d\.,]+)/i) || [])[1]?.replace(",", ".") || 999999);
+// limpar campo
+el.btnLimpar.addEventListener('click', ()=> el.cotacao.value = '');
 
-      if (!todosPrecos[nome]) todosPrecos[nome] = [];
+// Filtrar melhores preços (parse)
+el.btnFiltrar.addEventListener('click', ()=>{
+  parseCotacoes();
+  renderResultado();
+});
 
-      todosPrecos[nome].push({
-        produto: nome,
-        empresa,
-        marca,
-        valor,
-        texto: b.trim()
-      });
-    });
+// renderiza lista simples de cotações adicionadas
+function renderListaCotacoes(){
+  el.listaCotacoes.innerHTML = '';
+  cotacoes.forEach((c,i)=>{
+    const div = document.createElement('div');
+    div.textContent = `#${i+1} — ${ (c.match(/\*Empresa:\*\s*(.+)/) || [])[1] || 'Desconhecida' }`;
+    el.listaCotacoes.appendChild(div);
   });
+}
 
-  /* ORDERNAR POR PREÇO */
-  for (let produto in todosPrecos) {
-    todosPrecos[produto].sort((a,b) => a.valor - b.valor);
-
-    melhores[produto] = todosPrecos[produto][0];
-
-    if (todosPrecos[produto].length > 1) {
-      alternativos[produto] = todosPrecos[produto].slice(1);
+// parse tolerante das cotações
+function parseCotacoes(){
+  todosPrecos = {};
+  for(const raw of cotacoes){
+    const empresa = (raw.match(/\*Empresa:\*\s*(.+)/i) || [null, 'Desconhecida'])[1].trim();
+    // quebrar por blocos de item (por '📦' ou por linhas que iniciam com '*')
+    const parts = raw.split('📦').slice(1);
+    if(parts.length === 0){
+      // fallback: procurar por padrões *Nome*
+      const altParts = raw.split(/\n(?=\*)/);
+      altParts.forEach(block => processBlock(block, empresa));
     } else {
-      semAlternativa[produto] = todosPrecos[produto][0];
+      parts.forEach(block => processBlock(block, empresa));
     }
   }
 
-  renderResultado();
+  // ordenar cada produto por valor asc
+  Object.keys(todosPrecos).forEach(prod => {
+    todosPrecos[prod].sort((a,b)=> (isFinite(a.valor)?a.valor:Infinity) - (isFinite(b.valor)?b.valor:Infinity));
+  });
 }
 
-/* =========================
- REMOVER ITEM → IR PARA 2º
-========================= */
-function removerItem(produto, empresa) {
-  const lista = todosPrecos[produto];
+function processBlock(block, empresa){
+  // tenta extrair nome entre *...*
+  const nomeMatch = block.match(/\*(.+?)\*/);
+  const nome = nomeMatch ? nomeMatch[1].trim() : (block.split('\n')[0]||'').trim();
+  if(!nome) return;
 
-  if (!lista) return;
-
-  // remover fornecedor atual
-  const novaLista = lista.filter(item => item.empresa !== empresa);
-  todosPrecos[produto] = novaLista;
-
-  if (novaLista.length === 0) {
-    // ninguém mais vende
-    semAlternativa[produto] = { produto, empresa: "—", valor: 0, marca: "" };
-    delete melhores[produto];
-    delete alternativos[produto];
-  }
-  else if (novaLista.length === 1) {
-    // só restou 1 fornecedor
-    melhores[produto] = novaLista[0];
-    delete alternativos[produto];
-    semAlternativa[produto] = novaLista[0];
-  }
-  else {
-    // reorganiza lista (ordena e reatribui 1º e 2º+)
-    novaLista.sort((a,b)=>a.valor - b.valor);
-    melhores[produto] = novaLista[0];
-    alternativos[produto] = novaLista.slice(1);
-    delete semAlternativa[produto];
+  const marca = (block.match(/Marca:\s*([^\n\r]+)/i) || [])[1] || '';
+  const qtd = (block.match(/(?:Qtd|Quantidade|Contém):\s*(\d+)/i) || [])[1] || '';
+  const valorStr = (block.match(/(?:Valor|R\$):?\s*R?\$?\s*([\d\.,]+)/i) || [])[1] || (block.match(/R\$\s*([\d\.,]+)/) || [])[1] || '';
+  let valor = Infinity;
+  if(valorStr){
+    // transformar "1.234,56" -> 1234.56 or "1234,56" -> 1234.56
+    valor = parseFloat(valorStr.replace(/\./g,'').replace(',', '.')) || Infinity;
   }
 
-  renderResultado();
+  const produto = nome;
+  if(!todosPrecos[produto]) todosPrecos[produto] = [];
+  todosPrecos[produto].push({
+    produto,
+    empresa: empresa.trim(),
+    marca: marca.trim(),
+    qtd: qtd ? parseInt(qtd) : null,
+    valor,
+    texto: block.trim()
+  });
 }
 
-/* =========================
- RENDER RESULTADO
-========================= */
-function renderResultado() {
-  let html = "<h3>🏆 Melhores preços por produto</h3>";
+// remover item: pega 2º melhor se existir, atualiza todosPrecos e renderiza
+function removerItem(produto, empresa){
+  if(!todosPrecos[produto]) return;
+  // remove todas as ofertas deste produto desse fornecedor
+  todosPrecos[produto] = todosPrecos[produto].filter(o => o.empresa !== empresa);
 
-  html += `<div class="fornecedor"><ul>`;
-
-  for (let produto in melhores) {
-    const i = melhores[produto];
-
-    html += `
-    <li>
-      <div class="item-left">
-        <strong>${produto}</strong><br>
-        Empresa: ${i.empresa}<br>
-        Marca: ${i.marca}<br>
-        Preço: R$ ${i.valor.toFixed(2)}
-      </div>
-
-      <div class="item-actions">
-        <button class="small" onclick="removerItem('${produto}','${i.empresa}')">Remover</button>
-      </div>
-    </li>`;
-  }
-
-  html += `</ul></div>`;
-
-  /* OUTROS FORNECEDORES */
-  let altHTML = "";
-
-  for (let prod in alternativos) {
-    alternativos[prod].forEach(i => {
-      altHTML += `
-      <li>
-        <strong>${prod}</strong><br>
-        ${i.empresa} — R$ ${i.valor.toFixed(2)}
-      </li>`;
-    });
-  }
-
-  document.getElementById("resultado").innerHTML = html;
-
-  const outros = document.getElementById("outrosFornecedores");
-  if (altHTML) {
-    outros.classList.remove("hidden");
-    document.getElementById("listaOutros").innerHTML = altHTML;
+  if(todosPrecos[produto].length === 0){
+    // nenhum fornecedor -> registrar no "outros"
+    addToOutros(produto);
+    delete todosPrecos[produto];
   } else {
-    outros.classList.add("hidden");
+    // já está ordenado? reordena para garantir
+    todosPrecos[produto].sort((a,b)=> (a.valor||Infinity) - (b.valor||Infinity));
+    // o novo melhor é todosPrecos[produto][0] — isso já ocorre automaticamente
   }
+  renderResultado();
 }
+
+// adiciona item na lista "outros" (sem alternativa)
+function addToOutros(produto){
+  const ul = el.listaOutros;
+  const li = document.createElement('li');
+  li.textContent = produto + ' — sem fornecedor alternativo';
+  ul.appendChild(li);
+  el.outrosContainer.classList.remove('hidden');
+}
+
+// render do resultado principal (melhor por produto)
+function renderResultado(){
+  el.resultado.innerHTML = '';
+  // se não tem dados
+  if(Object.keys(todosPrecos).length === 0){
+    el.resultado.classList.add('hidden');
+    return;
+  }
+  el.resultado.classList.remove('hidden');
+
+  // criar lista
+  const fragment = document.createDocumentFragment();
+  const title = document.createElement('h3');
+  title.textContent = 'Melhores preços por produto';
+  fragment.appendChild(title);
+
+  Object.keys(todosPrecos).sort().forEach(produto => {
+    const ofertas = todosPrecos[produto];
+    if(!ofertas || ofertas.length === 0) return;
+    const melhor = ofertas[0];
+
+    const div = document.createElement('div');
+    div.className = 'produto';
+
+    const left = document.createElement('div');
+    left.className = 'produto-left';
+    left.innerHTML = `<strong>${produto}</strong>
+      <div class="muted">Empresa: ${melhor.empresa} ${ melhor.marca ? ' — Marca: '+melhor.marca : '' }</div>
+      <div style="margin-top:6px">Preço: <strong>R$ ${ isFinite(melhor.valor) ? melhor.valor.toLocaleString('pt-BR', {minimumFractionDigits:2}) : '-' }</strong></div>
+      <pre class="small" style="margin:8px 0 0 0">${melhor.texto}</pre>`;
+
+    const actions = document.createElement('div');
+    actions.className = 'produto-actions';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'small-btn';
+    removeBtn.textContent = 'Remover (usar 2º)';
+    // dataset para identificar
+    removeBtn.dataset.produto = produto;
+    removeBtn.dataset.empresa = melhor.empresa;
+
+    actions.appendChild(removeBtn);
+
+    // se existir segundo colocado, mostrar
+    if(ofertas.length > 1){
+      const segundo = ofertas[1];
+      const info = document.createElement('div');
+      info.style.fontSize = '13px';
+      info.style.color = '#666';
+      info.style.marginLeft = '12px';
+      info.innerHTML = `2º: ${segundo.empresa} — R$ ${isFinite(segundo.valor) ? segundo.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '-'}`;
+      actions.appendChild(info);
+    }
+
+    div.appendChild(left);
+    div.appendChild(actions);
+    fragment.appendChild(div);
+  });
+
+  el.resultado.appendChild(fragment);
+}
+
+// delegação de evento para botão remover
+el.resultado.addEventListener('click', (ev)=>{
+  const btn = ev.target.closest('button.small-btn');
+  if(!btn) return;
+  const produto = btn.dataset.produto;
+  const empresa = btn.dataset.empresa;
+  if(!produto || !empresa) return;
+  // antes de remover, confirmar
+  const ok = confirm(`Remover ${produto} do fornecedor ${empresa}?\nSe houver 2º fornecedor, ele será escolhido automaticamente.`);
+  if(!ok) return;
+  removerItem(produto, empresa);
+});
+
+// impedir que o usuário perca dados: render inicial vazio
+renderListaCotacoes();
+renderResultado();
+
 </script>
 </body>
 </html>
