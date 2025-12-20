@@ -45,8 +45,9 @@
     <label>Cor de fundo</label>
     <input type="color" id="corFundo" value="#ffffff" />
 
-    <label>Logo do Mercado</label>
-    <input type="file" id="logo" accept="image/*" />
+    <!-- Logo fixa do Mercado Couto -->
+    <p style="font-size:13px;margin-top:10px;font-weight:600">Logo do Mercado (fixa)</p>
+    <p style="font-size:12px;color:#666">A logo será carregada automaticamente da pasta do projeto.</p>
 
     <label>Imagem do produto</label>
     <input type="file" id="imagem" accept="image/*" />
@@ -66,19 +67,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let img = null;
-let logo = null;
 
-document.getElementById('imagem').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    img = new Image();
-    img.onload = desenhar;
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
-});
 
 // logo
 
@@ -108,18 +97,19 @@ function desenhar(){
   ctx.fillStyle = '#c62828';
   ctx.fillRect(0,0,canvas.width,120);
 
-  if(logo){
-    ctx.drawImage(logo,20,20,140,80);
-  }
-
-  if(logo){
-    ctx.drawImage(logo,10,10,80,50);
+  // logo fixa no topo
+  if(logo.complete){
+    const logoWidth = 200;
+    const logoHeight = 110;
+    const logoX = (canvas.width - logoWidth) / 2;
+    const logoY = 10;
+    ctx.drawImage(logo,logoX,logoY,logoWidth,logoHeight);
   }
 
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 26px Arial';
+  ctx.font = 'bold 48px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText(titulo,250,45);
+  ctx.fillText(titulo,canvas.width/2,155);
 
   if(img){
     // imagem centralizada
