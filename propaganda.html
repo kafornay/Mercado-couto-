@@ -100,11 +100,15 @@ function desenhar(){
   ctx.fillStyle = '#c62828';
   ctx.fillRect(0,0,canvas.width,160);
 
-  // logo centralizada
+  // logo centralizada SEM DISTORCER (mantém proporção)
   if(logo.complete){
-    const lw = 260;
-    const lh = 130;
-    ctx.drawImage(logo,(canvas.width-lw)/2,15,lw,lh);
+    const maxW = 320;
+    const maxH = 160;
+    const ratio = Math.min(maxW / logo.width, maxH / logo.height);
+    const w = logo.width * ratio;
+    const h = logo.height * ratio;
+    ctx.drawImage(logo,(canvas.width - w) / 2,20,w,h);
+  }
   }
 
   // titulo
