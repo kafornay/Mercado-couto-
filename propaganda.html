@@ -45,10 +45,6 @@
     <label>Cor de fundo</label>
     <input type="color" id="corFundo" value="#ffffff" />
 
-    <!-- Logo fixa do Mercado Couto -->
-    <p style="font-size:13px;margin-top:10px;font-weight:600">Logo do Mercado (fixa)</p>
-    <p style="font-size:12px;color:#666">A logo será carregada automaticamente da pasta do projeto.</p>
-
     <label>Imagem do produto</label>
     <input type="file" id="imagem" accept="image/*" />
 
@@ -66,86 +62,87 @@
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
 let img = null;
 
+// LOGO FIXA
+const logo = new Image();
+logo.src = 'logo.png'; // coloque sua logo com esse nome na mesma pasta do HTML
+logo.onload = () => desenhar();
 
-// logo
-
-document.getElementById('logo').addEventListener('change', e => {
+// imagem do produto
+document.getElementById('imagem').addEventListener('change', e => {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    logo = new Image();
-    logo.onload = desenhar;
-    logo.src = reader.result;
+    img = new Image();
+    img.onload = desenhar;
+    img.src = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
 function desenhar(){
-  const titulo = tituloEl().value;
-  const produto = produtoEl().value;
-  const preco = precoEl().value;
-  const extra = extraEl().value;
-  const fundo = fundoEl().value;
+  const titulo = document.getElementById('titulo').value;
+  const produto = document.getElementById('produto').value;
+  const preco = document.getElementById('preco').value;
+  const extra = document.getElementById('extra').value;
+  const fundo = document.getElementById('corFundo').value;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // fundo
   ctx.fillStyle = fundo;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
+  // faixa topo
   ctx.fillStyle = '#c62828';
-  ctx.fillRect(0,0,canvas.width,120);
+  ctx.fillRect(0,0,canvas.width,160);
 
-  // logo fixa no topo
+  // logo centralizada
   if(logo.complete){
-    const logoWidth = 200;
-    const logoHeight = 110;
-    const logoX = (canvas.width - logoWidth) / 2;
-    const logoY = 10;
-    ctx.drawImage(logo,logoX,logoY,logoWidth,logoHeight);
+    const lw = 260;
+    const lh = 130;
+    ctx.drawImage(logo,(canvas.width-lw)/2,15,lw,lh);
   }
 
+  // titulo
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 48px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText(titulo,canvas.width/2,155);
+  ctx.fillText(titulo,canvas.width/2,220);
 
+  // imagem produto
   if(img){
-    // imagem centralizada
-    const imgSize = 500;
-    const imgX = (canvas.width - imgSize) / 2;
-    const imgY = 160;
-    ctx.drawImage(img,imgX,imgY,imgSize,imgSize);
+    const size = 520;
+    ctx.drawImage(img,(canvas.width-size)/2,260,size,size);
   }
 
-  const textY = img ? 700 : 300;
+  const baseY = img ? 820 : 360;
 
+  // produto
   ctx.fillStyle = '#000';
-  ctx.font = 'bold 22px Arial';
-  ctx.fillText(produto,canvas.width/2,textY);
+  ctx.font = 'bold 42px Arial';
+  ctx.fillText(produto,canvas.width/2,baseY);
 
+  // preço
   ctx.fillStyle = '#2e7d32';
-  ctx.font = 'bold 36px Arial';
-  ctx.fillText(preco,canvas.width/2,textY+60);
+  ctx.font = 'bold 64px Arial';
+  ctx.fillText(preco,canvas.width/2,baseY+80);
 
+  // texto extra
   ctx.fillStyle = '#555';
-  ctx.font = '16px Arial';
-  ctx.fillText(extra,canvas.width/2,textY+110);
+  ctx.font = '28px Arial';
+  ctx.fillText(extra,canvas.width/2,baseY+140);
 }
 
 function baixar(){
   const link = document.createElement('a');
   link.download = 'propaganda_mercado_couto.png';
-  link.href = canvas.toDataURL();
+  link.href = canvas.toDataURL('image/png');
   link.click();
 }
-
-const tituloEl = ()=>document.getElementById('titulo');
-const produtoEl = ()=>document.getElementById('produto');
-const precoEl = ()=>document.getElementById('preco');
-const extraEl = ()=>document.getElementById('extra');
-const fundoEl = ()=>document.getElementById('corFundo');
 
 desenhar();
 </script>
