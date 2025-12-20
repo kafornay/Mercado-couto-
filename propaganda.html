@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <label>Logo do Mercado</label>
+        <label>Trocar Logo (Opcional)</label>
         <input type="file" id="fLogo" accept="image/*">
 
         <label>Imagem do Produto</label>
@@ -64,9 +64,14 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    let imgProd = null, imgLogo = null;
+    let imgProd = null;
+    let imgLogo = new Image();
 
-    // Handler para carregar a Logo
+    // Carregamento automático da Logo fixa
+    imgLogo.src = 'logo.png';
+    imgLogo.onload = draw;
+
+    // Handler para trocar a logo manualmente (se desejar)
     document.getElementById('fLogo').onchange = e => {
         const r = new FileReader();
         r.onload = () => { imgLogo = new Image(); imgLogo.onload = draw; imgLogo.src = r.result; };
@@ -91,43 +96,42 @@
         ctx.fillStyle = cBg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Logo no Topo (Centralizada)
-        if(imgLogo) {
-            const lScale = Math.min(300/imgLogo.width, 150/imgLogo.height);
+        // 2. Logo no Topo (Aumentada para 450px de largura max)
+        if(imgLogo.complete) {
+            const lScale = Math.min(450/imgLogo.width, 220/imgLogo.height);
             const lw = imgLogo.width * lScale;
             const lh = imgLogo.height * lScale;
-            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 60, lw, lh);
+            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 40, lw, lh);
         }
 
-        // 3. Título "OFERTA DO DIA"
+        // 3. Título "OFERTA DO DIA" (Descido um pouco para dar espaço à logo maior)
         ctx.textAlign = 'center';
         ctx.fillStyle = '#d32f2f';
         ctx.font = 'bold 110px Arial Black';
         ctx.shadowColor = 'rgba(0,0,0,0.1)';
         ctx.shadowBlur = 10;
-        ctx.fillText("OFERTA DO DIA", canvas.width/2, 350);
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 420);
         ctx.shadowBlur = 0;
 
         // 4. Imagem do Produto
         if(imgProd) {
-            const pScale = Math.min(850/imgProd.width, 650/imgProd.height);
+            const pScale = Math.min(850/imgProd.width, 600/imgProd.height);
             const pw = imgProd.width * pScale;
             const ph = imgProd.height * pScale;
-            ctx.drawImage(imgProd, (canvas.width - pw)/2, 420, pw, ph);
+            ctx.drawImage(imgProd, (canvas.width - pw)/2, 480, pw, ph);
         }
 
-        // 5. Selo de Preço Inclinado (Igual à Imagem)
+        // 5. Selo de Preço Inclinado
         ctx.save();
         ctx.translate(canvas.width/2, 1100);
         ctx.rotate(-0.04); 
 
-        // Retângulo com Borda Dupla
         ctx.fillStyle = cSelo;
         ctx.fillRect(-480, -120, 960, 280);
         ctx.strokeStyle = "#000";
         ctx.lineWidth = 4;
-        ctx.strokeRect(-480, -120, 960, 280); // Borda externa
-        ctx.strokeRect(-472, -112, 944, 264); // Linha interna estilizada
+        ctx.strokeRect(-480, -120, 960, 280);
+        ctx.strokeRect(-472, -112, 944, 264);
 
         ctx.fillStyle = "#000";
         ctx.font = "bold 48px Arial";
