@@ -1,133 +1,255 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Propaganda Mercado Couto</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5}
-header{background:#fff;color:#111;text-align:center;padding:14px;font-weight:800;letter-spacing:1px}
-.container{max-width:1100px;margin:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
-@media(min-width:768px){.container{flex-direction:row}}
-.controls{background:#fff;color:#111;border-radius:16px;padding:16px;flex:1;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.controls label{font-size:13px;font-weight:600;margin-top:10px;display:block;color:#333}
-.controls input,.controls textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin-top:4px;font-size:14px}
-.preview{flex:1;display:flex;justify-content:center;align-items:center}
-canvas{width:100%;max-width:360px;border-radius:22px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
-.buttons{display:flex;gap:10px;margin-top:14px}
-button{flex:1;padding:14px;border:none;border-radius:14px;font-weight:700;cursor:pointer;font-size:15px}
-.save{background:#2e7d32;color:#fff}
-.update{background:#1565c0;color:#fff}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Couto - Pro Designer</title>
+    <style>
+        :root {
+            --primary: #e53935;
+            --secondary: #1e88e5;
+            --accent: #ffeb3b;
+            --bg: #121212;
+            --surface: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        body { 
+            margin: 0; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header { 
+            background: linear-gradient(90deg, #b71c1c, #e53935);
+            padding: 20px; 
+            text-align: center; 
+            font-weight: 900; 
+            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 1.2rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+            width: 100%;
+        }
+
+        @media(min-width: 900px) {
+            .main-layout { grid-template-columns: 400px 1fr; }
+        }
+
+        .controls {
+            background: var(--surface);
+            padding: 25px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+        }
+
+        input:focus { border-color: var(--primary); outline: none; }
+
+        .preview-area {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: sticky;
+            top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            background: #fff;
+        }
+
+        .btn-stack { display: flex; gap: 10px; margin-top: 10px; }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-update { background: var(--secondary); color: white; }
+        .btn-save { background: #43a047; color: white; }
+        button:hover { transform: translateY(-2px); filter: brightness(1.2); }
+    </style>
 </head>
 <body>
-<header>CRIADOR DE PROPAGANDA – MERCADO COUTO</header>
 
-<div class="container">
-<div class="controls">
-<label>Produto</label>
-<input id="produto" value="ARROZ 5KG">
+<header>🚀 MERCADO COUTO - AD CREATOR PRO</header>
 
-<label>Preço</label>
-<input id="preco" value="R$ 24,99">
+<div class="main-layout">
+    <div class="controls">
+        <div class="input-group">
+            <label>Nome do Produto</label>
+            <input id="produto" placeholder="Ex: Arroz Tio João 5kg" oninput="draw()">
+        </div>
+        
+        <div class="input-group">
+            <label>Preço (R$)</label>
+            <input id="preco" placeholder="24,99" oninput="draw()">
+        </div>
 
-<label>Chamada</label>
-<textarea id="extra">Oferta válida enquanto durar o estoque</textarea>
+        <div class="input-group">
+            <label>Rodapé / Validade</label>
+            <textarea id="extra" rows="2" oninput="draw()">Oferta válida até durar o estoque.</textarea>
+        </div>
 
-<label>Imagem do produto</label>
-<input type="file" id="imgInput" accept="image/*">
+        <div class="input-group">
+            <label>Foto do Produto</label>
+            <input type="file" id="imgInput" accept="image/*">
+        </div>
 
-<div class="buttons">
-<button class="update" onclick="draw()">Atualizar</button>
-<button class="save" onclick="save()">Salvar PNG</button>
-</div>
-</div>
+        <div class="btn-stack">
+            <button class="btn-save" onclick="save()">Baixar PNG</button>
+        </div>
+    </div>
 
-<div class="preview">
-<canvas id="canvas" width="1080" height="1350"></canvas>
-</div>
+    <div class="preview-area">
+        <canvas id="canvas" width="1080" height="1350"></canvas>
+    </div>
 </div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-let productImg = null;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const imgInput = document.getElementById('imgInput');
+    let productImg = null;
 
-// LOGO CENTRAL
-const logo = new Image();
-logo.src = 'logo.png';
-logo.onload = draw;
+    // Inicialização
+    window.onload = () => {
+        document.getElementById('produto').value = "CERVEJA LATA 350ML";
+        document.getElementById('preco').value = "3,49";
+        draw();
+    };
 
-imgInput.onchange = e =>{
- const f = e.target.files[0];
- if(!f) return;
- const r = new FileReader();
- r.onload = ()=>{
-   productImg = new Image();
-   productImg.onload = draw;
-   productImg.src = r.result;
- };
- r.readAsDataURL(f);
-};
+    imgInput.onchange = e => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            productImg = new Image();
+            productImg.onload = draw;
+            productImg.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    };
 
-function draw(){
- const produto = produtoEl().value;
- const preco = precoEl().value;
- const extra = extraEl().value;
+    function draw() {
+        const produto = document.getElementById('produto').value.toUpperCase();
+        const preco = document.getElementById('preco').value;
+        const extra = document.getElementById('extra').value;
 
- ctx.clearRect(0,0,canvas.width,canvas.height);
+        // 1. Fundo com Gradiente
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#d32f2f');
+        gradient.addColorStop(0.2, '#f44336');
+        gradient.addColorStop(1, '#ffffff');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
- // FUNDO BRANCO
- ctx.fillStyle = '#ffffff';
- ctx.fillRect(0,0,canvas.width,canvas.height);
+        // 2. Elementos Decorativos (Círculo de fundo)
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.beginPath();
+        ctx.arc(540, 600, 400, 0, Math.PI * 2);
+        ctx.fill();
 
- // LOGO CENTRAL SUPERIOR (SEM DISTORCER)
- if(logo.complete){
-   const maxW = 360;
-   const ratio = Math.min(maxW/logo.width,180/logo.height);
-   const w = logo.width*ratio;
-   const h = logo.height*ratio;
-   ctx.drawImage(logo,(canvas.width-w)/2,40,w,h);
- }
+        // 3. Logo/Título Superior
+        ctx.fillStyle = '#fff';
+        ctx.font = 'black 80px Arial Black';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 15;
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 120);
+        ctx.shadowBlur = 0;
 
- // IMAGEM DO PRODUTO
- if(productImg){
-   const size = 560;
-   ctx.drawImage(productImg,(canvas.width-size)/2,260,size,size);
- }
+        // 4. Imagem do Produto
+        if(productImg) {
+            const ratio = Math.min(700 / productImg.width, 700 / productImg.height);
+            const w = productImg.width * ratio;
+            const h = productImg.height * ratio;
+            
+            // Sombra da imagem
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 30;
+            ctx.drawImage(productImg, (canvas.width - w)/2, 250, w, h);
+            ctx.shadowBlur = 0;
+        }
 
- const baseY = productImg ? 900 : 420;
+        // 5. Faixa de Preço (Design Impactante)
+        const badgeY = 1000;
+        ctx.fillStyle = '#ffeb3b'; // Amarelo vibrante
+        ctx.beginPath();
+        ctx.roundRect(100, badgeY - 100, 880, 280, 40);
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 5;
+        ctx.stroke();
 
- // PRODUTO
- ctx.fillStyle = '#000';
- ctx.font = '700 46px Arial';
- ctx.textAlign = 'center';
- ctx.fillText(produto,canvas.width/2,baseY);
+        // Texto Produto
+        ctx.fillStyle = '#1a1a1a';
+        ctx.font = 'bold 50px Arial';
+        ctx.fillText(produto, canvas.width/2, badgeY - 20);
 
- // PREÇO
- ctx.fillStyle = '#2e7d32';
- ctx.font = '900 82px Arial';
- ctx.fillText(preco,canvas.width/2,baseY+90);
+        // Texto R$
+        ctx.font = 'bold 60px Arial';
+        ctx.fillText("R$", 360, badgeY + 100);
 
- // TEXTO EXTRA
- ctx.fillStyle = '#555';
- ctx.font = '30px Arial';
- ctx.fillText(extra,canvas.width/2,baseY+150);
-}
+        // Valor
+        ctx.font = 'black 180px Arial Black';
+        ctx.fillText(preco, 580, badgeY + 125);
 
-function save(){
- const a = document.createElement('a');
- a.download = 'propaganda_mercado_couto.png';
- a.href = canvas.toDataURL('image/png');
- a.click();
-}
+        // 6. Rodapé
+        ctx.fillStyle = '#666';
+        ctx.font = '30px Arial';
+        ctx.fillText(extra, canvas.width/2, 1300);
+    }
 
-const produtoEl = ()=>document.getElementById('produto');
-const precoEl = ()=>document.getElementById('preco');
-const extraEl = ()=>document.getElementById('extra');
-
-draw();
+    function save() {
+        const link = document.createElement('a');
+        link.download = `oferta_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+    }
 </script>
+
 </body>
 </html>
