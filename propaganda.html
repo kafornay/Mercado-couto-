@@ -3,69 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Ofertas - Mercado Couto</title>
+    <title>Mercado Couto - Ad Creator Pro</title>
     <style>
         :root {
-            --primary: #212121;
-            --accent: #ffcc00;
-            --bg-editor: #f0f2f5;
+            --primary-red: #d32f2f;
+            --dark-bg: #222;
+            --input-bg: #fff;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        
         body { 
             margin: 0; 
-            background: var(--bg-editor); 
-            display: flex; 
-            flex-direction: column; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: #fff;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
         header { 
-            background: #fff; 
+            background: linear-gradient(90deg, #b71c1c, #e53935);
             padding: 15px; 
-            text-align: center; 
-            font-weight: 800; 
-            border-bottom: 2px solid #ddd;
-            color: #d32f2f;
+            text-align: left;
+            padding-left: 50px;
+            font-weight: 900; 
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .layout {
+        .main-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
+            gap: 30px;
+            padding: 30px;
+            max-width: 1300px;
             margin: auto;
         }
 
-        @media(min-width: 900px) {
-            .layout { grid-template-columns: 380px 1fr; }
+        @media(min-width: 1000px) {
+            .main-container { grid-template-columns: 400px 1fr; }
         }
 
-        .sidebar {
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .controls-card {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        label { font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
         
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
+        label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #bbb;
         }
 
-        .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #fff;
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+        }
 
-        .preview-box {
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-update { background: #1e88e5; color: white; }
+        .btn-save { background: #ffc107; color: #000; }
+        .btn-download { background: #43a047; color: white; grid-column: span 2; }
+
+        .preview-pane {
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -74,59 +98,45 @@
         canvas {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
-
-        .btn-save {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        .btn-save:hover { background: #1b5e20; }
     </style>
 </head>
 <body>
 
-<header>MERCADO COUTO - DESIGNER DE ENCARTES</header>
+<header>🚀 MERCADO COUTO - AD CREATOR PRO</header>
 
-<div class="layout">
-    <div class="sidebar">
-        <label>Nome do Produto</label>
-        <input id="prodNome" value="ARROZ TIO JOÃO 5KG" oninput="draw()">
+<div class="main-container">
+    <div class="controls-card">
+        <div class="control-group">
+            <label>Produto</label>
+            <input id="prodNome" value="CERVEJA LATA 350ML" oninput="draw()">
+        </div>
         
-        <label>Preço (Apenas números)</label>
-        <input id="prodPreco" value="24,99" oninput="draw()">
-
-        <label>Rodapé / Obs</label>
-        <textarea id="prodObs" oninput="draw()">Oferta válida enquanto durarem os estoques.</textarea>
-
-        <div class="color-grid">
-            <div>
-                <label>Cor do Fundo</label>
-                <input type="color" id="colorBg" value="#ffffff" oninput="draw()">
-            </div>
-            <div>
-                <label>Cor do Selo</label>
-                <input type="color" id="colorSelo" value="#ffcc00" oninput="draw()">
-            </div>
+        <div class="control-group">
+            <label>Preço</label>
+            <input id="prodPreco" value="3,49" oninput="draw()">
         </div>
 
-        <label>Foto do Produto (PNG sem fundo é melhor)</label>
-        <input type="file" id="imgFile" accept="image/*">
+        <div class="control-group">
+            <label>Texto Extra</label>
+            <textarea id="prodExtra" oninput="draw()">Oferta válida até durar o estoque.</textarea>
+        </div>
 
-        <button class="btn-save" onclick="download()">BAIXAR IMAGEM (PNG)</button>
+        <div class="control-group">
+            <label>Imagem do Produto</label>
+            <input type="file" id="imgUpload" accept="image/*">
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn-update" onclick="draw()">Atualizar</button>
+            <button class="btn-save" onclick="download()">Salvar PNG</button>
+        </div>
     </div>
 
-    <div class="preview-box">
+    <div class="preview-pane">
         <canvas id="canvas" width="1080" height="1350"></canvas>
     </div>
 </div>
@@ -136,8 +146,8 @@
     const ctx = canvas.getContext('2d');
     let productImg = null;
 
-    // Carregar imagem
-    document.getElementById('imgFile').onchange = e => {
+    // Listener de Upload
+    document.getElementById('imgUpload').onchange = e => {
         const reader = new FileReader();
         reader.onload = () => {
             productImg = new Image();
@@ -150,63 +160,66 @@
     function draw() {
         const nome = document.getElementById('prodNome').value.toUpperCase();
         const preco = document.getElementById('prodPreco').value;
-        const obs = document.getElementById('prodObs').value;
-        const corBg = document.getElementById('colorBg').value;
-        const corSelo = document.getElementById('colorSelo').value;
+        const extra = document.getElementById('prodExtra').value;
 
-        // Limpar e Fundo
-        ctx.fillStyle = corBg;
+        // 1. Fundo Branco
+        ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Faixa de Título Superior
-        ctx.fillStyle = '#d32f2f';
-        ctx.fillRect(0, 0, canvas.width, 180);
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 80px Arial';
+        // 2. Título "OFERTA DO DIA" com Sombra
         ctx.textAlign = 'center';
-        ctx.fillText("OFERTA IMPERDÍVEL", canvas.width/2, 115);
+        ctx.fillStyle = '#d32f2f';
+        ctx.font = 'bold 110px Arial Black';
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 10;
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 320);
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
 
-        // Imagem do Produto
+        // 3. Imagem do Produto
         if(productImg) {
-            const padding = 200;
-            const maxWidth = canvas.width - padding;
-            const maxHeight = 600;
-            const ratio = Math.min(maxWidth / productImg.width, maxHeight / productImg.height);
+            const ratio = Math.min(800 / productImg.width, 600 / productImg.height);
             const w = productImg.width * ratio;
             const h = productImg.height * ratio;
-            
-            ctx.drawImage(productImg, (canvas.width - w)/2, 250, w, h);
+            ctx.drawImage(productImg, (canvas.width - w)/2, 400, w, h);
         }
 
-        // Selo de Preço
-        const seloY = 920;
-        ctx.shadowColor = 'rgba(0,0,0,0.1)';
-        ctx.shadowBlur = 20;
-        ctx.fillStyle = corSelo;
+        // 4. Selo de Preço Inclinado (O estilo da sua prévia)
+        const seloX = 50;
+        const seloY = 1000;
+        const seloW = 980;
+        const seloH = 260;
+
+        ctx.save();
+        ctx.translate(canvas.width/2, seloY);
+        ctx.rotate(-0.03); // Inclinação leve
+
+        // Retângulo Amarelo com Borda Preta Dupla
+        ctx.fillStyle = "#ffcc00";
+        ctx.fillRect(-seloW/2, -50, seloW, seloH);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(-seloW/2, -50, seloW, seloH);
         
-        // Desenha um retângulo arredondado para o preço
-        ctx.beginPath();
-        ctx.roundRect(140, seloY, 800, 320, 30);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        // Texto Produto dentro do selo
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 45px Arial";
+        ctx.fillText(nome, 0, 15);
 
-        // Texto do Produto no Selo
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 45px Arial';
-        ctx.fillText(nome, canvas.width/2, seloY + 70);
-
-        // Preço
-        ctx.font = 'bold 60px Arial';
-        ctx.fillText("R$", 380, seloY + 200);
+        // Preço Gigante
+        ctx.font = "bold 65px Arial";
+        ctx.fillText("R$", -240, 130);
         
-        ctx.font = 'black 190px Arial Black';
-        ctx.fillText(preco, 600, seloY + 230);
+        ctx.font = "black 200px Arial Black";
+        ctx.fillText(preco, 120, 160);
+        
+        ctx.restore();
 
-        // Rodapé
-        ctx.fillStyle = '#666';
-        ctx.font = '30px Arial';
-        ctx.fillText(obs, canvas.width/2, 1310);
+        // 5. Rodapé
+        ctx.fillStyle = "#333";
+        ctx.font = "35px Arial";
+        ctx.fillText(extra, canvas.width/2, 1300);
     }
 
     function download() {
@@ -216,8 +229,8 @@
         link.click();
     }
 
-    // Iniciar
-    draw();
+    // Carregamento inicial
+    window.onload = draw;
 </script>
 
 </body>
