@@ -2,141 +2,61 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mercado Couto - Ad Creator Pro</title>
     <style>
-        :root {
-            --primary-red: #d32f2f;
-            --dark-bg: #222;
-            --input-bg: #fff;
-        }
-
-        body { 
-            margin: 0; 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: #1a1a1a; 
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header { 
-            background: linear-gradient(90deg, #b71c1c, #e53935);
-            padding: 15px; 
-            text-align: left;
-            padding-left: 50px;
-            font-weight: 900; 
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .main-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            padding: 30px;
-            max-width: 1300px;
-            margin: auto;
-        }
-
-        @media(min-width: 1000px) {
-            .main-container { grid-template-columns: 400px 1fr; }
-        }
-
-        .controls-card {
-            background: #2a2a2a;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .control-group { margin-bottom: 20px; }
-        
-        label { 
-            display: block; 
-            font-size: 13px; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            color: #bbb;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background: #fff;
-            color: #333;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        
-        button {
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .btn-update { background: #1e88e5; color: white; }
-        .btn-save { background: #ffc107; color: #000; }
-        .btn-download { background: #43a047; color: white; grid-column: span 2; }
-
-        .preview-pane {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        canvas {
-            max-width: 100%;
-            height: auto;
-            background: #fff;
-            border-radius: 4px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        }
+        :root { --primary: #d32f2f; --dark: #1a1a1a; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; display: flex; flex-direction: column; }
+        header { background: linear-gradient(90deg, #b71c1c, #e53935); padding: 15px 40px; font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; justify-content: space-between; }
+        .main { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; max-width: 1300px; margin: auto; width: 100%; }
+        @media(min-width: 950px) { .main { grid-template-columns: 380px 1fr; } }
+        .controls { background: #2a2a2a; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px; }
+        label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #fff; color: #333; font-weight: 600; }
+        .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .preview { display: flex; justify-content: center; }
+        canvas { max-width: 100%; height: auto; background: #fff; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); }
+        .btn-save { background: #ffc107; color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-save:hover { background: #ffb300; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
-<header>🚀 MERCADO COUTO - AD CREATOR PRO</header>
+<header>
+    <span>🚀 MERCADO COUTO - PRO DESIGNER</span>
+</header>
 
-<div class="main-container">
-    <div class="controls-card">
-        <div class="control-group">
-            <label>Produto</label>
-            <input id="prodNome" value="CERVEJA LATA 350ML" oninput="draw()">
-        </div>
+<div class="main">
+    <div class="controls">
+        <label>Produto</label>
+        <input id="pNome" value="CERVEJA LATA 350ML" oninput="draw()">
         
-        <div class="control-group">
-            <label>Preço</label>
-            <input id="prodPreco" value="3,49" oninput="draw()">
+        <label>Preço</label>
+        <input id="pPreco" value="3,49" oninput="draw()">
+
+        <label>Informações Extras</label>
+        <textarea id="pExtra" oninput="draw()">Oferta válida até durar o estoque.</textarea>
+
+        <div class="color-row">
+            <div>
+                <label>Cor do Fundo</label>
+                <input type="color" id="cBg" value="#ffffff" oninput="draw()">
+            </div>
+            <div>
+                <label>Cor do Selo</label>
+                <input type="color" id="cSelo" value="#ffcc00" oninput="draw()">
+            </div>
         </div>
 
-        <div class="control-group">
-            <label>Texto Extra</label>
-            <textarea id="prodExtra" oninput="draw()">Oferta válida até durar o estoque.</textarea>
-        </div>
+        <label>Logo do Mercado</label>
+        <input type="file" id="fLogo" accept="image/*">
 
-        <div class="control-group">
-            <label>Imagem do Produto</label>
-            <input type="file" id="imgUpload" accept="image/*">
-        </div>
+        <label>Imagem do Produto</label>
+        <input type="file" id="fProd" accept="image/*">
 
-        <div class="btn-grid">
-            <button class="btn-update" onclick="draw()">Atualizar</button>
-            <button class="btn-save" onclick="download()">Salvar PNG</button>
-        </div>
+        <button class="btn-save" onclick="download()">BAIXAR PROPAGANDA (PNG)</button>
     </div>
 
-    <div class="preview-pane">
+    <div class="preview">
         <canvas id="canvas" width="1080" height="1350"></canvas>
     </div>
 </div>
@@ -144,94 +64,96 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    let productImg = null;
+    let imgProd = null, imgLogo = null;
 
-    // Listener de Upload
-    document.getElementById('imgUpload').onchange = e => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            productImg = new Image();
-            productImg.onload = draw;
-            productImg.src = reader.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
+    // Handler para carregar a Logo
+    document.getElementById('fLogo').onchange = e => {
+        const r = new FileReader();
+        r.onload = () => { imgLogo = new Image(); imgLogo.onload = draw; imgLogo.src = r.result; };
+        r.readAsDataURL(e.target.files[0]);
+    };
+
+    // Handler para carregar o Produto
+    document.getElementById('fProd').onchange = e => {
+        const r = new FileReader();
+        r.onload = () => { imgProd = new Image(); imgProd.onload = draw; imgProd.src = r.result; };
+        r.readAsDataURL(e.target.files[0]);
     };
 
     function draw() {
-        const nome = document.getElementById('prodNome').value.toUpperCase();
-        const preco = document.getElementById('prodPreco').value;
-        const extra = document.getElementById('prodExtra').value;
+        const nome = document.getElementById('pNome').value.toUpperCase();
+        const preco = document.getElementById('pPreco').value;
+        const extra = document.getElementById('pExtra').value;
+        const cBg = document.getElementById('cBg').value;
+        const cSelo = document.getElementById('cSelo').value;
 
-        // 1. Fundo Branco
-        ctx.fillStyle = "#ffffff";
+        // 1. Fundo Customizável
+        ctx.fillStyle = cBg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Título "OFERTA DO DIA" com Sombra
+        // 2. Logo no Topo (Centralizada)
+        if(imgLogo) {
+            const lScale = Math.min(300/imgLogo.width, 150/imgLogo.height);
+            const lw = imgLogo.width * lScale;
+            const lh = imgLogo.height * lScale;
+            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 60, lw, lh);
+        }
+
+        // 3. Título "OFERTA DO DIA"
         ctx.textAlign = 'center';
         ctx.fillStyle = '#d32f2f';
         ctx.font = 'bold 110px Arial Black';
-        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowColor = 'rgba(0,0,0,0.1)';
         ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 10;
-        ctx.fillText("OFERTA DO DIA", canvas.width/2, 320);
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 350);
         ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
 
-        // 3. Imagem do Produto
-        if(productImg) {
-            const ratio = Math.min(800 / productImg.width, 600 / productImg.height);
-            const w = productImg.width * ratio;
-            const h = productImg.height * ratio;
-            ctx.drawImage(productImg, (canvas.width - w)/2, 400, w, h);
+        // 4. Imagem do Produto
+        if(imgProd) {
+            const pScale = Math.min(850/imgProd.width, 650/imgProd.height);
+            const pw = imgProd.width * pScale;
+            const ph = imgProd.height * pScale;
+            ctx.drawImage(imgProd, (canvas.width - pw)/2, 420, pw, ph);
         }
 
-        // 4. Selo de Preço Inclinado (O estilo da sua prévia)
-        const seloX = 50;
-        const seloY = 1000;
-        const seloW = 980;
-        const seloH = 260;
-
+        // 5. Selo de Preço Inclinado (Igual à Imagem)
         ctx.save();
-        ctx.translate(canvas.width/2, seloY);
-        ctx.rotate(-0.03); // Inclinação leve
+        ctx.translate(canvas.width/2, 1100);
+        ctx.rotate(-0.04); 
 
-        // Retângulo Amarelo com Borda Preta Dupla
-        ctx.fillStyle = "#ffcc00";
-        ctx.fillRect(-seloW/2, -50, seloW, seloH);
+        // Retângulo com Borda Dupla
+        ctx.fillStyle = cSelo;
+        ctx.fillRect(-480, -120, 960, 280);
         ctx.strokeStyle = "#000";
         ctx.lineWidth = 4;
-        ctx.strokeRect(-seloW/2, -50, seloW, seloH);
-        
-        // Texto Produto dentro do selo
-        ctx.fillStyle = "#000";
-        ctx.font = "bold 45px Arial";
-        ctx.fillText(nome, 0, 15);
+        ctx.strokeRect(-480, -120, 960, 280); // Borda externa
+        ctx.strokeRect(-472, -112, 944, 264); // Linha interna estilizada
 
-        // Preço Gigante
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 48px Arial";
+        ctx.fillText(nome, 0, -35);
+
         ctx.font = "bold 65px Arial";
-        ctx.fillText("R$", -240, 130);
+        ctx.fillText("R$", -280, 85);
         
-        ctx.font = "black 200px Arial Black";
-        ctx.fillText(preco, 120, 160);
-        
+        ctx.font = "900 230px Arial Black";
+        ctx.fillText(preco, 100, 115);
         ctx.restore();
 
-        // 5. Rodapé
-        ctx.fillStyle = "#333";
+        // 6. Rodapé
+        ctx.fillStyle = "#444";
         ctx.font = "35px Arial";
-        ctx.fillText(extra, canvas.width/2, 1300);
+        ctx.fillText(extra, canvas.width/2, 1315);
     }
 
     function download() {
         const link = document.createElement('a');
-        link.download = 'oferta_couto.png';
+        link.download = 'propaganda_couto.png';
         link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
     }
 
-    // Carregamento inicial
     window.onload = draw;
 </script>
-
 </body>
 </html>
