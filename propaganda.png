@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor de Propagandas - Mercado Couto</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:#eceff1;margin:0;padding:0}
+    header{background:#c62828;color:#fff;padding:14px;text-align:center;font-size:18px;font-weight:700}
+    .container{display:flex;flex-direction:column;gap:12px;padding:12px;max-width:900px;margin:auto}
+    @media(min-width:768px){.container{flex-direction:row}}
+    .controls{flex:1;background:#fff;border-radius:12px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .controls h3{margin-top:0;font-size:16px}
+    .controls label{display:block;margin-top:10px;font-size:13px;font-weight:600}
+    .controls input,.controls textarea{width:100%;padding:10px;margin-top:4px;border-radius:8px;border:1px solid #ccc;font-size:14px}
+    .preview{flex:1;display:flex;justify-content:center;align-items:center}
+    canvas{width:100%;max-width:360px;height:auto;background:#fff;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    .buttons{display:flex;gap:10px;margin-top:14px}
+    button{flex:1;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+    .btn-update{background:#2e7d32;color:#fff}
+    .btn-save{background:#1565c0;color:#fff}
+    button:active{transform:scale(.97)}
+  </style>
+</head>
+<body>
+<header>EDITOR DE PROPAGANDAS – MERCADO COUTO</header>
+
+<div class="container">
+  <div class="controls">
+    <h3>Conteúdo da Propaganda</h3>
+
+    <label>Título</label>
+    <input type="text" id="titulo" value="OFERTA DA SEMANA" />
+
+    <label>Produto</label>
+    <input type="text" id="produto" value="ARROZ 5KG" />
+
+    <label>Preço</label>
+    <input type="text" id="preco" value="R$ 24,99" />
+
+    <label>Texto extra</label>
+    <textarea id="extra">Somente no Mercado Couto</textarea>
+
+    <label>Cor de fundo</label>
+    <input type="color" id="corFundo" value="#ffffff" />
+
+    <label>Logo do Mercado</label>
+    <input type="file" id="logo" accept="image/*" />
+
+    <label>Imagem do produto</label>
+    <input type="file" id="imagem" accept="image/*" />
+
+    <div class="buttons">
+      <button class="btn-update" onclick="desenhar()">Atualizar</button>
+      <button class="btn-save" onclick="baixar()">Salvar PNG</button>
+    </div>
+  </div>
+
+  <div class="preview">
+    <canvas id="canvas" width="1080" height="1080"></canvas>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let img = null;
+let logo = null;
+
+document.getElementById('imagem').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    img = new Image();
+    img.onload = desenhar;
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// logo
+
+document.getElementById('logo').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    logo = new Image();
+    logo.onload = desenhar;
+    logo.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+function desenhar(){
+  const titulo = tituloEl().value;
+  const produto = produtoEl().value;
+  const preco = precoEl().value;
+  const extra = extraEl().value;
+  const fundo = fundoEl().value;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = fundo;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle = '#c62828';
+  ctx.fillRect(0,0,canvas.width,120);
+
+  if(logo){
+    ctx.drawImage(logo,20,20,140,80);
+  }
+
+  if(logo){
+    ctx.drawImage(logo,10,10,80,50);
+  }
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 26px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(titulo,250,45);
+
+  if(img){
+    // imagem centralizada
+    const imgSize = 500;
+    const imgX = (canvas.width - imgSize) / 2;
+    const imgY = 160;
+    ctx.drawImage(img,imgX,imgY,imgSize,imgSize);
+  }
+
+  const textY = img ? 700 : 300;
+
+  ctx.fillStyle = '#000';
+  ctx.font = 'bold 22px Arial';
+  ctx.fillText(produto,canvas.width/2,textY);
+
+  ctx.fillStyle = '#2e7d32';
+  ctx.font = 'bold 36px Arial';
+  ctx.fillText(preco,canvas.width/2,textY+60);
+
+  ctx.fillStyle = '#555';
+  ctx.font = '16px Arial';
+  ctx.fillText(extra,canvas.width/2,textY+110);
+}
+
+function baixar(){
+  const link = document.createElement('a');
+  link.download = 'propaganda_mercado_couto.png';
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+const tituloEl = ()=>document.getElementById('titulo');
+const produtoEl = ()=>document.getElementById('produto');
+const precoEl = ()=>document.getElementById('preco');
+const extraEl = ()=>document.getElementById('extra');
+const fundoEl = ()=>document.getElementById('corFundo');
+
+desenhar();
+</script>
+</body>
+</html>
