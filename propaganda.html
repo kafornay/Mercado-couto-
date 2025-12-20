@@ -3,43 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor de Propagandas - Mercado Couto</title>
+<title>Propaganda Mercado Couto</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f0f0f0}
-header{background:#c62828;color:#fff;text-align:center;padding:12px;font-weight:700}
-.container{max-width:1000px;margin:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5}
+header{background:#fff;color:#111;text-align:center;padding:14px;font-weight:800;letter-spacing:1px}
+.container{max-width:1100px;margin:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
 @media(min-width:768px){.container{flex-direction:row}}
-.controls{background:#fff;border-radius:12px;padding:14px;flex:1}
-.controls label{font-size:13px;font-weight:600;margin-top:10px;display:block}
-.controls input,.controls textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:4px}
+.controls{background:#fff;color:#111;border-radius:16px;padding:16px;flex:1;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.controls label{font-size:13px;font-weight:600;margin-top:10px;display:block;color:#333}
+.controls input,.controls textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin-top:4px;font-size:14px}
 .preview{flex:1;display:flex;justify-content:center;align-items:center}
-canvas{width:100%;max-width:360px;border-radius:16px;background:#fff}
-.buttons{display:flex;gap:10px;margin-top:12px}
-button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:600;cursor:pointer}
-.save{background:#1565c0;color:#fff}
-.update{background:#2e7d32;color:#fff}
+canvas{width:100%;max-width:360px;border-radius:22px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.buttons{display:flex;gap:10px;margin-top:14px}
+button{flex:1;padding:14px;border:none;border-radius:14px;font-weight:700;cursor:pointer;font-size:15px}
+.save{background:#2e7d32;color:#fff}
+.update{background:#1565c0;color:#fff}
 </style>
 </head>
 <body>
-<header>EDITOR DE PROPAGANDAS – MERCADO COUTO</header>
+<header>CRIADOR DE PROPAGANDA – MERCADO COUTO</header>
 
 <div class="container">
 <div class="controls">
-<label>Título</label>
-<input id="titulo" value="OFERTA DA SEMANA">
-
 <label>Produto</label>
 <input id="produto" value="ARROZ 5KG">
 
 <label>Preço</label>
 <input id="preco" value="R$ 24,99">
 
-<label>Texto extra</label>
-<textarea id="extra">Somente no Mercado Couto</textarea>
-
-<label>Cor de fundo</label>
-<input type="color" id="cor" value="#ffffff">
+<label>Chamada</label>
+<textarea id="extra">Oferta válida enquanto durar o estoque</textarea>
 
 <label>Imagem do produto</label>
 <input type="file" id="imgInput" accept="image/*">
@@ -51,7 +45,7 @@ button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:600;cursor
 </div>
 
 <div class="preview">
-<canvas id="canvas" width="1080" height="1080"></canvas>
+<canvas id="canvas" width="1080" height="1350"></canvas>
 </div>
 </div>
 
@@ -60,67 +54,66 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let productImg = null;
 
+// LOGO CENTRAL
 const logo = new Image();
 logo.src = 'logo.png';
-logo.onload = () => draw();
+logo.onload = draw;
 
-const imgInput = document.getElementById('imgInput');
-imgInput.onchange = e => {
- const file = e.target.files[0];
- if(!file) return;
+imgInput.onchange = e =>{
+ const f = e.target.files[0];
+ if(!f) return;
  const r = new FileReader();
- r.onload = () =>{
+ r.onload = ()=>{
    productImg = new Image();
    productImg.onload = draw;
    productImg.src = r.result;
  };
- r.readAsDataURL(file);
+ r.readAsDataURL(f);
 };
 
 function draw(){
- const titulo = document.getElementById('titulo').value;
- const produto = document.getElementById('produto').value;
- const preco = document.getElementById('preco').value;
- const extra = document.getElementById('extra').value;
- const cor = document.getElementById('cor').value;
+ const produto = produtoEl().value;
+ const preco = precoEl().value;
+ const extra = extraEl().value;
 
  ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle = cor;
+
+ // FUNDO BRANCO
+ ctx.fillStyle = '#ffffff';
  ctx.fillRect(0,0,canvas.width,canvas.height);
 
- ctx.fillStyle = '#c62828';
- ctx.fillRect(0,0,canvas.width,170);
-
+ // LOGO CENTRAL SUPERIOR (SEM DISTORCER)
  if(logo.complete){
-   const maxW = 320;
-   const scale = maxW / logo.width;
-   const w = logo.width * scale;
-   const h = logo.height * scale;
-   ctx.drawImage(logo,(canvas.width-w)/2,20,w,h);
+   const maxW = 360;
+   const ratio = Math.min(maxW/logo.width,180/logo.height);
+   const w = logo.width*ratio;
+   const h = logo.height*ratio;
+   ctx.drawImage(logo,(canvas.width-w)/2,40,w,h);
  }
 
- ctx.fillStyle = '#fff';
- ctx.font = 'bold 48px Arial';
- ctx.textAlign = 'center';
- ctx.fillText(titulo,canvas.width/2,210);
-
+ // IMAGEM DO PRODUTO
  if(productImg){
-   const size = 520;
+   const size = 560;
    ctx.drawImage(productImg,(canvas.width-size)/2,260,size,size);
  }
 
- const y = productImg ? 820 : 360;
+ const baseY = productImg ? 900 : 420;
+
+ // PRODUTO
  ctx.fillStyle = '#000';
- ctx.font = 'bold 42px Arial';
- ctx.fillText(produto,canvas.width/2,y);
+ ctx.font = '700 46px Arial';
+ ctx.textAlign = 'center';
+ ctx.fillText(produto,canvas.width/2,baseY);
 
+ // PREÇO
  ctx.fillStyle = '#2e7d32';
- ctx.font = 'bold 64px Arial';
- ctx.fillText(preco,canvas.width/2,y+80);
+ ctx.font = '900 82px Arial';
+ ctx.fillText(preco,canvas.width/2,baseY+90);
 
+ // TEXTO EXTRA
  ctx.fillStyle = '#555';
- ctx.font = '28px Arial';
- ctx.fillText(extra,canvas.width/2,y+140);
+ ctx.font = '30px Arial';
+ ctx.fillText(extra,canvas.width/2,baseY+150);
 }
 
 function save(){
@@ -129,6 +122,10 @@ function save(){
  a.href = canvas.toDataURL('image/png');
  a.click();
 }
+
+const produtoEl = ()=>document.getElementById('produto');
+const precoEl = ()=>document.getElementById('preco');
+const extraEl = ()=>document.getElementById('extra');
 
 draw();
 </script>
