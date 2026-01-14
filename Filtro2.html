@@ -1,657 +1,164 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Filtro de Melhores Preços</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Filtro Inteligente de Cotações</title>
 <style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    background: #f0f2f5;
-    color: #333;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .container {
-    flex: 1;
-    max-width: 960px;
-    margin: 20px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  h2 { text-align:center; margin-bottom:18px; font-weight:700; color:#1a2533; }
-  textarea {
-    width:100%; height:150px; padding:10px; font-size:16px;
-    border-radius:6px; border:1px solid #ced4da; resize:vertical; margin-bottom:12px; box-sizing:border-box;
-  }
-
-  .input-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-  .input-actions button { flex:1 1 auto; min-width:120px; }
-
-  button {
-    display:inline-block; padding:10px 18px; border:none; border-radius:6px;
-    background:#007bff; color:white; cursor:pointer; font-size:15px; margin:5px 0;
-    transition: background-color 0.18s, transform 0.08s;
-  }
-  button:hover { background:#0056b3; transform: translateY(-1px); }
-
-  #resultado, #faltando {
-    margin-top: 18px;
-    padding: 14px;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    background: #f8f9fa;
-  }
-
-  .fornecedor {
-    background: #ffffff;
-    border: 1px solid #dee2e6;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-  }
-
-  .fornecedor h3 {
-    color: #007bff;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 8px;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-
-  .fornecedor ul { list-style: none; padding: 0; margin:0; }
-  .fornecedor li {
-    border-bottom: 1px dashed #ddd;
-    padding: 12px 0;
-    font-size: 14px;
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:flex-start;
-  }
-  .fornecedor li:last-child { border-bottom: none; }
-
-  .item-left { flex: 1 1 auto; }
-  .item-actions { width: 220px; flex: 0 0 auto; display:flex; gap:8px; align-items:center; justify-content:flex-end; }
-
-  .fornecedor li button.small {
-    background-color: #dc3545;
-    color: white;
-    padding: 6px 10px;
-    font-size: 13px;
-    border-radius: 4px;
-  }
-  .fornecedor li button.small:hover { background-color: #c82333; }
-
-  .whatsapp, .pdf {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 8px 14px;
-    border-radius: 18px;
-    text-decoration: none;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .whatsapp { background: #25d366; }
-  .whatsapp:hover { background-color: #1da851; }
-  .pdf { background: #007bff; margin-left:8px; }
-  .pdf:hover { background: #0056b3; }
-
-  .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #28a745;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.16);
-    opacity: 0;
-    transform: translateY(-10px);
-    animation: fadeInOut 3s ease forwards;
-    z-index: 9999;
-  }
-  .toast.alert { background: #ffc107; color: #222; }
-  @keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-10px); }
-    10%, 90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-10px); }
-  }
-
-  .sidebar {
-    width: 300px;
-    background: white;
-    box-shadow: 0 0 12px rgba(0,0,0,0.12);
-    padding: 14px;
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    transition: transform 0.28s ease;
-    z-index: 1000;
-    box-sizing: border-box;
-  }
-  .sidebar.hidden { transform: translateX(105%); }
-  .sidebar h3 {
-    margin-top: 0;
-    font-size: 18px;
-    color: #007bff;
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .sidebar ul { list-style:none; padding:0; margin-top:10px; }
-  .sidebar li { padding: 6px 0; border-bottom: 1px dashed #eee; font-size:14px; }
-
-  #toggleSidebarBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 22px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-    cursor: pointer;
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #toggleSidebarBtn:hover { background-color: #0056b3; transform: translateY(-2px); }
-
-  @media (max-width: 880px) {
-    .container { margin: 12px; padding: 16px; max-width: calc(100% - 24px); }
-    textarea { height: 130px; font-size: 15px; }
-    .input-actions { gap:6px; }
-    .input-actions button { min-width: unset; flex: 1 1 100%; }
-    button { width: 100%; margin: 8px 0; }
-    .sidebar { width: 86%; }
-    .item-actions { width: 160px; }
-  }
-
-  @media (max-width: 480px) {
-    h2 { font-size: 18px; }
-    .fornecedor h3 { font-size: 15px; }
-    .whatsapp, .pdf { font-size: 13px; padding: 8px 12px; }
-    #toggleSidebarBtn { width: 52px; height: 52px; }
-  }
+body {
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+}
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+}
+textarea {
+  width:100%;
+  height:140px;
+}
+button {
+  padding:10px 15px;
+  border:none;
+  background:#007bff;
+  color:#fff;
+  border-radius:5px;
+  cursor:pointer;
+}
+button:hover { background:#0056b3; }
+.fornecedor {
+  border:1px solid #ddd;
+  margin-top:20px;
+  padding:15px;
+  border-radius:6px;
+}
+.fornecedor h3 { color:#007bff; }
+li { margin-bottom:10px; }
+.remover { background:#dc3545; }
+.remover:hover { background:#b52a37; }
+.marca-box {
+  margin: 10px 0;
+  padding:10px;
+  background:#f8f9fa;
+  border-radius:6px;
+}
 </style>
 </head>
+
 <body>
-
 <div class="container">
-  <h2>Filtro de Melhores Preços</h2>
-  <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea>
-  <div id="listaCotacoes"></div>
+<h2>Filtro Inteligente de Melhores Preços</h2>
 
-  <div class="input-actions">
-    <button onclick="document.getElementById('cotacao').value = ''">Limpar</button>
-    <button onclick="navigator.clipboard.readText().then(text => document.getElementById('cotacao').value = text)">Colar</button>
-    <button id="adicionarBtn">Adicionar Cotação</button>
-  </div>
+<textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea><br><br>
+<button onclick="adicionar()">Adicionar Cotação</button>
+<button onclick="processar()">Filtrar Melhor Preço</button>
 
-  <hr style="margin: 14px 0;">
-  <div style="display:flex; gap:8px; flex-wrap:wrap;">
-    <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
-    <button onclick="verificarFaltantes()">Verificar Itens Faltantes</button>
-    <button onclick="gerarPDFAll()">📄 Baixar PDF (Todos)</button>
-    <button onclick="enviarWhatsApp()">📲 Enviar resumo WhatsApp</button>
-  </div>
-
-  <div id="resultado"></div>
-  <div id="faltando"></div>
-
-  <hr style="margin: 14px 0;">
-  <div id="outrosFornecedores" class="fornecedor hidden">
-    <h3>📦 Outros Fornecedores</h3>
-    <ul id="listaOutros"></ul>
-  </div>
+<div class="marca-box">
+<strong>❌ Marcas indesejadas</strong><br>
+<div id="marcas"></div>
 </div>
 
-<div class="sidebar hidden" id="sidebar">
-  <h3>🧾 Marcas Detectadas <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#007bff">✖</button></h3>
-  <ul id="listaMarcas"></ul>
-  <div style="margin-top:12px;">
-    <button onclick="aplicarFiltroMarcas()">Aplicar Filtro</button>
-  </div>
+<div id="resultado"></div>
 </div>
-
-<button id="toggleSidebarBtn" onclick="toggleSidebar()">👁️</button>
-
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-/* =========================
-   Dados e estruturas
-   ========================= */
-const cotacoes = [];
-let todosPrecos = {}; // { produto: [ {empresa, valor, texto, marca, qtdNaCaixa}, ... ] }
-let marcasDetectadas = new Set();
-let indesejadasSet = new Set();
-let historicoOriginais = {}; // { produto: [empresa1, empresa2...] }
+let cotacoes = [];
+let produtos = {};
+let marcasBloqueadas = new Set();
 
-/* =========================
-   Helpers
-   ========================= */
-function normalizarTexto(txt = '') {
-  return txt.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-}
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
-function showToast(msg, tipo='success') {
-  const toast = document.createElement('div');
-  toast.className = 'toast' + (tipo==='alert' ? ' alert' : '');
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+function adicionar() {
+  const txt = cotacao.value.trim();
+  if(!txt) return;
+  cotacoes.push(txt);
+  cotacao.value = '';
+  alert('Cotação adicionada');
 }
 
-/* =========================
-   Adicionar cotação (raw)
-   ========================= */
-document.getElementById('adicionarBtn').addEventListener('click', () => {
-  const texto = document.getElementById('cotacao').value.trim();
-  if (!texto) { showToast('Cole uma cotação antes de adicionar','alert'); return; }
-  cotacoes.push(texto);
+function processar() {
+  produtos = {};
+  document.getElementById('resultado').innerHTML = '';
+  marcasBloqueadas.clear();
 
-  // mostra lista simples
-  const empresa = (texto.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
-  const div = document.createElement('div');
-  div.className = 'item-card';
-  div.textContent = `Cotação adicionada: ${empresa}`;
-  document.getElementById('listaCotacoes').appendChild(div);
-
-  // limpar campo e atualizar marcas
-  document.getElementById('cotacao').value = '';
-  atualizarMarcasDetectadas(texto);
-  showToast('Cotação adicionada ✅');
-});
-
-/* =========================
-   Detectar marcas e renderizar sidebar
-   ========================= */
-function atualizarMarcasDetectadas(texto) {
-  const marcas = [...texto.matchAll(/Marca:\s*([^\n\r]+)/gi)].map(m=>m[1].trim());
-  marcas.forEach(m => marcasDetectadas.add(m));
-  renderCheckboxMarcas();
-}
-function renderCheckboxMarcas() {
-  const lista = document.getElementById('listaMarcas');
-  lista.innerHTML = '';
-  [...marcasDetectadas].sort().forEach(m=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<label><input type="checkbox" value="${m}" checked> ${m}</label>`;
-    lista.appendChild(li);
-  });
-}
-function aplicarFiltroMarcas() {
-  const checkboxes = document.querySelectorAll('#listaMarcas input[type="checkbox"]');
-  indesejadasSet = new Set();
-  checkboxes.forEach(cb => { if(!cb.checked) indesejadasSet.add(normalizarTexto(cb.value)) });
-  filtrarMelhoresPrecos();
-  showToast("Filtro de marcas aplicado ✅");
-}
-
-/* =========================
-   Parsing e filtragem
-   ========================= */
-function filtrarMelhoresPrecos() {
-  const precosMap = new Map(); // melhor por produto
-  const fornecedoresMap = {};  // { empresa: [ {nome, texto, qtdNaCaixa} ] }
-  todosPrecos = {};
-
-  cotacoes.forEach(txt => {
-    const empresa = (txt.match(/\*Empresa:\* (.+)/) || [])[1] || 'Desconhecida';
-    // split por emoji caixa, cada bloco representa um item (dependendo do formato)
+  cotacoes.forEach(txt=>{
+    const empresa = txt.match(/\*Empresa:\* (.+)/)?.[1] || 'Fornecedor';
     const itens = txt.split('📦').slice(1);
-    itens.forEach(bloco => {
-      const nome = (bloco.match(/\*(.+)\*/) || [])[1];
-      const marca = (bloco.match(/Marca:\s*([^\n\r]+)/) || [])[1];
-      if(!nome || !marca) return;
-      const marcaNorm = normalizarTexto(marca);
-      if(indesejadasSet.has(marcaNorm)) return;
 
-      const valorMatch = (bloco.match(/R\$\s*([\d.,]+)/) || [])[1];
-      const valor = valorMatch ? parseFloat(valorMatch.replace(/\./g,'').replace(',','.')) : Infinity;
-      const qtdNaCaixaMatch = bloco.match(/(?:Qtd|Quantidade|Contém):\s*(\d+)/i);
-      const qtdNaCaixa = qtdNaCaixaMatch ? parseInt(qtdNaCaixaMatch[1]) : 1;
+    itens.forEach(i=>{
+      const nome = i.match(/\*(.+)\*/)?.[1]?.toLowerCase();
+      const marca = i.match(/Marca:\s*(.+)/i)?.[1] || 'Sem marca';
+      const valor = parseFloat(
+        i.match(/R\$\s*([\d.,]+)/)?.[1].replace(/\./g,'').replace(',','.')
+      );
 
-      if(!todosPrecos[nome]) todosPrecos[nome] = [];
-      todosPrecos[nome].push({empresa, valor, texto: bloco.trim(), marca, qtdNaCaixa});
-
-      const melhor = precosMap.get(nome);
-      if(!melhor || valor < melhor.valor) {
-        precosMap.set(nome, {empresa, valor, texto: bloco.trim(), qtdNaCaixa});
-      }
+      if(!nome) return;
+      if(!produtos[nome]) produtos[nome]=[];
+      produtos[nome].push({empresa,marca,valor,texto:i});
     });
   });
 
-  // ordenar listas de todosPrecos por valor
-  for(const nome in todosPrecos) {
-    todosPrecos[nome].sort((a,b)=>a.valor - b.valor);
-  }
+  renderMarcas();
+  renderResultado();
+}
 
-  // construir fornecedoresMap com os melhores itens por empresa
-  precosMap.forEach(({empresa, texto, qtdNaCaixa}, nome) => {
-    if(!fornecedoresMap[empresa]) fornecedoresMap[empresa]=[];
-    fornecedoresMap[empresa].push({nome, texto, qtdNaCaixa});
+function renderMarcas() {
+  const box = document.getElementById('marcas');
+  box.innerHTML = '';
+  const marcas = new Set();
+
+  Object.values(produtos).flat().forEach(p=>marcas.add(p.marca));
+
+  marcas.forEach(m=>{
+    const cb = document.createElement('input');
+    cb.type='checkbox';
+    cb.onchange=()=> {
+      cb.checked ? marcasBloqueadas.add(m) : marcasBloqueadas.delete(m);
+      renderResultado();
+    };
+    box.appendChild(cb);
+    box.append(' '+m);
+    box.appendChild(document.createElement('br'));
   });
-
-  renderFornecedores(fornecedoresMap);
-  showToast('Filtro aplicado — melhores preços exibidos ✅');
 }
 
-/* =========================
-   Renderização UI
-   ========================= */
-function renderFornecedores(map) {
-  const resultado = document.getElementById('resultado');
-  resultado.innerHTML = '';
+function renderResultado() {
+  const res = document.getElementById('resultado');
+  res.innerHTML='';
 
-  // para cada fornecedor, criar bloco
-  Object.keys(map).forEach(empresa => {
-    const div = document.createElement('div');
-    div.className = 'fornecedor';
-    div.dataset.empresa = empresa;
+  Object.entries(produtos).forEach(([produto,opcoes])=>{
+    const validas = opcoes
+      .filter(o=>!marcasBloqueadas.has(o.marca))
+      .sort((a,b)=>a.valor-b.valor);
 
-    const header = document.createElement('div');
-    header.innerHTML = `<h3>${empresa}</h3>`;
-    div.appendChild(header);
+    if(validas.length===0) return;
 
-    const ul = document.createElement('ul');
-    map[empresa].forEach(item => {
-      const li = document.createElement('li');
-      const left = document.createElement('div');
-      left.className = 'item-left';
-      left.innerHTML = `<strong>${item.nome}</strong><br><div class="texto-produto">${item.texto.replace(/\n/g,'<br>')}</div>`;
-
-      const actions = document.createElement('div');
-      actions.className = 'item-actions';
-      // create remove button with event listener to avoid quoting issues
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'small';
-      removeBtn.textContent = 'Remover';
-      removeBtn.addEventListener('click', () => removerItem(empresa, item.nome));
-
-      actions.innerHTML = `
-        <div>
-          <label style="font-size:13px">Qtd. caixas:</label>
-          <input type="number" min="1" value="1" style="width:70px; margin-left:8px;" />
-        </div>
-      `;
-      actions.appendChild(removeBtn);
-
-      li.appendChild(left);
-      li.appendChild(actions);
-
-      // armazenar atributos para uso posterior
-      li.dataset.produto = item.nome;
-      li.dataset.qtdNaCaixa = item.qtdNaCaixa || 1;
-
-      ul.appendChild(li);
-    });
-
-    div.appendChild(ul);
-
-    // links (atualizados por atualizarLinks)
-    const whatsapp = document.createElement('a');
-    whatsapp.className = 'whatsapp';
-    whatsapp.href = '#';
-    whatsapp.target = '_blank';
-    whatsapp.textContent = 'Compartilhar via WhatsApp';
-
-    const pdfBtn = document.createElement('button');
-    pdfBtn.className = 'pdf';
-    pdfBtn.textContent = '📄 Baixar PDF';
-    pdfBtn.addEventListener('click', ()=> gerarPDF(empresa));
-
-    const controls = document.createElement('div');
-    controls.style.marginTop = '12px';
-    controls.appendChild(whatsapp);
-    controls.appendChild(pdfBtn);
-
-    div.appendChild(controls);
-
-    resultado.appendChild(div);
-
-    atualizarLinks(empresa);
-  });
-
-  inicializarOuLimparSemAlternativa();
-}
-
-/* =========================
-   Ações sobre items na UI
-   ========================= */
-function removerItem(empresa, nome) {
-  // segurança: nome exato deve existir em todosPrecos
-  if (!todosPrecos[nome]) {
-    showToast(`Produto ${nome} não encontrado nos preços registrados.`, 'alert');
-    return;
-  }
-
-  // remover todas as entradas desse fornecedor para o produto (caso haja duplicatas)
-  todosPrecos[nome] = (todosPrecos[nome] || []).filter(p => p.empresa !== empresa);
-
-  // se existir nova lista ordenada (já ordenada por filtrar), o primeiro será o novo melhor
-  if (todosPrecos[nome] && todosPrecos[nome].length > 0) {
-    const novoMelhor = todosPrecos[nome][0];
-    showToast(`'${nome}' movido para ${novoMelhor.empresa}`);
-    // reconstruir interface a partir dos dados atualizados
-    filtrarMelhoresPrecos();
-    return;
-  }
-
-  // se não houver alternativa -> mover para "Sem fornecedor alternativo"
-  adicionarAListaSemAlternativa(nome);
-  showToast(`'${nome}' não tem alternativa — enviado para "Sem fornecedor alternativo"`, 'alert');
-  filtrarMelhoresPrecos();
-}
-
-/* =========================
-   Adicionar item na lista "Sem fornecedor alternativo"
-   ========================= */
-function adicionarAListaSemAlternativa(nome) {
-  const lista = document.getElementById('listaOutros');
-  // evita duplicatas
-  if (Array.from(lista.children).some(li => li.dataset.produto === nome)) return;
-
-  const li = document.createElement('li');
-  li.dataset.produto = nome;
-  li.innerHTML = `<div><strong>${nome}</strong><br><em>Sem fornecedor disponível</em></div>
-    <button onclick="restaurarOriginal('${nome.replace(/'/g,"\\'")}')">↩️ Voltar original</button>`;
-  lista.appendChild(li);
-  document.getElementById('outrosFornecedores').classList.remove('hidden');
-}
-
-/* =========================
-   Restaurar original
-   ========================= */
-function restaurarOriginal(nome){
-  // remove ocorrências visuais
-  document.querySelectorAll(`li[data-produto='${nome}']`).forEach(el=>el.remove());
-
-  // tenta achar no historico (não obrigatório); aqui só remove da lista "outros"
-  const lista = document.getElementById('listaOutros');
-  Array.from(lista.children).forEach(li => {
-    if (li.dataset.produto === nome) li.remove();
-  });
-  if (lista.children.length === 0) document.getElementById('outrosFornecedores').classList.add('hidden');
-
-  showToast(`Item ${nome} removido da lista "Sem fornecedor alternativo"`);
-}
-
-/* =========================
-   Links (WhatsApp) e atualização
-   ========================= */
-function atualizarLinks(empresa){
-  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`); if(!div) return;
-  const itens = div.querySelectorAll('li');
-  let textoPedido = "";
-  itens.forEach(li=> {
-    const textoOriginal = li.querySelector('.texto-produto')?.innerText || '';
-    const caixasPedidas = parseInt(li.querySelector('input[type="number"]')?.value) || 1;
-    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
-    const totalUnidades = caixasPedidas * qtdNaCaixa;
-    const titulo = textoOriginal.split('\n')[0] || li.dataset.produto;
-    textoPedido += `📦 ${titulo}\nPedido: ${caixasPedidas} cx (${totalUnidades} un)\n\n`;
-  });
-  const textoFinal = `*Pedido para ${empresa}*\n\n${textoPedido}`;
-  const link = div.querySelector('.whatsapp');
-  if(link) link.href = `https://wa.me/?text=${encodeURIComponent(textoFinal)}`;
-}
-
-/* =========================
-   Outros Fornecedores / Sem alternativa - inicializar/limpar
-   ========================= */
-function inicializarOuLimparSemAlternativa(){
-  const campo = document.getElementById('outrosFornecedores');
-  const lista = document.getElementById('listaOutros');
-  lista.innerHTML = '';
-  campo.classList.add('hidden');
-}
-
-/* =========================
-   Verificar faltantes via Google Sheets
-   ========================= */
-async function verificarFaltantes(){
-  const faltandoDiv = document.getElementById('faltando');
-  faltandoDiv.innerHTML = '<p>Verificando itens faltantes...</p>';
-  try{
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxLJAKDj6xrk2pZK2Kst6hGKQZO4OAXx9ZKZIzuT3Qs1Oxv1fKsbpFTQKWTLkLd7DtA7A/exec');
-    const dados = await response.json();
-    const nomesPlanilha = dados.map(item=>item.produto).filter(Boolean).map(s=>s.toString().trim().toLowerCase());
-    const presentesNoDOM = new Set();
-    // itens exibidos (melhores)
-    Object.keys(todosPrecos).forEach(prod => {
-      const arr = todosPrecos[prod];
-      if (arr && arr.length > 0) presentesNoDOM.add(prod.toString().trim().toLowerCase());
-    });
-    const faltantes = nomesPlanilha.filter(nome=>!presentesNoDOM.has(nome));
-    if(faltantes.length===0){
-      faltandoDiv.innerHTML='<p>Todos os itens possuem pelo menos um fornecedor.</p>';
-      return;
+    const melhor = validas[0];
+    let div = document.querySelector(`[data-empresa="${melhor.empresa}"]`);
+    if(!div){
+      div=document.createElement('div');
+      div.className='fornecedor';
+      div.dataset.empresa=melhor.empresa;
+      div.innerHTML=`<h3>${melhor.empresa}</h3><ul></ul>`;
+      res.appendChild(div);
     }
-    const ul=document.createElement('ul');
-    faltantes.forEach(nome=>{
-      const li=document.createElement('li');
-      li.textContent=nome;
-      ul.appendChild(li);
-    });
-    faltandoDiv.innerHTML='<h4>Itens faltantes:</h4>';
-    faltandoDiv.appendChild(ul);
-  }catch(err){
-    faltandoDiv.innerHTML=`<p style="color:red">Erro ao consultar planilha: ${err.message}</p>`;
-  }
+
+    const li=document.createElement('li');
+    li.innerHTML=`
+      ${melhor.texto.replace(/\n/g,'<br>')}
+      <br><button class="remover" onclick="remover('${produto}','${melhor.empresa}')">
+      Remover / Trocar Marca
+      </button>`;
+    div.querySelector('ul').appendChild(li);
+  });
 }
 
-/* =========================
-   PDF (por fornecedor) e PDF global
-   ========================= */
-async function gerarPDF(empresa){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const div = document.querySelector(`.fornecedor[data-empresa='${empresa}']`);
-  if(!div) return showToast('Erro: fornecedor não encontrado','alert');
-
-  let y = 10;
-  doc.setFontSize(16);
-  doc.text(`Pedido para ${empresa}`, 10, y);
-  y += 8;
-  doc.setFontSize(12);
-
-  const itens = div.querySelectorAll('li');
-  itens.forEach(li=>{
-    const texto = li.querySelector('.texto-produto')?.innerText || li.dataset.produto;
-    const caixas = parseInt(li.querySelector('input[type="number"]')?.value) || 1;
-    const qtdNaCaixa = parseInt(li.dataset.qtdNaCaixa) || 1;
-    const totalUnidades = caixas * qtdNaCaixa;
-
-    const itemText = `📦 ${texto.split('\n')[0]}\nPedido: ${caixas} cx (${totalUnidades} un)`;
-    const lines = doc.splitTextToSize(itemText, 180);
-    doc.text(lines, 10, y);
-    y += lines.length * 6 + 4;
-    if(y > 270){ doc.addPage(); y = 10; }
-  });
-
-  doc.save(`${empresa}_pedido.pdf`);
+function remover(produto,empresa){
+  marcasBloqueadas.add(
+    produtos[produto].find(p=>p.empresa===empresa)?.marca
+  );
+  renderResultado();
 }
-
-function gerarPDFAll(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text("Relatório de Melhores Preços", 10, 10);
-  let y = 20;
-  const produtos = Object.keys(todosPrecos).sort();
-  if(produtos.length === 0) {
-    showToast('Nenhum produto para gerar relatório','alert');
-    return;
-  }
-  produtos.forEach(prod => {
-    const melhor = todosPrecos[prod][0];
-    const linha = `${prod} - ${melhor.empresa} - R$ ${Number(melhor.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-    const lines = doc.splitTextToSize(linha, 180);
-    doc.text(lines, 10, y);
-    y += lines.length * 6 + 4;
-    if(y > 270){ doc.addPage(); y = 10; }
-  });
-  doc.save('melhores_precos.pdf');
-  showToast('PDF gerado ✅');
-}
-
-/* =========================
-   Enviar resumo por WhatsApp (fixo)
-   ========================= */
-function enviarWhatsApp(){
-  if(Object.keys(todosPrecos).length === 0) { showToast('Nada a enviar — filtre primeiro','alert'); return; }
-  let msg = "Melhores preços:\n\n";
-  Object.keys(todosPrecos).forEach(prod => {
-    const melhor = todosPrecos[prod][0];
-    msg += `${prod} - ${melhor.empresa} - R$ ${Number(melhor.valor).toLocaleString('pt-BR')}\n`;
-  });
-  const phone = "5521992576333"; // número fixo (pode alterar)
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-}
-
-/* =========================
-   Inicializações eventuais
-   ========================= */
-document.addEventListener('click', (e) => {
-  // se clicou em inputs de quantidade dentro de fornecedor, atualizar link
-  const target = e.target;
-  if(target.tagName === 'INPUT' && target.closest('.fornecedor')) {
-    const fornecedor = target.closest('.fornecedor').dataset.empresa;
-    setTimeout(()=> atualizarLinks(fornecedor), 50);
-  }
-});
-
-// opcional: atualizar links periodicamente (pequeno listener)
-setInterval(()=>{
-  document.querySelectorAll('.fornecedor').forEach(div=>{
-    const emp = div.dataset.empresa;
-    if(emp) atualizarLinks(emp);
-  });
-}, 2000);
-
-// cria o bloco "outros" escondido no carregamento
-document.addEventListener('DOMContentLoaded', () => inicializarOuLimparSemAlternativa());
 </script>
-
 </body>
 </html>
