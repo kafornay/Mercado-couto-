@@ -1,163 +1,199 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Filtro Inteligente de Cotações</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f2f2f2;
-}
-.container {
-  max-width: 1000px;
-  margin: 20px auto;
-  background:#fff;
-  padding:20px;
-  border-radius:8px;
-}
-textarea {
-  width:100%;
-  height:140px;
-}
-button {
-  padding:10px 15px;
-  border:none;
-  background:#007bff;
-  color:#fff;
-  border-radius:5px;
-  cursor:pointer;
-}
-button:hover { background:#0056b3; }
-.fornecedor {
-  border:1px solid #ddd;
-  margin-top:20px;
-  padding:15px;
-  border-radius:6px;
-}
-.fornecedor h3 { color:#007bff; }
-li { margin-bottom:10px; }
-.remover { background:#dc3545; }
-.remover:hover { background:#b52a37; }
-.marca-box {
-  margin: 10px 0;
-  padding:10px;
-  background:#f8f9fa;
-  border-radius:6px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filtro de Melhores Preços</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: #f0f2f5;
+      color: #333;
+    }
+    .container {
+      max-width: 960px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #0056b3; }
+    .item-card {
+      background: #e9f7ef;
+      border-left: 4px solid #28a745;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .fornecedor {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .fornecedor h3 { color: #007bff; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 10px; }
+    .whatsapp {
+      display: inline-block;
+      margin-top: 10px;
+      background: #25d366;
+      padding: 8px 15px;
+      color: white;
+      border-radius: 20px;
+      text-decoration: none;
+    }
+  </style>
 </head>
 
 <body>
 <div class="container">
-<h2>Filtro Inteligente de Melhores Preços</h2>
+  <h2>Filtro de Melhores Preços</h2>
 
-<textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea><br><br>
-<button onclick="adicionar()">Adicionar Cotação</button>
-<button onclick="processar()">Filtrar Melhor Preço</button>
+  <textarea id="cotacao" placeholder="Cole aqui as cotações..."></textarea><br><br>
 
-<div class="marca-box">
-<strong>❌ Marcas indesejadas</strong><br>
-<div id="marcas"></div>
-</div>
+  <button onclick="adicionarCotacao()">Adicionar Cotação</button>
+  <button onclick="filtrarMelhoresPrecos()">Filtrar Melhores Preços</button>
 
-<div id="resultado"></div>
+  <div id="listaCotacoes"></div>
+
+  <hr>
+
+  <div class="fornecedor">
+    <h3>❌ Marcas indesejadas</h3>
+    <ul id="listaMarcas"></ul>
+  </div>
+
+  <div id="resultado"></div>
 </div>
 
 <script>
-let cotacoes = [];
-let produtos = {};
+const cotacoes = [];
+let todosPrecos = {};
 let marcasBloqueadas = new Set();
+let marcasEncontradas = new Set();
 
-function adicionar() {
-  const txt = cotacao.value.trim();
-  if(!txt) return;
-  cotacoes.push(txt);
+function adicionarCotacao() {
+  const texto = cotacao.value.trim();
+  if (!texto) return;
+  cotacoes.push(texto);
+
+  const empresa = texto.match(/\*Empresa:\* (.+)/)?.[1] || 'Fornecedor';
+  const div = document.createElement('div');
+  div.className = 'item-card';
+  div.textContent = `Cotação adicionada: ${empresa}`;
+  listaCotacoes.appendChild(div);
+
   cotacao.value = '';
-  alert('Cotação adicionada');
 }
 
-function processar() {
-  produtos = {};
-  document.getElementById('resultado').innerHTML = '';
-  marcasBloqueadas.clear();
+function filtrarMelhoresPrecos() {
+  const melhores = new Map();
+  const fornecedores = {};
+  todosPrecos = {};
+  marcasEncontradas.clear();
 
-  cotacoes.forEach(txt=>{
+  cotacoes.forEach(txt => {
     const empresa = txt.match(/\*Empresa:\* (.+)/)?.[1] || 'Fornecedor';
     const itens = txt.split('📦').slice(1);
 
-    itens.forEach(i=>{
-      const nome = i.match(/\*(.+)\*/)?.[1]?.toLowerCase();
-      const marca = i.match(/Marca:\s*(.+)/i)?.[1] || 'Sem marca';
-      const valor = parseFloat(
-        i.match(/R\$\s*([\d.,]+)/)?.[1].replace(/\./g,'').replace(',','.')
-      );
+    itens.forEach(bloco => {
+      const nome = bloco.match(/\*(.+)\*/)?.[1]?.toLowerCase();
+      if (!nome) return;
 
-      if(!nome) return;
-      if(!produtos[nome]) produtos[nome]=[];
-      produtos[nome].push({empresa,marca,valor,texto:i});
+      const valor = parseFloat(
+        bloco.match(/R\$\s*([\d.,]+)/)?.[1]
+          .replace(/\./g,'')
+          .replace(',','.')
+      ) || Infinity;
+
+      const marca = bloco.match(/Marca:\s*(.+)/i)?.[1]?.trim() || 'Sem marca';
+      marcasEncontradas.add(marca);
+
+      if (!todosPrecos[nome]) todosPrecos[nome] = [];
+      todosPrecos[nome].push({ empresa, valor, marca, texto: bloco.trim() });
+
+      if (marcasBloqueadas.has(marca)) return;
+
+      const atual = melhores.get(nome);
+      if (!atual || atual.valor > valor) {
+        melhores.set(nome, { empresa, valor, texto: bloco.trim() });
+      }
     });
   });
 
+  melhores.forEach((v, nome) => {
+    if (!fornecedores[v.empresa]) fornecedores[v.empresa] = [];
+    fornecedores[v.empresa].push({ nome, texto: v.texto });
+  });
+
+  renderFornecedores(fornecedores);
   renderMarcas();
-  renderResultado();
 }
 
 function renderMarcas() {
-  const box = document.getElementById('marcas');
-  box.innerHTML = '';
-  const marcas = new Set();
-
-  Object.values(produtos).flat().forEach(p=>marcas.add(p.marca));
-
-  marcas.forEach(m=>{
-    const cb = document.createElement('input');
-    cb.type='checkbox';
-    cb.onchange=()=> {
-      cb.checked ? marcasBloqueadas.add(m) : marcasBloqueadas.delete(m);
-      renderResultado();
+  listaMarcas.innerHTML = '';
+  marcasEncontradas.forEach(marca => {
+    const li = document.createElement('li');
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.checked = marcasBloqueadas.has(marca);
+    chk.onchange = () => {
+      chk.checked ? marcasBloqueadas.add(marca) : marcasBloqueadas.delete(marca);
+      filtrarMelhoresPrecos();
     };
-    box.appendChild(cb);
-    box.append(' '+m);
-    box.appendChild(document.createElement('br'));
+    li.appendChild(chk);
+    li.append(' ' + marca);
+    listaMarcas.appendChild(li);
   });
 }
 
-function renderResultado() {
-  const res = document.getElementById('resultado');
-  res.innerHTML='';
+function renderFornecedores(fornecedores) {
+  resultado.innerHTML = '';
+  Object.entries(fornecedores).forEach(([empresa, itens]) => {
+    const div = document.createElement('div');
+    div.className = 'fornecedor';
+    div.innerHTML = `<h3>${empresa}</h3><ul></ul>`;
+    const ul = div.querySelector('ul');
 
-  Object.entries(produtos).forEach(([produto,opcoes])=>{
-    const validas = opcoes
-      .filter(o=>!marcasBloqueadas.has(o.marca))
-      .sort((a,b)=>a.valor-b.valor);
+    itens.forEach(i => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        ${i.texto.replace(/\n/g,'<br>')}
+        <br><button onclick="removerItem('${empresa}','${i.nome}')">Remover / Trocar Marca</button>
+      `;
+      ul.appendChild(li);
+    });
 
-    if(validas.length===0) return;
-
-    const melhor = validas[0];
-    let div = document.querySelector(`[data-empresa="${melhor.empresa}"]`);
-    if(!div){
-      div=document.createElement('div');
-      div.className='fornecedor';
-      div.dataset.empresa=melhor.empresa;
-      div.innerHTML=`<h3>${melhor.empresa}</h3><ul></ul>`;
-      res.appendChild(div);
-    }
-
-    const li=document.createElement('li');
-    li.innerHTML=`
-      ${melhor.texto.replace(/\n/g,'<br>')}
-      <br><button class="remover" onclick="remover('${produto}','${melhor.empresa}')">
-      Remover / Trocar Marca
-      </button>`;
-    div.querySelector('ul').appendChild(li);
+    const msg = encodeURIComponent(`Pedido ${empresa}:\n` + itens.map(i=>i.texto).join('\n\n'));
+    div.innerHTML += `<a class="whatsapp" href="https://wa.me/?text=${msg}" target="_blank">WhatsApp</a>`;
+    resultado.appendChild(div);
   });
 }
 
-function remover(produto,empresa){
-  marcasBloqueadas.add(
-    produtos[produto].find(p=>p.empresa===empresa)?.marca
-  );
-  renderResultado();
+function removerItem(empresa, produto) {
+  const dados = todosPrecos[produto]?.find(p => p.empresa === empresa);
+  if (dados?.marca) marcasBloqueadas.add(dados.marca);
+  filtrarMelhoresPrecos();
 }
 </script>
 </body>
