@@ -3,76 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercado Couto - Designer Oficial</title>
+    <title>Mercado Couto - Designer de Elite</title>
     <style>
-        :root { --primary: #c62828; --accent: #ffcc00; --dark: #121212; }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Arial', sans-serif; background: var(--dark); color: white; }
+        :root { --red: #e31d1a; --yellow: #ffdf00; --dark: #0a0a0a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Arial Black', sans-serif; background: var(--dark); color: #fff; overflow-x: hidden; }
         
         header { 
-            background: #000; padding: 15px; text-align: center; 
-            border-bottom: 4px solid var(--primary); font-weight: 900;
+            background: linear-gradient(to right, #000, #b71c1c, #000); 
+            padding: 15px; text-align: center; border-bottom: 2px solid var(--yellow);
+            text-transform: uppercase; letter-spacing: 2px; font-size: 14px;
         }
 
-        .main-container { 
-            display: flex; flex-direction: column; gap: 20px; padding: 20px; 
-            max-width: 1300px; margin: auto; 
-        }
+        .wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
+        @media(min-width: 1000px) { .wrapper { grid-template-columns: 350px 1fr; } }
 
-        @media(min-width: 950px) {
-            .main-container { flex-direction: row; align-items: flex-start; }
-            .controls { width: 400px; position: sticky; top: 20px; }
-            .preview { flex: 1; }
+        /* Painel de Controle Estilizado */
+        .panel { 
+            background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #333;
+            display: flex; flex-direction: column; gap: 12px; height: fit-content;
         }
-
-        .controls { 
-            background: #1e1e1e; padding: 25px; border-radius: 15px; 
-            display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .panel h3 { font-size: 12px; color: var(--yellow); margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
         input, textarea { 
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; 
-            background: #fff; color: #333; font-weight: 700; font-size: 16px;
+            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; 
+            background: #fff; color: #000; font-weight: 900; font-size: 14px;
         }
+        
+        .file-input { background: #2a2a2a; color: #fff; border: 1px dashed #555; cursor: pointer; }
 
-        .btn-save { 
-            background: var(--primary); color: white; border: none; padding: 18px; 
-            border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s;
+        .btn-action { 
+            background: var(--yellow); color: #000; border: none; padding: 20px; 
+            border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px;
+            transition: all 0.2s; text-transform: uppercase;
         }
-        .btn-save:hover { background: #ff1744; transform: scale(1.02); }
+        .btn-action:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,223,0,0.3); }
 
+        /* Preview da Peça */
+        .artboard { position: relative; display: flex; justify-content: center; }
         canvas { 
-            max-width: 100%; height: auto; background: white; 
-            border-radius: 4px; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            max-width: 100%; height: auto; border-radius: 4px; 
+            box-shadow: 0 30px 100px rgba(0,0,0,0.9); background: #fff;
         }
     </style>
 </head>
 <body>
 
-<header>MERCADO COUTO - GERADOR DE ENCARTES</header>
+<header>🚀 Editor de Ofertas High-End - Mercado Couto</header>
 
-<div class="main-container">
-    <div class="controls">
-        <label>Sua Logo</label>
-        <input type="file" id="fLogo" accept="image/*">
+<div class="wrapper">
+    <div class="panel">
+        <h3>1. Identidade</h3>
+        <input type="file" id="fLogo" class="file-input" accept="image/*" title="Logo do Mercado">
+        
+        <h3>2. Produto</h3>
+        <input type="file" id="fProd" class="file-input" accept="image/*" title="Foto do Produto">
+        <input id="pNome" value="CERVEJA ITAIPAVA 473ML" oninput="draw()" placeholder="NOME DO PRODUTO">
+        
+        <h3>3. Condição</h3>
+        <input id="pPreco" value="3,59" oninput="draw()" placeholder="PREÇO (Ex: 3,49)">
+        <textarea id="pExtra" oninput="draw()" placeholder="RODAPÉ">Oferta válida até durar o estoque.</textarea>
 
-        <label>Imagem do Produto</label>
-        <input type="file" id="fProd" accept="image/*">
-
-        <label>Nome do Produto</label>
-        <input id="pNome" value="CERVEJA ITAIPAVA LATÃO 473ML" oninput="draw()">
-
-        <label>Preço</label>
-        <input id="pPreco" value="3,59" oninput="draw()">
-
-        <label>Texto Rodapé</label>
-        <textarea id="pExtra" oninput="draw()">Oferta válida até durar o estoque.</textarea>
-
-        <button class="btn-save" onclick="download()">BAIXAR IMAGEM A4</button>
+        <button class="btn-action" onclick="download()">Baixar Encarte A4 HD</button>
     </div>
 
-    <div class="preview">
+    <div class="artboard">
         <canvas id="canvas" width="2480" height="3508"></canvas>
     </div>
 </div>
@@ -80,156 +75,145 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    let imgLogo = new Image();
-    let imgProd = null;
+    let imgLogo = new Image(), imgProd = null;
 
-    // Logo padrão (caso queira deixar uma fixa)
-    imgLogo.onload = draw;
-    imgLogo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+    // Logo Padrão Transparente (Simulação)
+    imgLogo.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-    document.getElementById('fLogo').onchange = e => {
+    document.getElementById('fLogo').onchange = e => { loadFile(e, img => { imgLogo = img; draw(); }); };
+    document.getElementById('fProd').onchange = e => { loadFile(e, img => { imgProd = img; draw(); }); };
+
+    function loadFile(e, cb) {
         const r = new FileReader();
-        r.onload = () => { imgLogo = new Image(); imgLogo.onload = draw; imgLogo.src = r.result; };
+        r.onload = () => { const i = new Image(); i.onload = () => cb(i); i.src = r.result; };
         r.readAsDataURL(e.target.files[0]);
-    };
-
-    document.getElementById('fProd').onchange = e => {
-        const r = new FileReader();
-        r.onload = () => { imgProd = new Image(); imgProd.onload = draw; imgProd.src = r.result; };
-        r.readAsDataURL(e.target.files[0]);
-    };
+    }
 
     function draw() {
         const nome = document.getElementById('pNome').value.toUpperCase();
         const preco = document.getElementById('pPreco').value;
         const extra = document.getElementById('pExtra').value;
 
-        // 1. Fundo com brilho central (Radial Gradient)
-        const bgGrad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 100, canvas.width/2, canvas.height/2, 2000);
-        bgGrad.addColorStop(0, '#ffffff');
-        bgGrad.addColorStop(1, '#e0e0e0');
-        ctx.fillStyle = bgGrad;
+        // --- FUNDO PREMIUM ---
+        const grad = ctx.createRadialGradient(canvas.width/2, 1600, 100, canvas.width/2, 1600, 2200);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.7, '#d9d9d9');
+        grad.addColorStop(1, '#aaaaaa');
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Logo (Centralizada no topo)
-        if (imgLogo.complete) {
-            const lScale = Math.min(600/imgLogo.width, 400/imgLogo.height);
-            const lw = imgLogo.width * lScale;
-            const lh = imgLogo.height * lScale;
-            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 150, lw, lh);
-            
-            // Sombra da logo
-            ctx.fillStyle = 'rgba(0,0,0,0.1)';
-            ctx.beginPath();
-            ctx.ellipse(canvas.width/2, 180 + lh, 150, 20, 0, 0, Math.PI * 2);
-            ctx.fill();
+        // --- LOGO ---
+        if(imgLogo) {
+            const sc = Math.min(750/imgLogo.width, 450/imgLogo.height);
+            const lw = imgLogo.width * sc, lh = imgLogo.height * sc;
+            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 180, lw, lh);
         }
 
-        // 3. Título "OFERTA DO DIA"
+        // --- TÍTULO IMPACTO ---
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#b71c1c';
-        ctx.font = 'bold 240px "Arial Narrow", Arial';
-        ctx.fillText("OFERTA DO DIA", canvas.width/2, 1000);
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowBlur = 30;
+        ctx.fillStyle = '#e31d1a';
+        ctx.font = '900 280px "Arial Black"';
+        ctx.fillText("OFERTA", canvas.width/2, 950);
+        ctx.font = '900 150px "Arial Black"';
+        ctx.fillStyle = '#333';
+        ctx.fillText("DO DIA", canvas.width/2, 1100);
+        ctx.shadowBlur = 0;
 
-        // Linhas decorativas
-        ctx.strokeStyle = '#444';
-        ctx.lineWidth = 10;
+        // Elementos decorativos (Linhas laterais)
+        ctx.strokeStyle = '#e31d1a';
+        ctx.lineWidth = 15;
         ctx.beginPath();
-        ctx.moveTo(400, 1080); ctx.lineTo(1100, 1080);
-        ctx.moveTo(1380, 1080); ctx.lineTo(2080, 1080);
+        ctx.moveTo(300, 1020); ctx.lineTo(750, 1020);
+        ctx.moveTo(1730, 1020); ctx.lineTo(2180, 1020);
         ctx.stroke();
 
-        // 4. Imagem do Produto com Sombra Flutuante
+        // --- PRODUTO ---
         if(imgProd) {
-            const pScale = Math.min(1800/imgProd.width, 1400/imgProd.height);
-            const pw = imgProd.width * pScale;
-            const ph = imgProd.height * pScale;
+            const pSc = Math.min(1800/imgProd.width, 1500/imgProd.height);
+            const pw = imgProd.width * pSc, ph = imgProd.height * pSc;
             
-            // Sombra abaixo do produto
-            ctx.shadowColor = 'rgba(0,0,0,0.2)';
-            ctx.shadowBlur = 80;
-            ctx.shadowOffsetY = 50;
+            // Sombra de contato
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2, 1250 + ph, pw/2, 60, 0, 0, Math.PI*2);
+            ctx.fill();
+
             ctx.drawImage(imgProd, (canvas.width - pw)/2, 1200, pw, ph);
-            ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
         }
 
-        // 5. SELO DE PREÇO (IDÊNTICO À IMAGEM)
+        // --- SELO EXPLOSIVO (O "PULO DO GATO") ---
         ctx.save();
         ctx.translate(canvas.width/2, 2850);
         ctx.rotate(-0.04);
 
-        // Sombra externa do selo
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 40;
-
-        // Corpo do Selo (Amarelo com borda branca e preta)
-        const sW = 1800, sH = 600;
-        ctx.fillStyle = '#000'; // Borda externa preta
-        ctx.roundRect(-sW/2 - 10, -sH/2 - 10, sW + 20, sH + 20, 40).fill();
-        
-        ctx.fillStyle = '#fff'; // Borda interna branca
-        ctx.roundRect(-sW/2, -sH/2, sW, sH, 30).fill();
-
-        // Degradê amarelo do selo
-        const seloGrad = ctx.createLinearGradient(0, -sH/2, 0, sH/2);
-        seloGrad.addColorStop(0, '#ffeb3b');
-        seloGrad.addColorStop(1, '#fbc02d');
-        ctx.fillStyle = seloGrad;
-        ctx.roundRect(-sW/2 + 15, -sH/2 + 15, sW - 30, sH - 30, 20).fill();
+        // Camada 1: Sombra
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 60;
+        ctx.fillStyle = '#000';
+        ctx.roundRect(-980, -320, 1960, 750, 40).fill();
         ctx.shadowBlur = 0;
 
-        // Faixa Vermelha do Nome do Produto
-        ctx.fillStyle = '#c62828';
-        ctx.beginPath();
-        ctx.moveTo(-sW/2 - 50, -sH/2 + 50);
-        ctx.lineTo(sW/2 - 200, -sH/2 - 100);
-        ctx.lineTo(sW/2 + 50, -sH/2 + 50);
-        ctx.lineTo(-sW/2 + 200, -sH/2 + 150);
-        ctx.fill();
-        
-        // Texto do Produto na Faixa
+        // Camada 2: Borda Branca
         ctx.fillStyle = '#fff';
-        ctx.font = 'bold 90px Arial';
-        ctx.fillText(nome, 0, -sH/2 + 65);
+        ctx.roundRect(-960, -300, 1920, 710, 30).fill();
 
-        // Cifrão e Valor
-        ctx.fillStyle = '#000';
-        ctx.textAlign = 'left';
-        ctx.font = 'bold 120px Arial';
-        ctx.fillText("R$", -750, 150);
+        // Camada 3: Fundo Amarelo com Degradê Metalizado
+        const yGrad = ctx.createLinearGradient(0, -300, 0, 400);
+        yGrad.addColorStop(0, '#ffe500');
+        yGrad.addColorStop(0.5, '#ffcc00');
+        yGrad.addColorStop(1, '#ffb300');
+        ctx.fillStyle = yGrad;
+        ctx.roundRect(-940, -280, 1880, 670, 20).fill();
+
+        // Faixa do Nome (Vermelho Intenso)
+        ctx.fillStyle = '#e31d1a';
+        ctx.rotate(-0.01);
+        ctx.roundRect(-1020, -380, 2040, 220, 15).fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.stroke();
         
-        ctx.textAlign = 'center';
-        ctx.font = '900 550px Arial Black';
-        ctx.fillText(preco, 100, 250);
-
+        // Texto Produto
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 110px Arial';
+        ctx.fillText(nome, 0, -230);
         ctx.restore();
 
-        // 6. Rodapé
+        // --- PREÇO ---
+        ctx.save();
+        ctx.translate(canvas.width/2, 2850);
+        ctx.rotate(-0.04);
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 130px Arial';
+        ctx.fillText("R$", -800, 200);
+        
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#555';
-        ctx.font = '75px Arial';
+        ctx.font = '900 620px "Arial Black"';
+        ctx.letterSpacing = "-20px";
+        ctx.fillText(preco, 120, 320);
+        ctx.restore();
+
+        // --- RODAPÉ ---
+        ctx.fillStyle = '#444';
+        ctx.font = 'bold 70px Arial';
         ctx.fillText(extra, canvas.width/2, 3420);
     }
 
-    // Suporte para roundRect em navegadores que não tem
-    if (!Path2D.prototype.roundRect) {
+    // Polyfill roundRect
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-            if (w < 2 * r) r = w / 2;
-            if (h < 2 * r) r = h / 2;
-            this.beginPath();
-            this.moveTo(x + r, y);
-            this.arcTo(x + w, y, x + w, y + h, r);
-            this.arcTo(x + w, y + h, x, y + h, r);
-            this.arcTo(x, y + h, x, y, r);
-            this.arcTo(x, y, x + w, y, r);
-            this.closePath();
-            return this;
+            if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
+            this.beginPath(); this.moveTo(x + r, y);
+            this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+            this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r);
+            this.closePath(); return this;
         };
     }
 
     function download() {
         const link = document.createElement('a');
-        link.download = 'oferta_couto_premium.png';
+        link.download = `ENCARTE_COUTO_${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
     }
