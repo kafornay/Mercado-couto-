@@ -2,83 +2,148 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Mercado Couto - Smart Design A4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Couto - Smart A4</title>
     <style>
         :root { --primary: #d32f2f; --accent: #ffc107; --dark: #121212; }
-        body { margin: 0; font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--dark); color: #e0e0e0; display: flex; flex-direction: column; min-height: 100vh; }
         
-        header { background: #000; padding: 20px 40px; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        header span { font-weight: 900; letter-spacing: 2px; color: white; }
-
-        .main-container { display: grid; grid-template-columns: 1fr; gap: 30px; padding: 30px; max-width: 1600px; margin: auto; width: 100%; box-sizing: border-box; }
-        @media(min-width: 1100px) { .main-container { grid-template-columns: 420px 1fr; } }
-
-        /* Painel de Controle Estilizado */
-        .controls { background: #1e1e1e; padding: 30px; border-radius: 20px; border: 1px solid #333; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
-        .section-title { font-size: 0.7rem; color: var(--primary); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        * { box-sizing: border-box; }
         
-        label { font-size: 12px; font-weight: 600; color: #bbb; }
-        input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #2d2d2d; color: #fff; font-size: 14px; transition: 0.3s; }
-        input:focus { border-color: var(--primary); outline: none; background: #333; }
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--dark); 
+            color: #eee;
+        }
 
-        .quick-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-        .tag { background: #333; font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .tag:hover { background: var(--primary); }
+        header { 
+            background: #000; 
+            padding: 15px; 
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
 
-        .btn-save { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 16px; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-save:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,193,7,0.4); }
+        .main-container { 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 15px;
+            max-width: 1200px;
+            margin: auto;
+        }
 
-        /* Preview Area */
-        .preview-area { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        canvas { max-width: 100%; height: auto; border-radius: 5px; background: white; box-shadow: 0 0 100px rgba(0,0,0,0.5); }
-        .info-tip { font-size: 12px; color: #666; font-style: italic; }
+        /* Layout para Desktop */
+        @media(min-width: 900px) {
+            .main-container { flex-direction: row; align-items: flex-start; }
+            .controls { width: 400px; position: sticky; top: 20px; }
+            .preview-area { flex: 1; }
+        }
+
+        .controls { 
+            background: #1e1e1e; 
+            padding: 20px; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid #333; 
+            background: #2d2d2d; 
+            color: #fff;
+            font-size: 16px; /* Evita zoom automático no iOS */
+        }
+
+        .color-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-save { 
+            background: var(--accent); 
+            color: #000; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-save:active { transform: scale(0.98); }
+
+        .preview-area { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        canvas { 
+            max-width: 100%; 
+            height: auto; 
+            background: white; 
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6);
+        }
+
+        .footer-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <span>MERCADO COUTO <small>| SMART A4 DESIGNER</small></span>
-    <div id="status" style="font-size: 12px; color: #4caf50;">● Sistema Ativo</div>
-</header>
+<header>MERCADO COUTO PRO</header>
 
 <div class="main-container">
     <div class="controls">
-        <div class="section-title">Dados do Produto</div>
-        <label>Nome do Produto (Ex: Arroz Tipo 1 - 5kg)</label>
-        <input id="pNome" value="CERVEJA LATA 350ML" oninput="draw()">
-        
-        <label>Preço em Destaque</label>
-        <input id="pPreco" value="3,49" oninput="draw()" placeholder="0,00">
+        <div class="section-label">Informações</div>
+        <input id="pNome" placeholder="Nome do Produto" value="CERVEJA LATA 350ML" oninput="draw()">
+        <input id="pPreco" placeholder="Preço" value="3,49" oninput="draw()">
+        <textarea id="pExtra" rows="2" oninput="draw()">Oferta válida apenas para hoje!</textarea>
 
-        <label>Rodapé / Validade</label>
-        <textarea id="pExtra" oninput="draw()">Oferta válida apenas para hoje!</textarea>
-        <div class="quick-tags">
-            <span class="tag" onclick="setExtra('Oferta válida enquanto durarem os estoques.')">Estoque</span>
-            <span class="tag" onclick="setExtra('Limite de 12 unidades por cliente.')">Limite</span>
-            <span class="tag" onclick="setExtra('Imagens meramente ilustrativas.')">Ilustrativa</span>
-        </div>
-
-        <div class="section-title" style="margin-top:15px">Estética Inteligente</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="section-label">Visual</div>
+        <div class="color-group">
             <div>
-                <label>Fundo</label>
+                <label style="font-size:10px">Fundo</label>
                 <input type="color" id="cBg" value="#ffffff" oninput="draw()">
             </div>
             <div>
-                <label>Selo</label>
+                <label style="font-size:10px">Selo</label>
                 <input type="color" id="cSelo" value="#ffcc00" oninput="draw()">
             </div>
         </div>
 
-        <label>Imagem do Produto</label>
+        <div class="section-label">Imagens</div>
         <input type="file" id="fProd" accept="image/*">
         
-        <button class="btn-save" onclick="download()">Baixar Arquivo para Impressão (A4)</button>
+        <button class="btn-save" onclick="download()">BAIXAR ARQUIVO A4</button>
     </div>
 
     <div class="preview-area">
         <canvas id="canvas" width="2480" height="3508"></canvas>
-        <span class="info-tip">Proporção A4: 210mm x 297mm (300 DPI)</span>
+        <div class="footer-info">Tamanho de saída: A4 (Alta Resolução)</div>
     </div>
 </div>
 
@@ -87,20 +152,14 @@
     const ctx = canvas.getContext('2d');
     let imgProd = null;
 
-    // Função auxiliar para trocar texto rapidamente
-    function setExtra(txt) {
-        document.getElementById('pExtra').value = txt;
-        draw();
-    }
-
-    // Detector de luminosidade para cor de texto inteligente
-    function getContrastYIQ(hexcolor){
-        hexcolor = hexcolor.replace("#", "");
-        var r = parseInt(hexcolor.substr(0,2),16);
-        var g = parseInt(hexcolor.substr(2,2),16);
-        var b = parseInt(hexcolor.substr(4,2),16);
-        var yiq = ((r*299)+(g*587)+(b*114))/1000;
-        return (yiq >= 128) ? 'black' : 'white';
+    // Detecta contraste para cor de texto
+    function getContrastColor(hex){
+        hex = hex.replace("#", "");
+        const r = parseInt(hex.substr(0,2),16);
+        const g = parseInt(hex.substr(2,2),16);
+        const b = parseInt(hex.substr(4,2),16);
+        const yiq = ((r*299)+(g*587)+(b*114))/1000;
+        return (yiq >= 128) ? '#000000' : '#ffffff';
     }
 
     document.getElementById('fProd').onchange = e => {
@@ -116,98 +175,68 @@
         const cBg = document.getElementById('cBg').value;
         const cSelo = document.getElementById('cSelo').value;
 
-        // 1. Limpeza e Fundo
+        // Fundo
         ctx.fillStyle = cBg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Elementos Gráficos de Fundo (Design Inteligente)
-        ctx.fillStyle = 'rgba(0,0,0,0.03)';
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(canvas.width, 0);
-        ctx.lineTo(0, canvas.height * 0.2);
-        ctx.fill();
-
-        // 3. Título Estilizado
+        // Título
         ctx.textAlign = 'center';
         ctx.fillStyle = '#d32f2f';
-        ctx.font = 'bold 220px Montserrat, Arial Black';
-        ctx.shadowColor = 'rgba(0,0,0,0.1)';
-        ctx.shadowBlur = 20;
-        ctx.fillText("OFERTA DO DIA", canvas.width/2, 450);
-        ctx.shadowBlur = 0;
+        ctx.font = 'bold 200px Arial Black';
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 400);
 
-        // Linha decorativa
-        ctx.strokeStyle = '#d32f2f';
-        ctx.lineWidth = 15;
-        ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.3, 520);
-        ctx.lineTo(canvas.width * 0.7, 520);
-        ctx.stroke();
-
-        // 4. Espaço da Imagem (com sombra inteligente)
+        // Imagem do Produto
         if(imgProd) {
-            ctx.shadowColor = 'rgba(0,0,0,0.3)';
-            ctx.shadowBlur = 50;
-            ctx.shadowOffsetY = 30;
-            
-            const pScale = Math.min(1800/imgProd.width, 1400/imgProd.height);
+            const pScale = Math.min(1800/imgProd.width, 1500/imgProd.height);
             const pw = imgProd.width * pScale;
             const ph = imgProd.height * pScale;
-            ctx.drawImage(imgProd, (canvas.width - pw)/2, 700, pw, ph);
-            
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetY = 0;
+            ctx.drawImage(imgProd, (canvas.width - pw)/2, 650, pw, ph);
         }
 
-        // 5. Selo de Preço Premium
+        // Selo de Preço (Ajustado para ser um pouco menor)
         ctx.save();
-        ctx.translate(canvas.width/2, 2700);
-        
-        // Sombra do Selo
-        ctx.shadowColor = 'rgba(0,0,0,0.4)';
-        ctx.shadowBlur = 60;
-        
-        // Desenho do Selo (Hexágono ou Retângulo arredondado)
-        ctx.fillStyle = cSelo;
-        const rectW = 2200;
-        const rectH = 750;
-        ctx.beginPath();
-        ctx.roundRect(-rectW/2, -rectH/2, rectW, rectH, 40);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.translate(canvas.width/2, 2650);
+        ctx.rotate(-0.02); 
 
-        // Texto Interno do Selo (Contraste Inteligente)
-        const textColor = getContrastYIQ(cSelo);
-        ctx.fillStyle = textColor;
+        ctx.fillStyle = cSelo;
+        // Selo um pouco mais compacto
+        const sW = 2000;
+        const sH = 650;
+        ctx.beginPath();
+        ctx.roundRect(-sW/2, -sH/2, sW, sH, 50);
+        ctx.fill();
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        const txtColor = getContrastColor(cSelo);
+        ctx.fillStyle = txtColor;
         
         // Nome do Produto
-        ctx.font = "bold 130px Inter, Arial";
-        ctx.fillText(nome, 0, -180);
-
-        // Preço
         ctx.font = "bold 110px Arial";
-        ctx.fillText("R$", -780, 180);
+        ctx.fillText(nome, 0, -150);
+
+        // Preço (Tamanho reduzido de 650 para 520 para melhor equilíbrio)
+        ctx.font = "bold 100px Arial";
+        ctx.fillText("R$", -700, 150);
         
-        ctx.font = "900 650px Arial Black";
-        ctx.fillText(preco, 120, 250);
+        ctx.font = "900 520px Arial Black";
+        ctx.fillText(preco, 100, 230);
         ctx.restore();
 
-        // 6. Rodapé Inteligente (Ajusta cor baseada no fundo)
-        ctx.fillStyle = getContrastYIQ(cBg) === 'black' ? '#333' : '#eee';
-        ctx.font = "italic 80px Arial";
+        // Rodapé
+        ctx.fillStyle = getContrastColor(cBg) === '#000000' ? '#444' : '#ccc';
+        ctx.font = "70px Arial";
         ctx.fillText(extra, canvas.width/2, 3400);
     }
 
     function download() {
         const link = document.createElement('a');
-        const data = new Date().toLocaleDateString().replace(/\//g, '-');
-        link.download = `OFERTA_COUTO_${data}.png`;
+        link.download = `OFERTA_A4_${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
     }
 
-    // Inicialização
     window.onload = draw;
 </script>
 </body>
