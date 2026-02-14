@@ -1,163 +1,239 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Mercado Couto | Designer PRO</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body { margin: 0; font-family: 'Arial Black', sans-serif; background: #111; color: white; display: flex; height: 100vh; }
-        .sidebar { width: 320px; background: #1a1a1a; padding: 20px; border-right: 2px solid #e31d1a; overflow-y: auto; }
-        .field { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .btn-img { background: #ffdf00; color: #000; }
-        .btn-pdf { background: #fff; color: #000; }
-        .preview { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; padding: 20px; }
-        canvas { max-height: 90vh; max-width: 100%; background: #fff; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-    </style>
+<meta charset="UTF-8">
+<title>Mercado Couto | Designer PRO</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:'Arial Black',sans-serif;
+    background:#111;
+    color:#fff;
+    display:flex;
+    height:100vh;
+}
+.sidebar{
+    width:320px;
+    background:#1a1a1a;
+    padding:20px;
+    border-right:2px solid #e31d1a;
+    overflow-y:auto;
+}
+.field{margin-bottom:15px;}
+label{
+    display:block;
+    font-size:11px;
+    color:#888;
+    margin-bottom:5px;
+    text-transform:uppercase;
+}
+input,select,textarea{
+    width:100%;
+    padding:10px;
+    background:#222;
+    border:1px solid #444;
+    color:#fff;
+    border-radius:4px;
+    box-sizing:border-box;
+}
+.btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:4px;
+    font-weight:bold;
+    cursor:pointer;
+    text-transform:uppercase;
+    margin-top:10px;
+}
+.btn-img{background:#ffdf00;color:#000;}
+.btn-pdf{background:#fff;color:#000;}
+
+.preview{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+    padding:20px;
+}
+canvas{
+    max-height:90vh;
+    max-width:100%;
+    background:#fff;
+    box-shadow:0 0 30px rgba(0,0,0,.5);
+}
+</style>
 </head>
+
 <body>
 
 <div class="sidebar">
-    <h2 style="color:#ffdf00">COUTO EDIT</h2>
-    <div class="field"><label>Logo</label><input type="file" id="fLogo" accept="image/*"></div>
-    <div class="field"><label>Produto (PNG)</label><input type="file" id="fProd" accept="image/*"></div>
-    <div class="field"><label>Nome do Produto</label><input type="text" id="pNome" value="CERVEJA LATA 350ML" oninput="draw()"></div>
-    <div class="field"><label>Preço</label><input type="text" id="pPreco" value="3.49" oninput="draw()"></div>
-    <div class="field">
-        <label>Cor do Encarte</label>
-        <select id="pCor" onchange="draw()">
-            <option value="#e31d1a">Vermelho</option>
-            <option value="#2e7d32">Verde</option>
-            <option value="#0d47a1">Azul</option>
-        </select>
-    </div>
-    <div class="field"><label>Rodapé</label><textarea id="pExtra" oninput="draw()">Oferta válida enquanto durarem os estoques.</textarea></div>
-    <button class="btn btn-img" onclick="downloadImage()">Baixar Imagem</button>
-    <button class="btn btn-pdf" onclick="downloadPDF()">Baixar PDF</button>
+<h2 style="color:#ffdf00">COUTO EDIT</h2>
+
+<div class="field"><label>Logo</label>
+<input type="file" id="fLogo" accept="image/*"></div>
+
+<div class="field"><label>Produto (PNG)</label>
+<input type="file" id="fProd" accept="image/*"></div>
+
+<div class="field"><label>Nome do Produto</label>
+<input type="text" id="pNome" value="CERVEJA LATA 350ML"></div>
+
+<div class="field"><label>Preço</label>
+<input type="text" id="pPreco" value="3,49"></div>
+
+<div class="field">
+<label>Cor do Encarte</label>
+<select id="pCor">
+<option value="#e31d1a">Vermelho</option>
+<option value="#2e7d32">Verde</option>
+<option value="#0d47a1">Azul</option>
+</select>
+</div>
+
+<div class="field">
+<label>Rodapé</label>
+<textarea id="pExtra">Ofertas válidas enquanto durarem os estoques.</textarea>
+</div>
+
+<button class="btn btn-img" onclick="downloadImage()">Baixar Imagem</button>
+<button class="btn btn-pdf" onclick="downloadPDF()">Baixar PDF</button>
 </div>
 
 <div class="preview">
-    <canvas id="canvas" width="1200" height="1600"></canvas>
+<canvas id="canvas"></canvas>
 </div>
 
 <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let imgLogo = null, imgProd = null;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-    // Carregamento Seguro de Imagens
-    document.getElementById('fLogo').onchange = e => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => { imgLogo = img; draw(); };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
+// resolução real de impressão (A4 300dpi)
+canvas.width = 2480;
+canvas.height = 3508;
+
+let imgLogo = null;
+let imgProd = null;
+
+function loadImage(file, callback){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>callback(img);
+        img.src = e.target.result;
     };
+    reader.readAsDataURL(file);
+}
 
-    document.getElementById('fProd').onchange = e => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => { imgProd = img; draw(); };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
+document.getElementById('fLogo').onchange = e=>{
+    loadImage(e.target.files[0], img=>{
+        imgLogo = img;
+        draw();
+    });
+};
 
-    function draw() {
-        const nome = document.getElementById('pNome').value.toUpperCase();
-        const precoRaw = document.getElementById('pPreco').value.replace(',', '.');
-        const cor = document.getElementById('pCor').value;
-        const extra = document.getElementById('pExtra').value;
+document.getElementById('fProd').onchange = e=>{
+    loadImage(e.target.files[0], img=>{
+        imgProd = img;
+        draw();
+    });
+};
 
-        // Fundo
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+document.querySelectorAll("input,select,textarea")
+.forEach(el=>el.oninput = draw);
 
-        // Faixa Superior (Curvada simples)
-        ctx.fillStyle = cor;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(canvas.width, 0);
-        ctx.lineTo(canvas.width, 250);
-        ctx.quadraticCurveTo(canvas.width/2, 350, 0, 250);
-        ctx.fill();
+function formatPreco(v){
+    v = v.replace(",",".");
+    const num = parseFloat(v) || 0;
+    return num.toFixed(2);
+}
 
-        // Título
-        ctx.fillStyle = "#fff";
-        ctx.textAlign = "center";
-        ctx.font = "bold 80px Arial";
-        ctx.fillText("OFERTA IMBATÍVEL", canvas.width/2, 180);
+function draw(){
 
-        // Logo
-        if (imgLogo) {
-            const ratio = imgLogo.width / imgLogo.height;
-            ctx.drawImage(imgLogo, 50, 40, 150 * ratio, 150);
-        }
+    const nome = document.getElementById('pNome').value.toUpperCase();
+    const preco = formatPreco(document.getElementById('pPreco').value);
+    const cor = document.getElementById('pCor').value;
+    const extra = document.getElementById('pExtra').value;
 
-        // Produto
-        if (imgProd) {
-            // Sombra
-            ctx.beginPath();
-            ctx.ellipse(canvas.width/2, 950, 300, 50, 0, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(0,0,0,0.1)";
-            ctx.fill();
-            // Imagem
-            const pW = 700; const pH = (imgProd.height / imgProd.width) * pW;
-            ctx.drawImage(imgProd, (canvas.width - pW)/2, 900 - pH, pW, pH);
-        }
+    const [reais,centavos] = preco.split(".");
 
-        // Nome Produto
-        ctx.fillStyle = "#000";
-        ctx.font = "bold 70px Arial";
-        ctx.fillText(nome, canvas.width/2, 1050);
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        // Preço Estilo Varejo (Grande e Impactante)
-        const partes = precoRaw.split('.');
-        const reais = partes[0];
-        const centavos = (partes[1] || '00').padEnd(2, '0').substring(0,2);
+    // topo
+    ctx.fillStyle=cor;
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(canvas.width,0);
+    ctx.lineTo(canvas.width,500);
+    ctx.quadraticCurveTo(canvas.width/2,650,0,500);
+    ctx.fill();
 
-        ctx.fillStyle = cor;
-        // Splash de preço (Círculo ou Retângulo)
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, 1300, 240, 0, Math.PI * 2);
-        ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.font="bold 180px Arial";
+    ctx.textAlign="center";
+    ctx.fillText("OFERTA",canvas.width/2,350);
 
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 60px Arial";
-        ctx.fillText("R$", canvas.width/2 - 160, 1280);
-        
-        ctx.font = "bold 250px Arial";
-        ctx.fillText(reais, canvas.width/2, 1400);
-
-        ctx.font = "bold 90px Arial";
-        ctx.fillText("," + centavos, canvas.width/2 + 160, 1280);
-
-        // Rodapé
-        ctx.fillStyle = "#666";
-        ctx.font = "25px Arial";
-        ctx.fillText(extra, canvas.width/2, 1560);
+    // logo
+    if(imgLogo){
+        const h=250;
+        const w=imgLogo.width*(h/imgLogo.height);
+        ctx.drawImage(imgLogo,120,120,w,h);
     }
 
-    function downloadImage() {
-        const link = document.createElement('a');
-        link.download = 'oferta_couto.png';
-        link.href = canvas.toDataURL();
-        link.click();
+    // produto
+    if(imgProd){
+        const w=1400;
+        const h=imgProd.height*(w/imgProd.width);
+        ctx.drawImage(imgProd,(canvas.width-w)/2,900-h,w,h);
     }
 
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
-        pdf.save('oferta_couto.pdf');
-    }
+    // nome
+    ctx.fillStyle="#000";
+    ctx.font="bold 140px Arial";
+    ctx.fillText(nome,canvas.width/2,2100);
 
-    window.onload = draw;
+    // bolha preço
+    ctx.fillStyle=cor;
+    ctx.beginPath();
+    ctx.arc(canvas.width/2,2600,420,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#fff";
+    ctx.font="bold 140px Arial";
+    ctx.fillText("R$",canvas.width/2-260,2550);
+
+    ctx.font="bold 420px Arial";
+    ctx.fillText(reais,canvas.width/2,2800);
+
+    ctx.font="bold 160px Arial";
+    ctx.fillText(","+centavos,canvas.width/2+300,2550);
+
+    ctx.fillStyle="#666";
+    ctx.font="60px Arial";
+    ctx.fillText(extra,canvas.width/2,3350);
+}
+
+function downloadImage(){
+    const link=document.createElement('a');
+    link.download="oferta_couto.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+}
+
+function downloadPDF(){
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    pdf.addImage(canvas.toDataURL("image/jpeg",1.0),'JPEG',0,0,210,297);
+    pdf.save("oferta_couto.pdf");
+}
+
+draw();
 </script>
 </body>
 </html>
