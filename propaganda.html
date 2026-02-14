@@ -3,71 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercado Couto - Designer de Elite</title>
+    <title>Mercado Couto | Design de Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --accent: #e31d1a; --dark: #121212; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: var(--dark); color: #fff; display: flex; flex-direction: column; height: 100vh; }
+        :root { --accent: #ff0000; --gold: #ffd700; --dark-bg: #0f0f0f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); color: #eee; height: 100vh; overflow: hidden; }
+
+        /* Interface de Software */
+        .app-container { display: grid; grid-template-columns: 380px 1fr; height: 100vh; }
         
-        header { background: #000; padding: 15px; text-align: center; border-bottom: 3px solid var(--accent); font-weight: 900; letter-spacing: 2px; }
+        .sidebar { 
+            background: #1a1a1a; padding: 30px; border-right: 1px solid #333; 
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        }
+
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; margin-bottom: 10px; }
+
+        .field-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; }
         
-        .wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; flex: 1; }
-        @media(min-width: 1000px) { .wrapper { grid-template-columns: 380px 1fr; } }
+        input, textarea, select { 
+            background: #252525; border: 1px solid #444; color: #fff; 
+            padding: 12px; border-radius: 6px; font-size: 14px; transition: 0.3s;
+        }
+        input:focus { border-color: var(--gold); outline: none; background: #2d2d2d; }
 
-        .panel { background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; display: flex; flex-direction: column; gap: 15px; }
-        
-        label { font-size: 12px; color: #aaa; text-transform: uppercase; font-weight: bold; margin-bottom: -10px; }
-        input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: #fff; font-weight: 600; }
-        input:focus { border-color: var(--accent); outline: none; }
+        .btn-primary { 
+            background: var(--gold); color: #000; border: none; padding: 15px; 
+            border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase;
+            margin-top: 10px; transition: 0.2s;
+        }
+        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.1); }
+        .btn-pdf { background: transparent; border: 1px solid #555; color: #fff; margin-top: 5px; }
 
-        .file-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .file-input { font-size: 11px; padding: 8px; cursor: pointer; border: 1px dashed #555; }
+        /* Preview Area */
+        .preview-area { background: #0a0a0a; display: flex; align-items: center; justify-content: center; padding: 40px; overflow: hidden; }
+        canvas { max-height: 90vh; width: auto; box-shadow: 0 50px 100px rgba(0,0,0,0.8); border-radius: 2px; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .btn-action { background: var(--accent); color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-action:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .btn-pdf { background: #fff; color: #000; }
-
-        .artboard { display: flex; justify-content: center; align-items: flex-start; overflow: auto; background: #000; padding: 20px; border-radius: 10px; }
-        canvas { max-width: 100%; height: auto; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-radius: 4px; }
+        /* Custom File Input */
+        .custom-file { 
+            border: 1px dashed #555; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; border-radius: 6px;
+        }
     </style>
 </head>
 <body>
 
-<header>🚀 EDITOR DE OFERTAS ELITE - MERCADO COUTO</header>
-
-<div class="wrapper">
-    <div class="panel">
-        <div class="file-group">
-            <div><label>Logo</label><input type="file" id="fLogo" class="file-input" accept="image/*"></div>
-            <div><label>Produto</label><input type="file" id="fProd" class="file-input" accept="image/*"></div>
+<div class="app-container">
+    <div class="sidebar">
+        <h1>COUTO DESIGNER <sup>PRO</sup></h1>
+        
+        <div class="field-group">
+            <label>Logo da Empresa</label>
+            <input type="file" id="fLogo" accept="image/*">
         </div>
 
-        <label>Nome do Produto</label>
-        <input id="pNome" value="CERVEJA ITAIPAVA 473ML" oninput="draw()">
-        
-        <div class="file-group">
-            <div><label>Preço (Ex: 3,59)</label><input id="pPreco" value="3,59" oninput="draw()"></div>
-            <div><label>Tema</label>
+        <div class="field-group">
+            <label>Imagem do Produto (PNG sem fundo)</label>
+            <input type="file" id="fProd" accept="image/*">
+        </div>
+
+        <div class="field-group">
+            <label>Nome do Produto</label>
+            <input id="pNome" value="VINHO TINTO RESERVA 750ML" oninput="draw()">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="field-group">
+                <label>Preço (0,00)</label>
+                <input id="pPreco" value="49,90" oninput="draw()">
+            </div>
+            <div class="field-group">
+                <label>Cor do Tema</label>
                 <select id="pCor" onchange="draw()">
-                    <option value="#e31d1a">Oferta (Vermelho)</option>
-                    <option value="#2e7d32">Hortifruti (Verde)</option>
-                    <option value="#1565c0">Limpeza (Azul)</option>
+                    <option value="#d32f2f">OFERTA VERMELHA</option>
+                    <option value="#1b5e20">HORTIFRUTI VERDE</option>
+                    <option value="#0d47a1">LIMPEZA AZUL</option>
+                    <option value="#ff6f00">PADARIA LARANJA</option>
                 </select>
             </div>
         </div>
 
-        <label>Rodapé / Observações</label>
-        <textarea id="pExtra" rows="3" oninput="draw()">Oferta válida enquanto durarem os estoques. Imagens meramente ilustrativas.</textarea>
-
-        <div class="btn-group">
-            <button class="btn-action" onclick="downloadImage()">PNG</button>
-            <button class="btn-action btn-pdf" onclick="downloadPDF()">PDF</button>
+        <div class="field-group">
+            <label>Informações Adicionais</label>
+            <textarea id="pExtra" rows="2" oninput="draw()">Oferta exclusiva. Limitado a 6 unidades por cliente.</textarea>
         </div>
+
+        <button class="btn-primary" onclick="downloadImage()">Exportar Imagem (PNG)</button>
+        <button class="btn-primary btn-pdf" onclick="downloadPDF()">Gerar PDF A4</button>
     </div>
 
-    <div class="artboard">
+    <div class="preview-area">
         <canvas id="canvas" width="2480" height="3508"></canvas>
     </div>
 </div>
@@ -75,8 +102,10 @@
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    let imgLogo = null;
-    let imgProd = null;
+    let imgLogo = null, imgProd = null;
+
+    // Carregar fontes antes de desenhar
+    document.fonts.ready.then(() => draw());
 
     document.getElementById('fLogo').onchange = e => loadFile(e, img => { imgLogo = img; draw(); });
     document.getElementById('fProd').onchange = e => loadFile(e, img => { imgProd = img; draw(); });
@@ -90,75 +119,105 @@
     function draw() {
         const nome = document.getElementById('pNome').value.toUpperCase();
         const precoRaw = document.getElementById('pPreco').value.replace(',', '.');
+        const cor = document.getElementById('pCor').value;
         const extra = document.getElementById('pExtra').value;
-        const corTema = document.getElementById('pCor').value;
 
-        // Limpar e fundo
-        ctx.fillStyle = corTema;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // 1. Fundo com Gradiente Radial (Efeito Estúdio)
+        const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 100, canvas.width/2, canvas.height/2, 2500);
+        grd.addColorStop(0, '#ffffff');
+        grd.addColorStop(1, '#e0e0e0');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+
+        // 2. Faixa Diagonal de Topo
+        ctx.save();
+        ctx.fillStyle = cor;
+        ctx.beginPath();
+        ctx.moveTo(0,0); ctx.lineTo(canvas.width, 0); ctx.lineTo(canvas.width, 400); ctx.lineTo(0, 600);
+        ctx.fill();
+        ctx.restore();
+
+        // 3. Título Principal
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.font = '900 400px Montserrat';
+        ctx.fillText("OFERTA", canvas.width - 50, 450);
         
-        // Borda Interna Branca
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(40, 40, canvas.width - 80, canvas.height - 80);
-
-        // Faixa de Título
-        ctx.fillStyle = corTema;
-        ctx.fillRect(0, 180, canvas.width, 450);
-        ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
-        ctx.font = '900 280px Arial Black';
-        ctx.fillText("OFERTA", canvas.width / 2, 520);
+        ctx.font = '900 200px Montserrat';
+        ctx.fillText("OFERTA ESPECIAL", canvas.width - 120, 350);
 
-        // Logo (se houver)
-        if (imgLogo) {
-            const lW = 500; const lH = (imgLogo.height / imgLogo.width) * lW;
-            ctx.drawImage(imgLogo, 120, 70, lW, lH);
+        // 4. Logo
+        if(imgLogo) {
+            const ratio = imgLogo.width / imgLogo.height;
+            ctx.drawImage(imgLogo, 120, 100, 400 * ratio, 400);
         }
 
-        // Produto com sombra
-        if (imgProd) {
-            ctx.shadowColor = "rgba(0,0,0,0.2)";
-            ctx.shadowBlur = 60;
-            ctx.shadowOffsetY = 30;
-            const pW = 1400; const pH = (imgProd.height / imgProd.width) * pW;
-            ctx.drawImage(imgProd, (canvas.width - pW) / 2, 850, pW, pH);
-            ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+        // 5. Produto e Sombra de Contato
+        if(imgProd) {
+            const pW = 1500; const pH = (imgProd.height / imgProd.width) * pW;
+            // Sombra oval no chão
+            ctx.beginPath();
+            ctx.ellipse(canvas.width/2, 2150, 600, 100, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.fill();
+            // Imagem
+            ctx.drawImage(imgProd, (canvas.width - pW)/2, 2100 - pH, pW, pH);
         }
 
-        // Texto do Produto
-        ctx.fillStyle = '#222';
-        ctx.font = '900 160px Arial';
-        ctx.fillText(nome, canvas.width / 2, 2350);
+        // 6. Nome do Produto (Com Linha Decorativa)
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#111';
+        ctx.font = '900 160px Montserrat';
+        ctx.fillText(nome, canvas.width/2, 2350);
+        ctx.fillRect(canvas.width/2 - 200, 2380, 400, 10);
 
-        // Preço Estilizado
+        // 7. Splash de Preço (O "Selo" de Elite)
+        const sX = canvas.width/2; const sY = 2850;
+        ctx.save();
+        ctx.translate(sX, sY);
+        ctx.rotate(-0.05); // Leve inclinação para dar dinamismo
+        
+        // Sombra do Splash
+        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 40;
+        ctx.fillStyle = cor;
+        ctx.beginPath();
+        ctx.roundRect(-700, -350, 1400, 600, 100);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Textos do Preço
         const partes = precoRaw.split('.');
         const reais = partes[0];
         const centavos = (partes[1] || '00').padEnd(2, '0').substring(0,2);
 
-        ctx.fillStyle = corTema;
-        // Cifrão
+        ctx.fillStyle = '#fff';
         ctx.textAlign = 'right';
-        ctx.font = '900 180px Arial';
-        ctx.fillText("R$", canvas.width/2 - 380, 2900);
-        // Inteiro
+        ctx.font = '900 150px Montserrat';
+        ctx.fillText("R$", -380, 80);
+        
         ctx.textAlign = 'center';
-        ctx.font = '900 850px Arial';
-        ctx.fillText(reais, canvas.width/2, 3050);
-        // Centavos
-        ctx.textAlign = 'left';
-        ctx.font = '900 320px Arial';
-        ctx.fillText("," + centavos, canvas.width/2 + 380, 2650);
+        ctx.font = '900 650px Montserrat';
+        ctx.fillText(reais, 0, 180);
 
-        // Rodapé
-        ctx.fillStyle = '#666';
-        ctx.font = '700 65px Arial';
+        ctx.textAlign = 'left';
+        ctx.font = '900 250px Montserrat';
+        ctx.fillText("," + centavos, 380, -100);
+        ctx.restore();
+
+        // 8. Rodapé Estilizado
+        ctx.fillStyle = cor;
+        ctx.fillRect(0, 3400, canvas.width, 108);
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 60px Roboto';
         ctx.textAlign = 'center';
-        ctx.fillText(extra, canvas.width / 2, 3380);
+        ctx.fillText(extra, canvas.width/2, 3475);
     }
 
+    // Funções de Download
     function downloadImage() {
         const link = document.createElement('a');
-        link.download = 'oferta-couto.png';
+        link.download = `oferta_${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png', 1);
         link.click();
     }
@@ -166,12 +225,10 @@
     async function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-        const imgData = canvas.toDataURL("image/jpeg", 0.9);
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
         pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
-        pdf.save("oferta-couto.pdf");
+        pdf.save("encarte_pro.pdf");
     }
-
-    window.onload = draw;
 </script>
 
 </body>
