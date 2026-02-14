@@ -3,100 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercado Couto | Design de Elite</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mercado Couto | Pro Designer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --accent: #ff0000; --gold: #ffd700; --dark-bg: #0f0f0f; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Roboto', sans-serif; background: var(--dark-bg); color: #eee; height: 100vh; overflow: hidden; }
-
-        /* Interface de Software */
-        .app-container { display: grid; grid-template-columns: 380px 1fr; height: 100vh; }
+        :root { --accent: #ff0000; --gold: #ffd700; }
+        body { margin: 0; background: #111; color: white; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { 
-            background: #1a1a1a; padding: 30px; border-right: 1px solid #333; 
-            display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
-        }
-
-        h1 { font-family: 'Montserrat', sans-serif; font-size: 18px; color: var(--gold); letter-spacing: 1px; margin-bottom: 10px; }
-
-        .field-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; }
+        /* Sidebar */
+        .sidebar { width: 350px; background: #1a1a1a; padding: 20px; border-right: 2px solid #333; overflow-y: auto; z-index: 10; }
+        .sidebar h2 { font-size: 1.2rem; color: var(--gold); margin-bottom: 20px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
-        input, textarea, select { 
-            background: #252525; border: 1px solid #444; color: #fff; 
-            padding: 12px; border-radius: 6px; font-size: 14px; transition: 0.3s;
-        }
-        input:focus { border-color: var(--gold); outline: none; background: #2d2d2d; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        input:focus { border-color: var(--gold); outline: none; }
 
-        .btn-primary { 
-            background: var(--gold); color: #000; border: none; padding: 15px; 
-            border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase;
-            margin-top: 10px; transition: 0.2s;
-        }
-        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .btn-pdf { background: transparent; border: 1px solid #555; color: #fff; margin-top: 5px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
+        .btn-save { background: var(--gold); color: #000; }
+        .btn-pdf { background: #444; color: #fff; }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
 
         /* Preview Area */
-        .preview-area { background: #0a0a0a; display: flex; align-items: center; justify-content: center; padding: 40px; overflow: hidden; }
-        canvas { max-height: 90vh; width: auto; box-shadow: 0 50px 100px rgba(0,0,0,0.8); border-radius: 2px; }
-
-        /* Custom File Input */
-        .custom-file { 
-            border: 1px dashed #555; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; border-radius: 6px;
-        }
+        .preview { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; padding: 20px; }
+        canvas { max-height: 95vh; max-width: 100%; box-shadow: 0 0 50px rgba(0,0,0,1); background: #fff; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="sidebar">
-        <h1>COUTO DESIGNER <sup>PRO</sup></h1>
-        
-        <div class="field-group">
-            <label>Logo da Empresa</label>
-            <input type="file" id="fLogo" accept="image/*">
-        </div>
-
-        <div class="field-group">
-            <label>Imagem do Produto (PNG sem fundo)</label>
-            <input type="file" id="fProd" accept="image/*">
-        </div>
-
-        <div class="field-group">
-            <label>Nome do Produto</label>
-            <input id="pNome" value="VINHO TINTO RESERVA 750ML" oninput="draw()">
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="field-group">
-                <label>Preço (0,00)</label>
-                <input id="pPreco" value="49,90" oninput="draw()">
-            </div>
-            <div class="field-group">
-                <label>Cor do Tema</label>
-                <select id="pCor" onchange="draw()">
-                    <option value="#d32f2f">OFERTA VERMELHA</option>
-                    <option value="#1b5e20">HORTIFRUTI VERDE</option>
-                    <option value="#0d47a1">LIMPEZA AZUL</option>
-                    <option value="#ff6f00">PADARIA LARANJA</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="field-group">
-            <label>Informações Adicionais</label>
-            <textarea id="pExtra" rows="2" oninput="draw()">Oferta exclusiva. Limitado a 6 unidades por cliente.</textarea>
-        </div>
-
-        <button class="btn-primary" onclick="downloadImage()">Exportar Imagem (PNG)</button>
-        <button class="btn-primary btn-pdf" onclick="downloadPDF()">Gerar PDF A4</button>
+<div class="sidebar">
+    <h2>COUTO PRO DESIGN</h2>
+    
+    <div class="field">
+        <label>Logo</label>
+        <input type="file" id="fLogo" accept="image/*">
     </div>
 
-    <div class="preview-area">
-        <canvas id="canvas" width="2480" height="3508"></canvas>
+    <div class="field">
+        <label>Produto (PNG)</label>
+        <input type="file" id="fProd" accept="image/*">
     </div>
+
+    <div class="field">
+        <label>Nome do Produto</label>
+        <input type="text" id="pNome" value="Picanha Bovina KG" oninput="draw()">
+    </div>
+
+    <div class="field">
+        <label>Preço</label>
+        <input type="text" id="pPreco" value="59.90" oninput="draw()">
+    </div>
+
+    <div class="field">
+        <label>Tema de Cor</label>
+        <select id="pCor" onchange="draw()">
+            <option value="#e31d1a">Vermelho Oferta</option>
+            <option value="#2e7d32">Verde Hortifruti</option>
+            <option value="#0d47a1">Azul Limpeza</option>
+            <option value="#f57c00">Laranja Padaria</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Rodapé</label>
+        <textarea id="pExtra" oninput="draw()">Oferta válida apenas para hoje.</textarea>
+    </div>
+
+    <button class="btn btn-save" onclick="downloadImage()">Baixar Imagem</button>
+    <button class="btn btn-pdf" onclick="downloadPDF()">Gerar PDF</button>
+</div>
+
+<div class="preview">
+    <canvas id="canvas" width="2480" height="3508"></canvas>
 </div>
 
 <script>
@@ -104,9 +82,7 @@
     const ctx = canvas.getContext('2d');
     let imgLogo = null, imgProd = null;
 
-    // Carregar fontes antes de desenhar
-    document.fonts.ready.then(() => draw());
-
+    // Carregar arquivos
     document.getElementById('fLogo').onchange = e => loadFile(e, img => { imgLogo = img; draw(); });
     document.getElementById('fProd').onchange = e => loadFile(e, img => { imgProd = img; draw(); });
 
@@ -116,119 +92,125 @@
         if(e.target.files[0]) r.readAsDataURL(e.target.files[0]);
     }
 
+    // Função para desenhar retângulos arredondados (Compatível com todos browsers)
+    function roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+    }
+
     function draw() {
         const nome = document.getElementById('pNome').value.toUpperCase();
         const precoRaw = document.getElementById('pPreco').value.replace(',', '.');
         const cor = document.getElementById('pCor').value;
         const extra = document.getElementById('pExtra').value;
 
-        // 1. Fundo com Gradiente Radial (Efeito Estúdio)
-        const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 100, canvas.width/2, canvas.height/2, 2500);
-        grd.addColorStop(0, '#ffffff');
-        grd.addColorStop(1, '#e0e0e0');
-        ctx.fillStyle = grd;
-        ctx.fillRect(0,0, canvas.width, canvas.height);
+        // Limpar
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 2. Faixa Diagonal de Topo
-        ctx.save();
+        // Fundo Gradiente
+        const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 500, canvas.width/2, canvas.height/2, 2500);
+        grd.addColorStop(0, "#ffffff");
+        grd.addColorStop(1, "#dcdcdc");
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Cabeçalho Curvado
         ctx.fillStyle = cor;
         ctx.beginPath();
-        ctx.moveTo(0,0); ctx.lineTo(canvas.width, 0); ctx.lineTo(canvas.width, 400); ctx.lineTo(0, 600);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(canvas.width, 0);
+        ctx.lineTo(canvas.width, 450);
+        ctx.bezierCurveTo(canvas.width * 0.7, 600, canvas.width * 0.3, 300, 0, 500);
         ctx.fill();
-        ctx.restore();
 
-        // 3. Título Principal
-        ctx.textAlign = 'right';
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
-        ctx.font = '900 400px Montserrat';
-        ctx.fillText("OFERTA", canvas.width - 50, 450);
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '900 200px Montserrat';
-        ctx.fillText("OFERTA ESPECIAL", canvas.width - 120, 350);
+        // Texto Oferta
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.font = "900 250px Montserrat, Arial Black";
+        ctx.fillText("OFERTA DO DIA", canvas.width/2, 350);
 
-        // 4. Logo
-        if(imgLogo) {
-            const ratio = imgLogo.width / imgLogo.height;
-            ctx.drawImage(imgLogo, 120, 100, 400 * ratio, 400);
+        // Logo
+        if (imgLogo) {
+            const h = 300; const w = (imgLogo.width / imgLogo.height) * h;
+            ctx.drawImage(imgLogo, 100, 50, w, h);
         }
 
-        // 5. Produto e Sombra de Contato
-        if(imgProd) {
-            const pW = 1500; const pH = (imgProd.height / imgProd.width) * pW;
-            // Sombra oval no chão
+        // Sombra do Produto
+        if (imgProd) {
             ctx.beginPath();
-            ctx.ellipse(canvas.width/2, 2150, 600, 100, 0, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.ellipse(canvas.width/2, 2150, 500, 80, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0,0,0,0.2)";
             ctx.fill();
-            // Imagem
+
+            const pW = 1400; const pH = (imgProd.height / imgProd.width) * pW;
             ctx.drawImage(imgProd, (canvas.width - pW)/2, 2100 - pH, pW, pH);
         }
 
-        // 6. Nome do Produto (Com Linha Decorativa)
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#111';
-        ctx.font = '900 160px Montserrat';
+        // Nome do Produto
+        ctx.fillStyle = "#111";
+        ctx.font = "900 160px Montserrat, Arial Black";
         ctx.fillText(nome, canvas.width/2, 2350);
-        ctx.fillRect(canvas.width/2 - 200, 2380, 400, 10);
 
-        // 7. Splash de Preço (O "Selo" de Elite)
-        const sX = canvas.width/2; const sY = 2850;
+        // Badge de Preço
         ctx.save();
-        ctx.translate(sX, sY);
-        ctx.rotate(-0.05); // Leve inclinação para dar dinamismo
-        
-        // Sombra do Splash
-        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 40;
+        ctx.translate(canvas.width/2, 2850);
+        ctx.rotate(-0.03);
         ctx.fillStyle = cor;
-        ctx.beginPath();
-        ctx.roundRect(-700, -350, 1400, 600, 100);
+        roundedRect(ctx, -700, -350, 1400, 600, 80);
         ctx.fill();
-        ctx.shadowBlur = 0;
 
-        // Textos do Preço
+        // Texto Preço
         const partes = precoRaw.split('.');
         const reais = partes[0];
         const centavos = (partes[1] || '00').padEnd(2, '0').substring(0,2);
 
-        ctx.fillStyle = '#fff';
-        ctx.textAlign = 'right';
-        ctx.font = '900 150px Montserrat';
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "right";
+        ctx.font = "900 150px Montserrat";
         ctx.fillText("R$", -380, 80);
         
-        ctx.textAlign = 'center';
-        ctx.font = '900 650px Montserrat';
+        ctx.textAlign = "center";
+        ctx.font = "900 650px Montserrat";
         ctx.fillText(reais, 0, 180);
 
-        ctx.textAlign = 'left';
-        ctx.font = '900 250px Montserrat';
+        ctx.textAlign = "left";
+        ctx.font = "900 280px Montserrat";
         ctx.fillText("," + centavos, 380, -100);
         ctx.restore();
 
-        // 8. Rodapé Estilizado
-        ctx.fillStyle = cor;
-        ctx.fillRect(0, 3400, canvas.width, 108);
-        ctx.fillStyle = '#fff';
-        ctx.font = '700 60px Roboto';
-        ctx.textAlign = 'center';
-        ctx.fillText(extra, canvas.width/2, 3475);
+        // Rodapé
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 60px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(extra, canvas.width/2, 3450);
     }
 
-    // Funções de Download
     function downloadImage() {
         const link = document.createElement('a');
-        link.download = `oferta_${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png', 1);
+        link.download = 'oferta.png';
+        link.href = canvas.toDataURL('image/png');
         link.click();
     }
 
-    async function downloadPDF() {
+    function downloadPDF() {
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-        const imgData = canvas.toDataURL("image/jpeg", 0.95);
-        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
-        pdf.save("encarte_pro.pdf");
+        const pdf = new jsPDF({ format: 'a4' });
+        const img = canvas.toDataURL('image/jpeg', 0.9);
+        pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+        pdf.save('oferta.pdf');
     }
+
+    // Esperar fontes carregarem
+    window.onload = () => { setTimeout(draw, 500); };
 </script>
 
 </body>
