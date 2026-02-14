@@ -1,224 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercado Couto - Designer de Elite</title>
-    <style>
-        :root { --red: #e31d1a; --yellow: #ffdf00; --dark: #0a0a0a; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Arial Black', sans-serif; background: var(--dark); color: #fff; overflow-x: hidden; }
-        
-        header { 
-            background: linear-gradient(to right, #000, #b71c1c, #000); 
-            padding: 15px; text-align: center; border-bottom: 2px solid var(--yellow);
-            text-transform: uppercase; letter-spacing: 2px; font-size: 14px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercado Couto - Designer de Elite</title>
 
-        .wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
-        @media(min-width: 1000px) { .wrapper { grid-template-columns: 350px 1fr; } }
+<!-- Biblioteca PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        /* Painel de Controle Estilizado */
-        .panel { 
-            background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #333;
-            display: flex; flex-direction: column; gap: 12px; height: fit-content;
-        }
-        .panel h3 { font-size: 12px; color: var(--yellow); margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        
-        input, textarea { 
-            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; 
-            background: #fff; color: #000; font-weight: 900; font-size: 14px;
-        }
-        
-        .file-input { background: #2a2a2a; color: #fff; border: 1px dashed #555; cursor: pointer; }
+<style>
+:root { --red:#e31d1a; --yellow:#ffdf00; --dark:#0a0a0a; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Arial Black',sans-serif; background:var(--dark); color:#fff; }
 
-        .btn-action { 
-            background: var(--yellow); color: #000; border: none; padding: 20px; 
-            border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px;
-            transition: all 0.2s; text-transform: uppercase;
-        }
-        .btn-action:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,223,0,0.3); }
+header{
+background:linear-gradient(to right,#000,#b71c1c,#000);
+padding:15px;text-align:center;border-bottom:2px solid var(--yellow);
+text-transform:uppercase;letter-spacing:2px;font-size:14px;
+}
 
-        /* Preview da Peça */
-        .artboard { position: relative; display: flex; justify-content: center; }
-        canvas { 
-            max-width: 100%; height: auto; border-radius: 4px; 
-            box-shadow: 0 30px 100px rgba(0,0,0,0.9); background: #fff;
-        }
-    </style>
+.wrapper{ display:grid; grid-template-columns:1fr; gap:20px; padding:20px; max-width:1400px; margin:auto;}
+@media(min-width:1000px){ .wrapper{ grid-template-columns:350px 1fr; } }
+
+.panel{
+background:#1a1a1a;padding:25px;border-radius:12px;border:1px solid #333;
+display:flex;flex-direction:column;gap:12px;height:fit-content;
+}
+
+input,textarea{
+width:100%;padding:12px;border-radius:6px;border:1px solid #444;
+background:#fff;color:#000;font-weight:900;font-size:14px;
+}
+
+.file-input{ background:#2a2a2a;color:#fff;border:1px dashed #555;cursor:pointer;}
+
+.btn-action{
+background:var(--yellow);color:#000;border:none;padding:18px;
+border-radius:8px;font-weight:900;cursor:pointer;text-transform:uppercase;
+}
+
+.artboard{ display:flex;justify-content:center; }
+canvas{ max-width:100%; background:#fff; box-shadow:0 30px 100px rgba(0,0,0,.9);}
+</style>
 </head>
+
 <body>
 
-<header>🚀 Editor de Ofertas High-End - Mercado Couto</header>
+<header>🚀 Editor de Ofertas - Mercado Couto</header>
 
 <div class="wrapper">
-    <div class="panel">
-        <h3>1. Identidade</h3>
-        <input type="file" id="fLogo" class="file-input" accept="image/*" title="Logo do Mercado">
-        
-        <h3>2. Produto</h3>
-        <input type="file" id="fProd" class="file-input" accept="image/*" title="Foto do Produto">
-        <input id="pNome" value="CERVEJA ITAIPAVA 473ML" oninput="draw()" placeholder="NOME DO PRODUTO">
-        
-        <h3>3. Condição</h3>
-        <input id="pPreco" value="3,59" oninput="draw()" placeholder="PREÇO (Ex: 3,49)">
-        <textarea id="pExtra" oninput="draw()" placeholder="RODAPÉ">Oferta válida até durar o estoque.</textarea>
+<div class="panel">
+<input type="file" id="fLogo" class="file-input" accept="image/*">
+<input type="file" id="fProd" class="file-input" accept="image/*">
 
-        <button class="btn-action" onclick="download()">Baixar Encarte A4 HD</button>
-    </div>
+<input id="pNome" value="CERVEJA ITAIPAVA 473ML" oninput="draw()">
+<input id="pPreco" value="3,59" oninput="draw()">
+<textarea id="pExtra" oninput="draw()">Oferta válida enquanto durarem os estoques</textarea>
 
-    <div class="artboard">
-        <canvas id="canvas" width="2480" height="3508"></canvas>
-    </div>
+<button class="btn-action" onclick="downloadImage()">Baixar IMAGEM</button>
+<button class="btn-action" onclick="downloadPDF()">Baixar PDF</button>
+</div>
+
+<div class="artboard">
+<canvas id="canvas" width="2480" height="3508"></canvas>
+</div>
 </div>
 
 <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let imgLogo = new Image(), imgProd = null;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-    // Logo Padrão Transparente (Simulação)
-    imgLogo.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+let imgLogo = new Image();
+let imgProd = null;
 
-    document.getElementById('fLogo').onchange = e => { loadFile(e, img => { imgLogo = img; draw(); }); };
-    document.getElementById('fProd').onchange = e => { loadFile(e, img => { imgProd = img; draw(); }); };
+imgLogo.src = '';
 
-    function loadFile(e, cb) {
-        const r = new FileReader();
-        r.onload = () => { const i = new Image(); i.onload = () => cb(i); i.src = r.result; };
-        r.readAsDataURL(e.target.files[0]);
-    }
+document.getElementById('fLogo').onchange = e => loadFile(e, img => { imgLogo = img; draw(); });
+document.getElementById('fProd').onchange = e => loadFile(e, img => { imgProd = img; draw(); });
 
-    function draw() {
-        const nome = document.getElementById('pNome').value.toUpperCase();
-        const preco = document.getElementById('pPreco').value;
-        const extra = document.getElementById('pExtra').value;
+function loadFile(e, cb){
+const r = new FileReader();
+r.onload = () => {
+const i = new Image();
+i.onload = () => cb(i);
+i.src = r.result;
+};
+r.readAsDataURL(e.target.files[0]);
+}
 
-        // --- FUNDO PREMIUM ---
-        const grad = ctx.createRadialGradient(canvas.width/2, 1600, 100, canvas.width/2, 1600, 2200);
-        grad.addColorStop(0, '#ffffff');
-        grad.addColorStop(0.7, '#d9d9d9');
-        grad.addColorStop(1, '#aaaaaa');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+function draw(){
+const nome = document.getElementById('pNome').value.toUpperCase();
+const preco = document.getElementById('pPreco').value;
+const extra = document.getElementById('pExtra').value;
 
-        // --- LOGO ---
-        if(imgLogo) {
-            const sc = Math.min(750/imgLogo.width, 450/imgLogo.height);
-            const lw = imgLogo.width * sc, lh = imgLogo.height * sc;
-            ctx.drawImage(imgLogo, (canvas.width - lw)/2, 180, lw, lh);
-        }
+ctx.clearRect(0,0,canvas.width,canvas.height);
 
-        // --- TÍTULO IMPACTO ---
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(0,0,0,0.15)';
-        ctx.shadowBlur = 30;
-        ctx.fillStyle = '#e31d1a';
-        ctx.font = '900 280px "Arial Black"';
-        ctx.fillText("OFERTA", canvas.width/2, 950);
-        ctx.font = '900 150px "Arial Black"';
-        ctx.fillStyle = '#333';
-        ctx.fillText("DO DIA", canvas.width/2, 1100);
-        ctx.shadowBlur = 0;
+const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+grad.addColorStop(0,'#ffffff');
+grad.addColorStop(1,'#dcdcdc');
+ctx.fillStyle = grad;
+ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        // Elementos decorativos (Linhas laterais)
-        ctx.strokeStyle = '#e31d1a';
-        ctx.lineWidth = 15;
-        ctx.beginPath();
-        ctx.moveTo(300, 1020); ctx.lineTo(750, 1020);
-        ctx.moveTo(1730, 1020); ctx.lineTo(2180, 1020);
-        ctx.stroke();
+ctx.textAlign='center';
+ctx.fillStyle='#e31d1a';
+ctx.font='900 260px Arial';
+ctx.fillText("OFERTA",canvas.width/2,800);
 
-        // --- PRODUTO ---
-        if(imgProd) {
-            const pSc = Math.min(1800/imgProd.width, 1500/imgProd.height);
-            const pw = imgProd.width * pSc, ph = imgProd.height * pSc;
-            
-            // Sombra de contato
-            ctx.fillStyle = 'rgba(0,0,0,0.2)';
-            ctx.beginPath();
-            ctx.ellipse(canvas.width/2, 1250 + ph, pw/2, 60, 0, 0, Math.PI*2);
-            ctx.fill();
+ctx.fillStyle='#333';
+ctx.font='900 140px Arial';
+ctx.fillText("DO DIA",canvas.width/2,980);
 
-            ctx.drawImage(imgProd, (canvas.width - pw)/2, 1200, pw, ph);
-        }
+if(imgLogo){
+ctx.drawImage(imgLogo,canvas.width/2-300,150,600,300);
+}
 
-        // --- SELO EXPLOSIVO (O "PULO DO GATO") ---
-        ctx.save();
-        ctx.translate(canvas.width/2, 2850);
-        ctx.rotate(-0.04);
+if(imgProd){
+ctx.drawImage(imgProd,canvas.width/2-600,1100,1200,1200);
+}
 
-        // Camada 1: Sombra
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 60;
-        ctx.fillStyle = '#000';
-        ctx.roundRect(-980, -320, 1960, 750, 40).fill();
-        ctx.shadowBlur = 0;
+ctx.fillStyle='#000';
+ctx.font='900 600px Arial';
+ctx.fillText(preco,canvas.width/2,2700);
 
-        // Camada 2: Borda Branca
-        ctx.fillStyle = '#fff';
-        ctx.roundRect(-960, -300, 1920, 710, 30).fill();
+ctx.font='bold 70px Arial';
+ctx.fillText(extra,canvas.width/2,3400);
+}
 
-        // Camada 3: Fundo Amarelo com Degradê Metalizado
-        const yGrad = ctx.createLinearGradient(0, -300, 0, 400);
-        yGrad.addColorStop(0, '#ffe500');
-        yGrad.addColorStop(0.5, '#ffcc00');
-        yGrad.addColorStop(1, '#ffb300');
-        ctx.fillStyle = yGrad;
-        ctx.roundRect(-940, -280, 1880, 670, 20).fill();
+function redrawAndWait(){
+return new Promise(resolve=>{
+draw();
+requestAnimationFrame(()=>{
+requestAnimationFrame(()=>resolve());
+});
+});
+}
 
-        // Faixa do Nome (Vermelho Intenso)
-        ctx.fillStyle = '#e31d1a';
-        ctx.rotate(-0.01);
-        ctx.roundRect(-1020, -380, 2040, 220, 15).fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 10; ctx.stroke();
-        
-        // Texto Produto
-        ctx.fillStyle = '#fff';
-        ctx.font = '900 110px Arial';
-        ctx.fillText(nome, 0, -230);
-        ctx.restore();
+function downloadImage(){
+const link=document.createElement('a');
+link.download='encarte.png';
+link.href=canvas.toDataURL('image/png',1);
+link.click();
+}
 
-        // --- PREÇO ---
-        ctx.save();
-        ctx.translate(canvas.width/2, 2850);
-        ctx.rotate(-0.04);
-        ctx.fillStyle = '#000';
-        ctx.textAlign = 'left';
-        ctx.font = 'bold 130px Arial';
-        ctx.fillText("R$", -800, 200);
-        
-        ctx.textAlign = 'center';
-        ctx.font = '900 620px "Arial Black"';
-        ctx.letterSpacing = "-20px";
-        ctx.fillText(preco, 120, 320);
-        ctx.restore();
+async function downloadPDF(){
+await redrawAndWait();
 
-        // --- RODAPÉ ---
-        ctx.fillStyle = '#444';
-        ctx.font = 'bold 70px Arial';
-        ctx.fillText(extra, canvas.width/2, 3420);
-    }
+const { jsPDF } = window.jspdf;
 
-    // Polyfill roundRect
-    if (!CanvasRenderingContext2D.prototype.roundRect) {
-        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-            if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
-            this.beginPath(); this.moveTo(x + r, y);
-            this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
-            this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r);
-            this.closePath(); return this;
-        };
-    }
+const pdf=new jsPDF({
+orientation:"portrait",
+unit:"mm",
+format:"a4"
+});
 
-    function download() {
-        const link = document.createElement('a');
-        link.download = `ENCARTE_COUTO_${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
-    }
+const imgData=canvas.toDataURL("image/jpeg",1.0);
 
-    window.onload = draw;
+pdf.addImage(imgData,"JPEG",0,0,210,297);
+pdf.save("encarte.pdf");
+}
+
+window.onload=draw;
 </script>
+
 </body>
 </html>
