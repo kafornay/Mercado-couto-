@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Preços Pro</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #ffffff;
+            --accent: #2d2d2d;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent);
+        }
+
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; font-weight: 800; }
+
+        .input-group { margin-bottom: 20px; }
+
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #bbb; }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        .results {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--accent);
+        }
+
+        .result-card {
+            background: rgba(0, 255, 136, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
+        .result-value { font-size: 1.4rem; font-weight: bold; color: var(--primary); }
+        
+        .sell-card { background: var(--primary); color: var(--bg); }
+        .sell-card .result-label { color: rgba(0,0,0,0.6); }
+        .sell-card .result-value { color: var(--bg); }
+
+        span.symbol { font-size: 0.9rem; margin-right: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Precificação Rapida</h2>
+
+    <div class="input-group">
+        <label>Valor Total da Compra (R$)</label>
+        <input type="number" id="valorTotal" placeholder="Ex: 1000.00" oninput="calcular()">
+    </div>
+
+    <div class="input-group">
+        <label>Quantidade de Itens</label>
+        <input type="number" id="quantidade" placeholder="Ex: 10" oninput="calcular()">
+    </div>
+
+    <div class="input-group">
+        <label>Margem de Lucro (%)</label>
+        <input type="number" id="margem" value="40" oninput="calcular()">
+    </div>
+
+    <div class="results">
+        <div class="result-card">
+            <span class="result-label">Custo Unitário</span>
+            <span class="result-value"><span class="symbol">R$</span><span id="custoUnit">0,00</span></span>
+        </div>
+
+        <div class="result-card sell-card">
+            <span class="result-label">Preço de Venda</span>
+            <span class="result-value"><span class="symbol">R$</span><span id="precoVenda">0,00</span></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        const valorTotal = parseFloat(document.getElementById('valorTotal').value) || 0;
+        const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
+        const margem = parseFloat(document.getElementById('margem').value) || 0;
+
+        if (valorTotal > 0 && quantidade > 0) {
+            // Cálculo do custo unitário
+            const custoU = valorTotal / quantidade;
+            
+            // Cálculo do preço de venda (Margem sobre o custo)
+            // Fórmula: Custo + (Custo * Margem / 100)
+            const venda = custoU * (1 + (margem / 100));
+
+            document.getElementById('custoUnit').innerText = custoU.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('precoVenda').innerText = venda.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        } else {
+            document.getElementById('custoUnit').innerText = "0,00";
+            document.getElementById('precoVenda').innerText = "0,00";
+        }
+    }
+</script>
+
+</body>
+</html>
