@@ -2,25 +2,25 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Preços Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora Pro V2</title>
     <style>
         :root {
             --primary: #00ff88;
-            --bg: #121212;
-            --card: #1e1e1e;
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
             --text: #ffffff;
-            --accent: #2d2d2d;
+            --accent: #252525;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
 
         body {
             background-color: var(--bg);
             color: var(--text);
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             margin: 0;
         }
 
@@ -29,102 +29,113 @@
             max-width: 400px;
             background: var(--card);
             padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--accent);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid #333;
         }
 
-        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; font-weight: 800; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; font-weight: 800; letter-spacing: -1px; }
 
         .input-group { margin-bottom: 20px; }
 
-        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #bbb; }
+        label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; font-weight: 600; text-transform: uppercase; }
 
         input {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: var(--accent);
             border: 2px solid transparent;
-            border-radius: 12px;
+            border-radius: 16px;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
             transition: 0.3s;
             outline: none;
+            -webkit-appearance: none;
         }
 
-        input:focus { border-color: var(--primary); }
+        input:focus { border-color: var(--primary); background: #2d2d2d; }
 
         .results {
             margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--accent);
+            display: grid;
+            gap: 15px;
         }
 
         .result-card {
-            background: rgba(0, 255, 136, 0.05);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            background: #252525;
+            padding: 20px;
+            border-radius: 18px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            border: 1px solid #333;
         }
 
-        .result-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
-        .result-value { font-size: 1.4rem; font-weight: bold; color: var(--primary); }
+        .result-label { font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
+        .result-value { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
         
-        .sell-card { background: var(--primary); color: var(--bg); }
-        .sell-card .result-label { color: rgba(0,0,0,0.6); }
-        .sell-card .result-value { color: var(--bg); }
+        .sell-card { background: var(--primary); border: none; }
+        .sell-card .result-label { color: rgba(0,0,0,0.5); }
+        .sell-card .result-value { color: #000; }
 
-        span.symbol { font-size: 0.9rem; margin-right: 2px; }
+        .symbol { font-size: 1rem; margin-right: 4px; opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Precificação Rapida</h2>
+    <h2>Precificação</h2>
 
     <div class="input-group">
-        <label>Valor Total da Compra (R$)</label>
-        <input type="number" id="valorTotal" placeholder="Ex: 1000.00" oninput="calcular()">
+        <label>Valor Total (NF / Compra)</label>
+        <input type="text" id="valorTotal" placeholder="R$ 0,00" inputmode="numeric" oninput="formatarMoeda(this)">
     </div>
 
     <div class="input-group">
         <label>Quantidade de Itens</label>
-        <input type="number" id="quantidade" placeholder="Ex: 10" oninput="calcular()">
+        <input type="number" id="quantidade" placeholder="0" inputmode="numeric" oninput="calcular()">
     </div>
 
     <div class="input-group">
         <label>Margem de Lucro (%)</label>
-        <input type="number" id="margem" value="40" oninput="calcular()">
+        <input type="number" id="margem" value="40" inputmode="numeric" oninput="calcular()">
     </div>
 
     <div class="results">
         <div class="result-card">
-            <span class="result-label">Custo Unitário</span>
-            <span class="result-value"><span class="symbol">R$</span><span id="custoUnit">0,00</span></span>
+            <span class="result-label">Custo por Unidade</span>
+            <div class="result-value"><span class="symbol">R$</span><span id="custoUnit">0,00</span></div>
         </div>
 
         <div class="result-card sell-card">
-            <span class="result-label">Preço de Venda</span>
-            <span class="result-value"><span class="symbol">R$</span><span id="precoVenda">0,00</span></span>
+            <span class="result-label">Sugerido para Venda</span>
+            <div class="result-value"><span class="symbol">R$</span><span id="precoVenda">0,00</span></div>
         </div>
     </div>
 </div>
 
 <script>
+    function formatarMoeda(i) {
+        let v = i.value.replace(/\D/g,'');
+        v = (v/100).toFixed(2) + '';
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+        v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+        i.value = "R$ " + v;
+        calcular();
+    }
+
+    function converterParaNumero(valorFormatado) {
+        return parseFloat(valorFormatado.replace("R$ ", "").replace(/\./g, "").replace(",", ".")) || 0;
+    }
+
     function calcular() {
-        const valorTotal = parseFloat(document.getElementById('valorTotal').value) || 0;
+        const valorTotal = converterParaNumero(document.getElementById('valorTotal').value);
         const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
         const margem = parseFloat(document.getElementById('margem').value) || 0;
 
         if (valorTotal > 0 && quantidade > 0) {
-            // Cálculo do custo unitário
             const custoU = valorTotal / quantidade;
-            
-            // Cálculo do preço de venda (Margem sobre o custo)
-            // Fórmula: Custo + (Custo * Margem / 100)
             const venda = custoU * (1 + (margem / 100));
 
             document.getElementById('custoUnit').innerText = custoU.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
