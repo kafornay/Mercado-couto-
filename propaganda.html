@@ -3,295 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COUTO EDIT - Gerador de Encartes</title>
+    <title>COUTO EDIT - ULTRA PRO</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #111;
-            color: #fff;
-            display: flex;
-            min-height: 100vh;
+        :root { --cor-main: #e60000; --cor-detalhe: #ffd400; }
+        
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; background: #080808; color: #fff; 
+            display: flex; height: 100vh; overflow: hidden; 
         }
 
-        /* ===== PAINEL ESQUERDO ===== */
-        .painel {
-            width: 320px;
-            padding: 20px;
-            background: #1a1a1a;
-            border-right: 4px solid #b30000;
-            overflow-y: auto;
-            height: 100vh;
-            box-sizing: border-box;
+        /* PAINEL DE CONTROLE */
+        .painel { 
+            width: 360px; padding: 25px; background: #111; border-right: 4px solid var(--cor-main); 
+            overflow-y: auto; box-sizing: border-box; 
+        }
+        h2 { 
+            color: var(--cor-detalhe); font-family: 'Archivo Black', sans-serif; text-align: center; 
+            margin-bottom: 25px; text-transform: uppercase; letter-spacing: -1px;
+        }
+        label { display: block; margin-top: 15px; font-size: 11px; color: #777; font-weight: bold; text-transform: uppercase; }
+        input, textarea { 
+            width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #333; 
+            margin-top: 5px; background: #1a1a1a; color: #fff; font-weight: bold; font-size: 14px;
+        }
+        
+        .cores { display: flex; gap: 10px; margin-top: 10px; }
+        .cor { width: 38px; height: 38px; border-radius: 6px; cursor: pointer; border: 2px solid #333; transition: 0.3s; }
+        .cor.ativa { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 15px var(--cor-main); }
+
+        button { 
+            width: 100%; padding: 16px; border: none; border-radius: 6px; margin-top: 15px; 
+            font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; 
+        }
+        .btn-img { background: var(--cor-detalhe); color: #000; font-size: 16px; }
+        .btn-img:hover { background: #fff; transform: translateY(-2px); }
+
+        /* ÁREA DE PREVIEW */
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #1e1e1e; padding: 20px; }
+
+        /* O ENCARTE PROFISSIONAL */
+        .encarte { 
+            width: 450px; height: 640px; background: #fff; position: relative; overflow: hidden; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7); font-family: 'Archivo Black', sans-serif;
         }
 
-        h2 { color: #ffd400; margin-top: 0; text-align: center; letter-spacing: 1px; }
-
-        label { display: block; margin-top: 15px; font-size: 12px; color: #aaa; font-weight: bold; text-transform: uppercase; }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #333;
-            margin-top: 5px;
-            background: #2a2a2a;
-            color: #fff;
-            box-sizing: border-box;
+        /* TOPO ESTILO VAREJO */
+        .topo { 
+            background: var(--cor-main); color: #fff; padding: 25px 10px; text-align: center; 
+            position: relative; z-index: 2;
+        }
+        .topo h1 { 
+            margin: 0; font-size: 42px; line-height: 0.8; font-style: italic; 
+            text-transform: uppercase; transform: skewX(-10deg); text-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+        }
+        .faixa-oferta { 
+            background: var(--cor-detalhe); color: #000; padding: 5px; font-size: 15px; 
+            margin-top: 10px; transform: rotate(-1deg); display: inline-block; width: 100%;
         }
 
-        textarea { resize: none; height: 60px; }
-
-        /* Seletores de Cores */
-        .cores { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .cor {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: 0.2s;
+        /* IMAGEM E NOME */
+        .produto-box { 
+            height: 300px; display: flex; justify-content: center; align-items: center; 
+            padding: 20px; position: relative;
         }
-        .cor.ativa { border-color: #fff; transform: scale(1.1); }
+        .produto-img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
+        .nome-produto { 
+            background: #222; color: #fff; text-align: center; padding: 15px; 
+            margin: 0 20px; font-size: 26px; line-height: 1; min-height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            border-bottom: 6px solid var(--cor-detalhe); text-transform: uppercase;
         }
 
-        .btn-img { background: #ffd400; color: #000; margin-top: 25px; }
-        .btn-img:hover { background: #ffea00; }
-        .btn-pdf { background: #444; color: #fff; }
-        .btn-pdf:hover { background: #555; }
-
-        /* ===== PREVIEW ===== */
-        .preview-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #222;
-            padding: 20px;
+        /* SELO DE PREÇO AGRESSIVO */
+        .selo-preco {
+            position: absolute; bottom: 45px; right: -5px; width: 240px; height: 240px;
+            background: var(--cor-main); color: #fff;
+            clip-path: polygon(100% 50%, 94% 63%, 95% 77%, 83% 83%, 77% 95%, 63% 94%, 50% 100%, 37% 94%, 23% 95%, 17% 83%, 5% 77%, 6% 63%, 0% 50%, 6% 37%, 5% 23%, 17% 17%, 23% 5%, 37% 6%, 50% 0%, 63% 6%, 77% 5%, 83% 17%, 95% 23%, 94% 37%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transform: rotate(4deg); box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+            border: 4px solid var(--cor-detalhe);
         }
 
-        /* ===== ENCARTE ===== */
-        .encarte {
-            width: 420px;
-            height: 600px;
-            background: #fff;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        .rs-tag { font-size: 30px; color: var(--cor-detalhe); margin-bottom: -15px; margin-left: -70px; }
+        .preco-wrapper { display: flex; align-items: flex-start; }
+        .valor-inteiro { font-size: 115px; line-height: 0.85; letter-spacing: -10px; }
+        .valor-centavos { font-size: 55px; color: var(--cor-detalhe); margin-top: 5px; letter-spacing: -2px; }
+        .unidade-tag { 
+            font-size: 18px; margin-top: -5px; background: rgba(0,0,0,0.3); 
+            padding: 2px 15px; border-radius: 50px; border: 1px solid var(--cor-detalhe);
         }
 
-        .topo {
-            background: #6a00a8;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            font-weight: 900;
-            font-size: 28px;
-            text-transform: uppercase;
-        }
-
-        .faixa {
-            background: #ffd400;
-            color: #000;
-            text-align: center;
-            padding: 6px;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .produto-img {
-            width: 240px;
-            height: 240px;
-            margin: 20px auto 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .produto-img img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .nome-produto {
-            background: #6a00a8;
-            color: #fff;
-            text-align: center;
-            padding: 12px;
-            margin: 10px 30px;
-            font-weight: 900;
-            font-size: 18px;
-            border-radius: 4px;
-        }
-
-        /* Selo de Preço Estrela/Explosão */
-        .preco {
-            width: 180px;
-            height: 180px;
-            background: #6a00a8;
-            color: #fff;
-            margin: 10px auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-weight: 900;
-            position: relative;
-            clip-path: polygon(100% 50%, 95% 61%, 95% 72%, 87% 79%, 81% 88%, 71% 91%, 62% 98%, 50% 95%, 38% 98%, 29% 91%, 19% 88%, 13% 79%, 5% 72%, 5% 61%, 0% 50%, 5% 39%, 5% 28%, 13% 21%, 19% 12%, 29% 9%, 38% 2%, 50% 5%, 62% 2%, 71% 9%, 81% 12%, 87% 21%, 95% 28%, 95% 39%);
-        }
-
-        .preco .cifrao { font-size: 22px; color: #ffd400; margin-bottom: -5px; }
-        .preco span { font-size: 65px; line-height: 1; }
-        .preco .unidade { font-size: 14px; color: #ffd400; text-transform: uppercase; }
-
-        .rodape {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: #6a00a8;
-            color: #fff;
-            text-align: center;
-            padding: 8px;
-            font-size: 11px;
-            line-height: 1.2;
+        .rodape { 
+            position: absolute; bottom: 0; width: 100%; background: #000; 
+            color: #fff; text-align: center; padding: 12px; font-size: 10px; font-family: Arial; font-weight: normal;
         }
     </style>
 </head>
 <body>
 
 <div class="painel">
-    <h2>COUTO EDIT</h2>
+    <h2>COUTO EDIT <span style="color:#fff">PRO</span></h2>
 
-    <label>Imagem do Produto (PNG)</label>
-    <input type="file" id="produtoInput" accept="image/*">
+    <label>Imagem (PNG Transparente)</label>
+    <input type="file" id="produtoInput">
+
+    <label>Título Chamada</label>
+    <input type="text" id="tituloTxt" value="OFERTA IMBATÍVEL">
 
     <label>Nome do Produto</label>
-    <input type="text" id="nome" value="CERVEJA LATA 350ML">
+    <input type="text" id="nome" value="PICANHA BOVINA KG">
 
-    <label>Preço</label>
-    <input type="text" id="preco" value="3,49">
+    <label>Preço (ex: 59,90)</label>
+    <input type="text" id="preco" value="59,90">
 
-    <label>Unidade (CADA, KG, UN)</label>
-    <input type="text" id="unidade" value="CADA">
+    <label>Unidade</label>
+    <input type="text" id="unidade" value="QUILO">
 
-    <label>Cor do Encarte</label>
+    <label>Identidade Visual</label>
     <div class="cores">
-        <div class="cor" style="background:#e60000" onclick="mudarCor('#e60000', this)"></div>
-        <div class="cor" style="background:#2d7a2d" onclick="mudarCor('#2d7a2d', this)"></div>
+        <div class="cor ativa" style="background:#e60000" onclick="mudarCor('#e60000', this)"></div>
         <div class="cor" style="background:#0047ab" onclick="mudarCor('#0047ab', this)"></div>
-        <div class="cor" style="background:#f08000" onclick="mudarCor('#f08000', this)"></div>
-        <div class="cor ativa" style="background:#6a00a8" onclick="mudarCor('#6a00a8', this)"></div>
+        <div class="cor" style="background:#008000" onclick="mudarCor('#008000', this)"></div>
+        <div class="cor" style="background:#ff6600" onclick="mudarCor('#ff6600', this)"></div>
+        <div class="cor" style="background:#6a00a8" onclick="mudarCor('#6a00a8', this)"></div>
     </div>
 
-    <label>Texto do Rodapé</label>
-    <textarea id="rodapeTxt">Oferta válida enquanto durarem os estoques. Imagens meramente ilustrativas.</textarea>
-
-    <button class="btn-img" onclick="baixarImagem()">Baixar Imagem (PNG)</button>
-    <button class="btn-pdf" onclick="baixarPDF()">Baixar PDF (A4)</button>
+    <button class="btn-img" onclick="baixarImagem()">BAIXAR ENCARTE EM HD</button>
+    <button style="background:#333; color:#fff; font-size:11px" onclick="baixarPDF()">GERAR PDF PARA IMPRESSÃO</button>
 </div>
 
 <div class="preview-area">
     <div class="encarte" id="encarte">
-        <div class="topo">OFERTA IMBATÍVEL</div>
-        <div class="faixa">CONFIRA NOSSAS PROMOÇÕES</div>
-
-        <div class="produto-img" id="imgProduto">
-            <img src="https://via.placeholder.com/200?text=Produto" id="previewImg">
+        <div class="topo" id="topoCor">
+            <h1 id="tituloPreview">OFERTA IMBATÍVEL</h1>
+            <div class="faixa-oferta">PREÇO BAIXO DE VERDADE É AQUI!</div>
         </div>
 
-        <div class="nome-produto" id="nomePreview">CERVEJA LATA 350ML</div>
+        <div class="produto-box">
+            <img src="https://via.placeholder.com/400?text=PRODUTO+PNG" class="produto-img" id="previewImg">
+        </div>
 
-        <div class="preco" id="seloPreco">
-            <div class="cifrao">R$</div>
-            <span id="precoPreview">3,49</span>
-            <div class="unidade" id="unidadePreview">CADA</div>
+        <div class="nome-produto" id="nomePreview">PICANHA BOVINA KG</div>
+
+        <div class="selo-preco" id="seloCor">
+            <span class="rs-tag">R$</span>
+            <div class="preco-wrapper">
+                <span class="valor-inteiro" id="intPart">59</span>
+                <span class="valor-centavos" id="centPart">,90</span>
+            </div>
+            <span class="unidade-tag" id="unPreview">QUILO</span>
         </div>
 
         <div class="rodape" id="rodapePreview">
-            Oferta válida enquanto durarem os estoques. Imagens meramente ilustrativas.
+            Ofertas válidas enquanto durarem os estoques. Fotos meramente ilustrativas. Preços sujeitos a alteração.
         </div>
     </div>
 </div>
 
 <script>
-    /* ATUALIZAÇÃO EM TEMPO REAL */
-    const nomeIn = document.getElementById('nome');
     const precoIn = document.getElementById('preco');
-    const unidadeIn = document.getElementById('unidade');
-    const rodapeIn = document.getElementById('rodapeTxt');
+    
+    // Separação de preço estilo supermercado
+    function atualizarPreco() {
+        const valor = precoIn.value.replace('.', ',');
+        const partes = valor.split(',');
+        document.getElementById('intPart').innerText = partes[0];
+        document.getElementById('centPart').innerText = partes[1] ? ',' + partes[1] : ',00';
+    }
 
-    nomeIn.oninput = () => document.getElementById('nomePreview').innerText = nomeIn.value.toUpperCase();
-    precoIn.oninput = () => document.getElementById('precoPreview').innerText = precoIn.value;
-    unidadeIn.oninput = () => document.getElementById('unidadePreview').innerText = unidadeIn.value.toUpperCase();
-    rodapeIn.oninput = () => document.getElementById('rodapePreview').innerText = rodapeIn.value;
+    // Live Updates
+    document.getElementById('tituloTxt').oninput = e => document.getElementById('tituloPreview').innerText = e.target.value.toUpperCase();
+    document.getElementById('nome').oninput = e => document.getElementById('nomePreview').innerText = e.target.value.toUpperCase();
+    document.getElementById('unidade').oninput = e => document.getElementById('unPreview').innerText = e.target.value.toUpperCase();
+    precoIn.oninput = atualizarPreco;
 
-    /* CARREGAR IMAGEM DO PRODUTO */
+    // Upload de Imagem
     document.getElementById('produtoInput').onchange = e => {
         const reader = new FileReader();
-        reader.onload = () => {
-            document.getElementById('previewImg').src = reader.result;
-        }
+        reader.onload = () => document.getElementById('previewImg').src = reader.result;
         reader.readAsDataURL(e.target.files[0]);
     }
 
-    /* TROCA DE CORES DINÂMICA */
-    function mudarCor(corHex, elemento) {
-        const temas = [
-            document.querySelector('.topo'),
-            document.getElementById('nomePreview'),
-            document.getElementById('seloPreco'),
-            document.querySelector('.rodape')
-        ];
-        
-        temas.forEach(el => el.style.background = corHex);
-
-        // Atualiza a borda visual nos botões de cor
+    // Troca de Cor Profissional
+    function mudarCor(cor, el) {
+        document.documentElement.style.setProperty('--cor-main', cor);
+        document.getElementById('topoCor').style.background = cor;
+        document.getElementById('seloCor').style.background = cor;
         document.querySelectorAll('.cor').forEach(c => c.classList.remove('ativa'));
-        elemento.classList.add('ativa');
+        el.classList.add('ativa');
     }
 
-    /* EXPORTAR COMO IMAGEM */
+    // Exportação de Alta Qualidade
     function baixarImagem() {
-        const encarte = document.querySelector("#encarte");
-        html2canvas(encarte, { scale: 3 }).then(canvas => {
-            const link = document.createElement("a");
-            link.download = "encarte-oferta.png";
-            link.href = canvas.toDataURL("image/png");
+        const encarte = document.getElementById('encarte');
+        html2canvas(encarte, { 
+            scale: 4, // Aumenta a resolução para impressão
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `CoutoEdit_Oferta_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
             link.click();
         });
     }
 
-    /* EXPORTAR COMO PDF */
     async function baixarPDF() {
         const { jsPDF } = window.jspdf;
-        const encarte = document.querySelector("#encarte");
-        
-        const canvas = await html2canvas(encarte, { scale: 3 });
-        const imgData = canvas.toDataURL("image/jpeg", 1.0);
-
+        const canvas = await html2canvas(document.getElementById('encarte'), { scale: 3 });
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        pdf.addImage(imgData, 'JPEG', 20, 10, pdfWidth - 40, pdfHeight - 40); 
-        pdf.save("encarte-couto.pdf");
+        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 10, 10, 190, 270);
+        pdf.save("CoutoEdit_Encarte.pdf");
     }
+
+    atualizarPreco();
 </script>
 
 </body>
