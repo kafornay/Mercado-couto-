@@ -75,6 +75,7 @@
             background: #222; color: #fff; padding: 15px; text-align: center;
             font-size: 22px; text-transform: uppercase; line-height: 1;
             border-bottom: 5px solid var(--cor-detalhe); flex-shrink: 0;
+            position: relative; z-index: 5;
         }
 
         /* BLOCO 4: PREÇO (ZONA FIXA) */
@@ -84,20 +85,20 @@
         }
 
         .selo-explosao {
-            width: 210px; height: 210px; background: var(--cor-main);
+            width: 150px; height: 150px; background: var(--cor-main);
             clip-path: polygon(100% 50%, 94% 63%, 95% 77%, 83% 83%, 77% 95%, 63% 94%, 50% 100%, 37% 94%, 23% 95%, 17% 83%, 5% 77%, 6% 63%, 0% 50%, 6% 37%, 5% 23%, 17% 17%, 23% 5%, 37% 6%, 50% 0%, 63% 6%, 77% 5%, 83% 17%, 95% 23%, 94% 37%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 3px solid var(--cor-detalhe); color: #fff; position: absolute; top: -40px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 3px solid var(--cor-detalhe); color: #fff; position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .rs { font-size: 24px; color: var(--cor-detalhe); margin-bottom: -15px; margin-left: -70px; }
+        .rs { font-size: 18px; color: var(--cor-detalhe); margin-bottom: -10px; margin-left: -50px; }
         .valor-box { display: flex; align-items: flex-start; }
-        .inteiro { font-size: 95px; line-height: 0.8; letter-spacing: -5px; }
-        .centavos { font-size: 45px; color: var(--cor-detalhe); margin-top: 5px; margin-left: 2px; }
+        .inteiro { font-size: 70px; line-height: 0.8; letter-spacing: -3px; }
+        .centavos { font-size: 32px; color: var(--cor-detalhe); margin-top: 4px; margin-left: 1px; }
         .unidade { 
-            font-size: 16px; margin-top: 2px; background: rgba(0,0,0,0.3); 
-            padding: 2px 12px; border-radius: 50px; border: 1px solid var(--cor-detalhe);
+            font-size: 12px; margin-top: 4px; background: rgba(0,0,0,0.3); 
+            padding: 1px 10px; border-radius: 50px; border: 1px solid var(--cor-detalhe);
         }
 
         .bloco-rodape {
