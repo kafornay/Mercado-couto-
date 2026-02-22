@@ -1,200 +1,82 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Mercado Couto | Designer PRO</title>
+import { useState, useRef, useCallback } from "react";
+import FlyerSidebar from "@/components/FlyerSidebar";
+import FlyerCanvas, { FlyerCanvasHandle } from "@/components/FlyerCanvas";
+import jsPDF from "jspdf";
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+interface FlyerData {
+  productName: string;
+  price: string;
+  color: string;
+  footer: string;
+}
 
-<style>
-body { margin:0; font-family:'Arial Black',sans-serif; background:#111; color:white; display:flex; height:100vh; }
-.sidebar { width:320px; background:#1a1a1a; padding:20px; border-right:2px solid #e31d1a; overflow-y:auto; }
-.field { margin-bottom:15px; }
-label { display:block; font-size:11px; color:#888; margin-bottom:5px; text-transform:uppercase; }
-input,select,textarea { width:100%; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:4px; box-sizing:border-box; }
-.btn { width:100%; padding:15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; text-transform:uppercase; margin-top:10px; }
-.btn-img { background:#ffdf00; color:#000; }
-.btn-pdf { background:#fff; color:#000; }
-.preview { flex:1; display:flex; align-items:center; justify-content:center; background:#000; padding:20px; }
-canvas { max-height:90vh; max-width:100%; background:#fff; box-shadow:0 0 30px rgba(0,0,0,0.5); }
-</style>
-</head>
+const Index = () => {
+  const [data, setData] = useState<FlyerData>({
+    productName: "CERVEJA LATA 350ML",
+    price: "3,49",
+    color: "#e31d1a",
+    footer: "Oferta válida enquanto durarem os estoques.",
+  });
 
-<body>
+  const [logoImg, setLogoImg] = useState<HTMLImageElement | null>(null);
+  const [productImg, setProductImg] = useState<HTMLImageElement | null>(null);
+  const canvasRef = useRef<FlyerCanvasHandle>(null);
 
-<div class="sidebar">
-<h2 style="color:#ffdf00">COUTO EDIT</h2>
+  const handleChange = useCallback((partial: Partial<FlyerData>) => {
+    setData((prev) => ({ ...prev, ...partial }));
+  }, []);
 
-<div class="field"><label>Logo</label>
-<input type="file" id="fLogo" accept="image/*"></div>
-
-<div class="field"><label>Produto (PNG)</label>
-<input type="file" id="fProd" accept="image/*"></div>
-
-<div class="field"><label>Nome do Produto</label>
-<input type="text" id="pNome" value="CERVEJA LATA 350ML"></div>
-
-<div class="field"><label>Preço</label>
-<input type="text" id="pPreco" value="3,49"></div>
-
-<div class="field">
-<label>Cor do Encarte</label>
-<select id="pCor">
-<option value="#e31d1a">Vermelho</option>
-<option value="#2e7d32">Verde</option>
-<option value="#0d47a1">Azul</option>
-</select>
-</div>
-
-<div class="field"><label>Rodapé</label>
-<textarea id="pExtra">Oferta válida enquanto durarem os estoques.</textarea></div>
-
-<button class="btn btn-img" onclick="downloadImage()">Baixar Imagem</button>
-<button class="btn btn-pdf" onclick="downloadPDF()">Baixar PDF</button>
-</div>
-
-<div class="preview">
-<canvas id="canvas" width="1200" height="1600"></canvas>
-</div>
-
-<script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
-let imgLogo = null;
-let imgProd = null;
-
-// --- carregar imagem com segurança ---
-function loadImage(file, callback){
-    if(!file) return;
+  const loadImage = (file: File | null, cb: (img: HTMLImageElement) => void) => {
+    if (!file) return;
     const reader = new FileReader();
-    reader.onload = e=>{
-        const img = new Image();
-        img.onload = ()=>callback(img);
-        img.src = e.target.result;
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => cb(img);
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
-}
+  };
 
-document.getElementById('fLogo').onchange = e=>{
-    loadImage(e.target.files[0], img=>{
-        imgLogo = img;
-        draw();
-    });
-};
-
-document.getElementById('fProd').onchange = e=>{
-    loadImage(e.target.files[0], img=>{
-        imgProd = img;
-        draw();
-    });
-};
-
-document.querySelectorAll("input,select,textarea")
-.forEach(el=>el.oninput = draw);
-
-// --- DESENHO PRINCIPAL ---
-function draw(){
-
-    const nome = document.getElementById('pNome').value.toUpperCase();
-    const precoRaw = document.getElementById('pPreco').value.replace(',', '.');
-    const cor = document.getElementById('pCor').value;
-    const extra = document.getElementById('pExtra').value;
-
-    const W = canvas.width;
-    const H = canvas.height;
-
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0,0,W,H);
-
-    // topo curvado
-    ctx.fillStyle = cor;
-    ctx.beginPath();
-    ctx.moveTo(0,0);
-    ctx.lineTo(W,0);
-    ctx.lineTo(W,250);
-    ctx.quadraticCurveTo(W/2,350,0,250);
-    ctx.fill();
-
-    // título
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.font = "bold 80px Arial";
-    ctx.fillText("OFERTA IMBATÍVEL", W/2,180);
-
-    // logo
-    if(imgLogo){
-        const h = 150;
-        const w = imgLogo.width*(h/imgLogo.height);
-        ctx.drawImage(imgLogo,50,40,w,h);
-    }
-
-    // produto (centralização real automática)
-    if(imgProd){
-
-        const maxWidth = 700;
-        const h = imgProd.height*(maxWidth/imgProd.width);
-
-        const x = (W-maxWidth)/2;
-        const y = 900-h;
-
-        // sombra
-        ctx.beginPath();
-        ctx.ellipse(W/2,950,300,50,0,0,Math.PI*2);
-        ctx.fillStyle="rgba(0,0,0,0.1)";
-        ctx.fill();
-
-        ctx.drawImage(imgProd,x,y,maxWidth,h);
-    }
-
-    // nome
-    ctx.fillStyle="#000";
-    ctx.font="bold 70px Arial";
-    ctx.fillText(nome,W/2,1050);
-
-    // preço
-    const partes = precoRaw.split('.');
-    const reais = partes[0];
-    const centavos = (partes[1] || '00').padEnd(2,'0').substring(0,2);
-
-    ctx.fillStyle=cor;
-    ctx.beginPath();
-    ctx.arc(W/2,1300,240,0,Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle="#fff";
-    ctx.font="bold 60px Arial";
-    ctx.fillText("R$",W/2-160,1280);
-
-    ctx.font="bold 250px Arial";
-    ctx.fillText(reais,W/2,1400);
-
-    ctx.font="bold 90px Arial";
-    ctx.fillText(","+centavos,W/2+160,1280);
-
-    ctx.fillStyle="#666";
-    ctx.font="25px Arial";
-    ctx.fillText(extra,W/2,1560);
-}
-
-// exportar imagem
-function downloadImage(){
-    const link=document.createElement('a');
-    link.download='oferta_couto.png';
-    link.href=canvas.toDataURL();
+  const downloadImage = () => {
+    const canvas = canvasRef.current?.getCanvas();
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = "oferta_couto.png";
+    link.href = canvas.toDataURL();
     link.click();
-}
+  };
 
-// exportar PDF
-function downloadPDF(){
-    const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF('p','mm','a4');
-    pdf.addImage(canvas.toDataURL('image/jpeg',1.0),'JPEG',0,0,210,297);
-    pdf.save('oferta_couto.pdf');
-}
+  const downloadPDF = () => {
+    const canvas = canvasRef.current?.getCanvas();
+    if (!canvas) return;
+    const pdf = new jsPDF("p", "mm", "a4");
+    pdf.addImage(canvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 0, 210, 297);
+    pdf.save("oferta_couto.pdf");
+  };
 
-draw();
-</script>
+  return (
+    <div className="flex h-screen bg-background">
+      <FlyerSidebar
+        data={data}
+        onChange={handleChange}
+        onLogoChange={(f) => loadImage(f, setLogoImg)}
+        onProductChange={(f) => loadImage(f, setProductImg)}
+        onDownloadImage={downloadImage}
+        onDownloadPDF={downloadPDF}
+      />
+      <main className="flex-1 flex items-center justify-center p-5 overflow-auto">
+        <FlyerCanvas
+          ref={canvasRef}
+          productName={data.productName}
+          price={data.price}
+          color={data.color}
+          footer={data.footer}
+          logoImg={logoImg}
+          productImg={productImg}
+        />
+      </main>
+    </div>
+  );
+};
 
-</body>
-</html>
+export default Index;
