@@ -1,190 +1,297 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Editor de Encarte - Mercado</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COUTO EDIT - Gerador de Encartes</title>
 
-<!-- jsPDF CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<style>
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#111;
-  color:#fff;
-  display:flex;
-}
-.sidebar{
-  width:320px;
-  background:#1e1e1e;
-  padding:20px;
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-.sidebar input, .sidebar button{
-  padding:10px;
-  font-size:16px;
-}
-.sidebar button{
-  cursor:pointer;
-  border:none;
-  font-weight:bold;
-}
-.main{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-}
-canvas{
-  max-height:90vh;
-  box-shadow:0 0 40px rgba(0,0,0,.6);
-  background:#fff;
-}
-</style>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #111;
+            color: #fff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== PAINEL ESQUERDO ===== */
+        .painel {
+            width: 320px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-right: 4px solid #b30000;
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h2 { color: #ffd400; margin-top: 0; text-align: center; letter-spacing: 1px; }
+
+        label { display: block; margin-top: 15px; font-size: 12px; color: #aaa; font-weight: bold; text-transform: uppercase; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            margin-top: 5px;
+            background: #2a2a2a;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        textarea { resize: none; height: 60px; }
+
+        /* Seletores de Cores */
+        .cores { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .cor {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .cor.ativa { border-color: #fff; transform: scale(1.1); }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-img { background: #ffd400; color: #000; margin-top: 25px; }
+        .btn-img:hover { background: #ffea00; }
+        .btn-pdf { background: #444; color: #fff; }
+        .btn-pdf:hover { background: #555; }
+
+        /* ===== PREVIEW ===== */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #222;
+            padding: 20px;
+        }
+
+        /* ===== ENCARTE ===== */
+        .encarte {
+            width: 420px;
+            height: 600px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
+
+        .topo {
+            background: #6a00a8;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 28px;
+            text-transform: uppercase;
+        }
+
+        .faixa {
+            background: #ffd400;
+            color: #000;
+            text-align: center;
+            padding: 6px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .produto-img {
+            width: 240px;
+            height: 240px;
+            margin: 20px auto 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .produto-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .nome-produto {
+            background: #6a00a8;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            margin: 10px 30px;
+            font-weight: 900;
+            font-size: 18px;
+            border-radius: 4px;
+        }
+
+        /* Selo de Preço Estrela/Explosão */
+        .preco {
+            width: 180px;
+            height: 180px;
+            background: #6a00a8;
+            color: #fff;
+            margin: 10px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            position: relative;
+            clip-path: polygon(100% 50%, 95% 61%, 95% 72%, 87% 79%, 81% 88%, 71% 91%, 62% 98%, 50% 95%, 38% 98%, 29% 91%, 19% 88%, 13% 79%, 5% 72%, 5% 61%, 0% 50%, 5% 39%, 5% 28%, 13% 21%, 19% 12%, 29% 9%, 38% 2%, 50% 5%, 62% 2%, 71% 9%, 81% 12%, 87% 21%, 95% 28%, 95% 39%);
+        }
+
+        .preco .cifrao { font-size: 22px; color: #ffd400; margin-bottom: -5px; }
+        .preco span { font-size: 65px; line-height: 1; }
+        .preco .unidade { font-size: 14px; color: #ffd400; text-transform: uppercase; }
+
+        .rodape {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #6a00a8;
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            font-size: 11px;
+            line-height: 1.2;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="sidebar">
-<h2>COUTO EDIT</h2>
+<div class="painel">
+    <h2>COUTO EDIT</h2>
 
-<label>Logo</label>
-<input type="file" id="logoInput">
+    <label>Imagem do Produto (PNG)</label>
+    <input type="file" id="produtoInput" accept="image/*">
 
-<label>Produto</label>
-<input type="file" id="productInput">
+    <label>Nome do Produto</label>
+    <input type="text" id="nome" value="CERVEJA LATA 350ML">
 
-<label>Nome Produto</label>
-<input type="text" id="productName" value="CERVEJA LATA 350ML">
+    <label>Preço</label>
+    <input type="text" id="preco" value="3,49">
 
-<label>Preço</label>
-<input type="text" id="price" value="3,49">
+    <label>Unidade (CADA, KG, UN)</label>
+    <input type="text" id="unidade" value="CADA">
 
-<label>Cor</label>
-<input type="color" id="color" value="#e31d1a">
+    <label>Cor do Encarte</label>
+    <div class="cores">
+        <div class="cor" style="background:#e60000" onclick="mudarCor('#e60000', this)"></div>
+        <div class="cor" style="background:#2d7a2d" onclick="mudarCor('#2d7a2d', this)"></div>
+        <div class="cor" style="background:#0047ab" onclick="mudarCor('#0047ab', this)"></div>
+        <div class="cor" style="background:#f08000" onclick="mudarCor('#f08000', this)"></div>
+        <div class="cor ativa" style="background:#6a00a8" onclick="mudarCor('#6a00a8', this)"></div>
+    </div>
 
-<label>Rodapé</label>
-<input type="text" id="footer" value="Oferta válida enquanto durarem os estoques.">
+    <label>Texto do Rodapé</label>
+    <textarea id="rodapeTxt">Oferta válida enquanto durarem os estoques. Imagens meramente ilustrativas.</textarea>
 
-<button style="background:#ffd400" onclick="downloadPNG()">BAIXAR IMAGEM</button>
-<button onclick="downloadPDF()">BAIXAR PDF</button>
+    <button class="btn-img" onclick="baixarImagem()">Baixar Imagem (PNG)</button>
+    <button class="btn-pdf" onclick="baixarPDF()">Baixar PDF (A4)</button>
 </div>
 
-<div class="main">
-<canvas id="canvas" width="2100" height="2970"></canvas>
+<div class="preview-area">
+    <div class="encarte" id="encarte">
+        <div class="topo">OFERTA IMBATÍVEL</div>
+        <div class="faixa">CONFIRA NOSSAS PROMOÇÕES</div>
+
+        <div class="produto-img" id="imgProduto">
+            <img src="https://via.placeholder.com/200?text=Produto" id="previewImg">
+        </div>
+
+        <div class="nome-produto" id="nomePreview">CERVEJA LATA 350ML</div>
+
+        <div class="preco" id="seloPreco">
+            <div class="cifrao">R$</div>
+            <span id="precoPreview">3,49</span>
+            <div class="unidade" id="unidadePreview">CADA</div>
+        </div>
+
+        <div class="rodape" id="rodapePreview">
+            Oferta válida enquanto durarem os estoques. Imagens meramente ilustrativas.
+        </div>
+    </div>
 </div>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+    /* ATUALIZAÇÃO EM TEMPO REAL */
+    const nomeIn = document.getElementById('nome');
+    const precoIn = document.getElementById('preco');
+    const unidadeIn = document.getElementById('unidade');
+    const rodapeIn = document.getElementById('rodapeTxt');
 
-let logoImg = null;
-let productImg = null;
+    nomeIn.oninput = () => document.getElementById('nomePreview').innerText = nomeIn.value.toUpperCase();
+    precoIn.oninput = () => document.getElementById('precoPreview').innerText = precoIn.value;
+    unidadeIn.oninput = () => document.getElementById('unidadePreview').innerText = unidadeIn.value.toUpperCase();
+    rodapeIn.oninput = () => document.getElementById('rodapePreview').innerText = rodapeIn.value;
 
-function loadImage(file, callback){
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e=>{
-    const img = new Image();
-    img.onload = ()=>callback(img);
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+    /* CARREGAR IMAGEM DO PRODUTO */
+    document.getElementById('produtoInput').onchange = e => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            document.getElementById('previewImg').src = reader.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
 
-document.getElementById("logoInput").onchange = e=>{
-  loadImage(e.target.files[0], img=>{
-    logoImg = img;
-    draw();
-  });
-};
+    /* TROCA DE CORES DINÂMICA */
+    function mudarCor(corHex, elemento) {
+        const temas = [
+            document.querySelector('.topo'),
+            document.getElementById('nomePreview'),
+            document.getElementById('seloPreco'),
+            document.querySelector('.rodape')
+        ];
+        
+        temas.forEach(el => el.style.background = corHex);
 
-document.getElementById("productInput").onchange = e=>{
-  loadImage(e.target.files[0], img=>{
-    productImg = img;
-    draw();
-  });
-};
+        // Atualiza a borda visual nos botões de cor
+        document.querySelectorAll('.cor').forEach(c => c.classList.remove('ativa'));
+        elemento.classList.add('ativa');
+    }
 
-document.querySelectorAll("input").forEach(i=>i.oninput = draw);
+    /* EXPORTAR COMO IMAGEM */
+    function baixarImagem() {
+        const encarte = document.querySelector("#encarte");
+        html2canvas(encarte, { scale: 3 }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = "encarte-oferta.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    }
 
-function draw(){
+    /* EXPORTAR COMO PDF */
+    async function baixarPDF() {
+        const { jsPDF } = window.jspdf;
+        const encarte = document.querySelector("#encarte");
+        
+        const canvas = await html2canvas(encarte, { scale: 3 });
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-const name = document.getElementById("productName").value;
-const price = document.getElementById("price").value;
-const color = document.getElementById("color").value;
-const footer = document.getElementById("footer").value;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-ctx.clearRect(0,0,2100,2970);
-
-//// BACKGROUND
-ctx.fillStyle="#f3f3f3";
-ctx.fillRect(0,0,2100,2970);
-
-//// HEADER
-ctx.fillStyle=color;
-ctx.fillRect(0,0,2100,420);
-
-ctx.fillStyle="#fff";
-ctx.font="bold 120px Arial";
-ctx.textAlign="center";
-ctx.fillText("OFERTA DA SEMANA",1050,250);
-
-//// LOGO
-if(logoImg){
-ctx.drawImage(logoImg,60,60,260,260);
-}
-
-//// PRODUTO
-if(productImg){
-ctx.drawImage(productImg,650,520,800,800);
-}
-
-//// NOME
-ctx.fillStyle="#000";
-ctx.font="bold 80px Arial";
-ctx.fillText(name.toUpperCase(),1050,1500);
-
-//// PREÇO CÍRCULO
-ctx.beginPath();
-ctx.arc(1050,2050,300,0,Math.PI*2);
-ctx.fillStyle=color;
-ctx.fill();
-
-ctx.fillStyle="#fff";
-ctx.font="bold 160px Arial";
-ctx.fillText("R$ "+price,1050,2100);
-
-//// RODAPÉ
-ctx.fillStyle="#333";
-ctx.fillRect(0,2800,2100,170);
-
-ctx.fillStyle="#fff";
-ctx.font="40px Arial";
-ctx.fillText(footer,1050,2900);
-
-}
-
-draw();
-
-function downloadPNG(){
-const link=document.createElement("a");
-link.download="oferta.png";
-link.href=canvas.toDataURL();
-link.click();
-}
-
-function downloadPDF(){
-const { jsPDF } = window.jspdf;
-const pdf = new jsPDF("p","mm","a4");
-pdf.addImage(canvas.toDataURL("image/jpeg",1.0),"JPEG",0,0,210,297);
-pdf.save("oferta.pdf");
-}
+        pdf.addImage(imgData, 'JPEG', 20, 10, pdfWidth - 40, pdfHeight - 40); 
+        pdf.save("encarte-couto.pdf");
+    }
 </script>
 
 </body>
