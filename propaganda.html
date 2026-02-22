@@ -42,7 +42,7 @@
         /* ÁREA DE PREVIEW */
         .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #1e1e1e; padding: 20px; }
 
-        /* O ENCARTE - AJUSTADO PARA PROPORÇÃO A4 (1:1.41) */
+        /* O ENCARTE - PROPORÇÃO A4 */
         .encarte { 
             width: 450px; height: 636px; background: #fff; position: relative; 
             display: flex; flex-direction: column; overflow: hidden;
@@ -78,7 +78,7 @@
             position: relative; z-index: 5;
         }
 
-        /* BLOCO 4: PREÇO (ZONA FIXA) */
+        /* BLOCO 4: PREÇO */
         .bloco-preco {
             height: 180px; position: relative; display: flex; justify-content: center; 
             align-items: center; background: #fff; flex-shrink: 0;
@@ -112,7 +112,7 @@
 <div class="painel">
     <h2>COUTO EDIT <span style="color:#fff">V3</span></h2>
 
-    <label>1. Foto do Produto (Transparente)</label>
+    <label>1. Foto do Produto</label>
     <input type="file" id="produtoInput">
 
     <label>2. Chamada de Oferta</label>
@@ -124,10 +124,13 @@
     <label>4. Preço (Ex: 3,49)</label>
     <input type="text" id="preco" value="3,49">
 
-    <label>5. Unidade (KG, CADA, UN)</label>
+    <label>5. Unidade</label>
     <input type="text" id="unidade" value="CADA">
 
-    <label>6. Cor do Tema</label>
+    <label>6. Texto do Rodapé</label>
+    <input type="text" id="rodapeTxt" value="Ofertas válidas enquanto durarem os estoques. Imagens meramente ilustrativas.">
+
+    <label>7. Cor do Tema</label>
     <div class="cores">
         <div class="cor ativa" style="background:#e60000" onclick="mudarCor('#e60000', this)"></div>
         <div class="cor" style="background:#0047ab" onclick="mudarCor('#0047ab', this)"></div>
@@ -136,7 +139,7 @@
         <div class="cor" style="background:#6a00a8" onclick="mudarCor('#6a00a8', this)"></div>
     </div>
 
-    <button class="btn-img" onclick="baixarImagem()">BAIXAR ENCARTE HD (A4)</button>
+    <button class="btn-img" onclick="baixarImagem()">BAIXAR ENCARTE A4</button>
 </div>
 
 <div class="preview-area">
@@ -163,7 +166,7 @@
             </div>
         </div>
 
-        <div class="bloco-rodape">
+        <div class="bloco-rodape" id="rodapePreview">
             Ofertas válidas enquanto durarem os estoques. Imagens meramente ilustrativas.
         </div>
     </div>
@@ -182,6 +185,7 @@
     document.getElementById('tituloTxt').oninput = e => document.getElementById('tituloPreview').innerText = e.target.value.toUpperCase();
     document.getElementById('nome').oninput = e => document.getElementById('nomePreview').innerText = e.target.value.toUpperCase();
     document.getElementById('unidade').oninput = e => document.getElementById('unPreview').innerText = e.target.value.toUpperCase();
+    document.getElementById('rodapeTxt').oninput = e => document.getElementById('rodapePreview').innerText = e.target.value;
     precoIn.oninput = atualizarPreco;
 
     document.getElementById('produtoInput').onchange = e => {
