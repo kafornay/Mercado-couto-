@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COUTO EDIT PRO - V3 MOBILE READY</title>
+    <title>COUTO EDIT PRO - V4 FINAL</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
@@ -12,281 +12,187 @@
         :root { 
             --cor-main: #e60000; 
             --cor-detalhe: #ffd400; 
-            --painel-width: 360px;
         }
         
         body { 
-            margin: 0; 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #0a0a0a; 
-            color: #fff; 
-            display: flex; 
-            flex-direction: row;
-            height: 100vh; 
-            overflow: hidden; 
+            margin: 0; font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #fff; 
+            display: flex; height: 100vh; overflow: hidden; 
         }
 
-        /* Responsividade para Celular */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
             .painel { width: 100% !important; border-right: none !important; border-bottom: 4px solid var(--cor-main); height: auto !important; }
-            .preview-area { min-height: 650px; padding: 20px 0 !important; }
+            .preview-area { min-height: 700px; padding: 20px 0 !important; }
         }
 
-        /* PAINEL DE CONTROLE */
-        .painel { 
-            width: var(--painel-width); 
-            padding: 20px; 
-            background: #151515; 
-            border-right: 4px solid var(--cor-main); 
-            overflow-y: auto; 
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
-
-        h2 { color: var(--cor-detalhe); font-family: 'Archivo Black', sans-serif; text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 22px; }
-        
-        .grupo { margin-bottom: 15px; }
+        /* PAINEL */
+        .painel { width: 360px; padding: 20px; background: #151515; border-right: 4px solid var(--cor-main); overflow-y: auto; flex-shrink: 0; box-sizing: border-box; }
+        h2 { color: var(--cor-detalhe); font-family: 'Archivo Black', sans-serif; text-align: center; margin-bottom: 20px; font-size: 22px; }
+        .grupo { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; font-weight: bold; box-sizing: border-box; }
+
+        .cores { display: flex; gap: 10px; margin: 15px 0; justify-content: center; }
+        .cor { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid #333; }
+        .cor.ativa { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 10px var(--cor-main); }
+
+        .btn-baixar { width: 100%; padding: 18px; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; background: var(--cor-detalhe); color: #000; }
+
+        /* PREVIEW */
+        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #1e1e1e; overflow: hidden; }
         
-        input { 
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; 
-            background: #222; color: #fff; font-weight: bold; box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .cores { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-        .cor { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid #333; transition: 0.2s; }
-        .cor.ativa { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 15px var(--cor-main); }
-
-        .btn-baixar { 
-            width: 100%; padding: 18px; border: none; border-radius: 8px; margin-top: 20px; 
-            font-weight: 900; cursor: pointer; text-transform: uppercase; 
-            background: var(--cor-detalhe); color: #000; font-size: 14px;
-            transition: background 0.3s;
-        }
-        .btn-baixar:active { transform: scale(0.98); }
-
-        /* ÁREA DE PREVIEW */
-        .preview-area { 
-            flex: 1; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background: #1e1e1e; 
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* CONTAINER PARA ESCALONAMENTO (Importante para Mobile) */
-        .zoom-container {
-            transform-origin: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* O ENCARTE - A4 */
+        /* ENCARTE A4 */
         .encarte { 
-            width: 450px; 
-            height: 636px; 
-            background: #fff; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            font-family: 'Archivo Black', sans-serif;
+            width: 450px; height: 636px; background: #fff; position: relative; 
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); font-family: 'Archivo Black', sans-serif;
+            color: #000;
         }
 
-        /* ESTILOS DO CONTEÚDO DO ENCARTE */
-        .bloco-topo { background: var(--cor-main); padding: 15px 10px; text-align: center; }
-        .bloco-topo h1 { margin: 0; font-size: 40px; color: #fff; font-style: italic; text-transform: uppercase; transform: skewX(-10deg); line-height: 0.9; }
-        .faixa-amarela { background: var(--cor-detalhe); color: #000; font-size: 14px; margin-top: 10px; padding: 4px; text-transform: uppercase; }
+        .bloco-topo { background: var(--cor-main); padding: 20px 10px; text-align: center; position: relative; }
+        .bloco-topo h1 { margin: 0; font-size: 38px; color: #fff; text-transform: uppercase; line-height: 1; letter-spacing: -1px; }
+        .faixa-amarela { background: var(--cor-detalhe); color: #000; font-size: 14px; margin-top: 10px; padding: 5px; text-transform: uppercase; display: inline-block; width: 90%; }
 
-        .bloco-imagem { 
-            flex: 1; display: flex; justify-content: center; align-items: center; 
-            padding: 15px; background: radial-gradient(circle, #fff 0%, #f0f0f0 100%);
-            overflow: hidden; 
-        }
-        .bloco-imagem img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .bloco-imagem { flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px; background: #fff; overflow: hidden; }
+        .bloco-imagem img { max-width: 85%; max-height: 85%; object-fit: contain; }
 
-        .bloco-nome { background: #222; color: #fff; padding: 15px 10px; text-align: center; font-size: 22px; text-transform: uppercase; border-bottom: 5px solid var(--cor-detalhe); }
+        .bloco-nome { background: #222; color: #fff; padding: 15px 5px; text-align: center; font-size: 24px; text-transform: uppercase; min-height: 40px; display: flex; align-items: center; justify-content: center; }
 
-        .bloco-preco { height: 180px; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; }
-        .selo-explosao {
-            width: 150px; height: 150px; background: var(--cor-main);
-            clip-path: polygon(100% 50%, 94% 63%, 95% 77%, 83% 83%, 77% 95%, 63% 94%, 50% 100%, 37% 94%, 23% 95%, 17% 83%, 5% 77%, 6% 63%, 0% 50%, 6% 37%, 5% 23%, 17% 17%, 23% 5%, 37% 6%, 50% 0%, 63% 6%, 77% 5%, 83% 17%, 95% 23%, 94% 37%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 3px solid var(--cor-detalhe); color: #fff;
-        }
+        /* SELO SVG */
+        .bloco-preco { height: 200px; position: relative; display: flex; justify-content: center; align-items: center; }
+        .selo-container { position: relative; width: 190px; height: 190px; display: flex; align-items: center; justify-content: center; }
+        .selo-svg { position: absolute; width: 100%; height: 100%; fill: var(--cor-main); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        
+        .preco-conteudo { position: relative; z-index: 2; color: #fff; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .rs { font-size: 18px; color: var(--cor-detalhe); margin-bottom: -5px; }
+        .valor-main { display: flex; align-items: flex-start; line-height: 0.8; }
+        .inteiro { font-size: 85px; letter-spacing: -4px; }
+        .centavos { font-size: 38px; color: var(--cor-detalhe); margin-top: 8px; }
+        .unidade { font-size: 13px; background: rgba(0,0,0,0.5); padding: 2px 12px; border-radius: 50px; margin-top: 5px; border: 1px solid var(--cor-detalhe); }
 
-        .rs { font-size: 18px; color: var(--cor-detalhe); margin-bottom: -10px; margin-left: -50px; }
-        .valor-box { display: flex; align-items: flex-start; }
-        .inteiro { font-size: 70px; line-height: 0.8; letter-spacing: -3px; }
-        .centavos { font-size: 32px; color: var(--cor-detalhe); margin-top: 4px; }
-        .unidade { font-size: 12px; margin-top: 4px; background: rgba(0,0,0,0.3); padding: 1px 10px; border-radius: 50px; border: 1px solid var(--cor-detalhe); }
-
-        .bloco-rodape { background: #000; color: #fff; padding: 10px; font-size: 10px; text-align: center; font-family: sans-serif; }
+        .bloco-rodape { background: #000; color: #fff; padding: 8px; font-size: 10px; text-align: center; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body>
 
 <div class="painel">
-    <h2>COUTO EDIT <span style="color:#fff">V3</span></h2>
-
-    <div class="grupo">
-        <label>1. Foto do Produto</label>
-        <input type="file" id="produtoInput" accept="image/*">
+    <h2>COUTO EDIT V3</h2>
+    <div class="grupo"><label>Foto do Produto</label><input type="file" id="produtoInput"></div>
+    <div class="grupo"><label>Título</label><input type="text" id="tituloTxt" value="OFERTA IMBATÍVEL"></div>
+    <div class="grupo"><label>Nome do Produto</label><input type="text" id="nome" value="CERVEJA LATA 350ML"></div>
+    <div class="grupo" style="display:flex; gap:10px;">
+        <div style="flex:2"><label>Preço</label><input type="text" id="preco" value="3,49"></div>
+        <div style="flex:1"><label>Unid.</label><input type="text" id="unidade" value="CADA"></div>
     </div>
+    <div class="grupo"><label>Rodapé</label><input type="text" id="rodapeTxt" value="Ofertas válidas enquanto durarem os estoques."></div>
 
-    <div class="grupo">
-        <label>2. Chamada</label>
-        <input type="text" id="tituloTxt" value="OFERTA IMBATÍVEL">
-    </div>
-
-    <div class="grupo">
-        <label>3. Nome do Produto</label>
-        <input type="text" id="nome" value="CERVEJA LATA 350ML">
-    </div>
-
-    <div class="grupo" style="display: flex; gap: 10px;">
-        <div style="flex: 2;">
-            <label>4. Preço</label>
-            <input type="text" id="preco" value="3,49">
-        </div>
-        <div style="flex: 1;">
-            <label>5. Unid.</label>
-            <input type="text" id="unidade" value="CADA">
-        </div>
-    </div>
-
-    <div class="grupo">
-        <label>6. Texto do Rodapé</label>
-        <input type="text" id="rodapeTxt" value="Ofertas válidas enquanto durarem os estoques.">
-    </div>
-
-    <label>7. Cor do Tema</label>
     <div class="cores">
         <div class="cor ativa" style="background:#e60000" onclick="mudarCor('#e60000', this)"></div>
         <div class="cor" style="background:#0047ab" onclick="mudarCor('#0047ab', this)"></div>
         <div class="cor" style="background:#008000" onclick="mudarCor('#008000', this)"></div>
         <div class="cor" style="background:#ff6600" onclick="mudarCor('#ff6600', this)"></div>
     </div>
-
-    <button class="btn-baixar" onclick="baixarImagem()">BAIXAR IMAGEM (A4)</button>
+    <button class="btn-baixar" onclick="baixarImagem()">BAIXAR ARQUIVO A4</button>
 </div>
 
-<div class="preview-area">
-    <div class="zoom-container" id="zoomContainer">
+<div class="preview-area" id="previewArea">
+    <div id="zoomHelper" style="transform-origin: center;">
         <div class="encarte" id="encarte">
             <div class="bloco-topo" id="topoCor">
                 <h1 id="tituloPreview">OFERTA IMBATÍVEL</h1>
-                <div class="faixa-amarela">PREÇO BAIXO DE VERDADE É AQUI!</div>
+                <div class="faixa-amarela">QUALIDADE E PREÇO BAIXO!</div>
             </div>
-
-            <div class="bloco-imagem">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" id="previewImg">
-            </div>
-
+            <div class="bloco-imagem"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" id="previewImg"></div>
             <div class="bloco-nome" id="nomePreview">CERVEJA LATA 350ML</div>
-
             <div class="bloco-preco">
-                <div class="selo-explosao" id="seloCor">
-                    <span class="rs">R$</span>
-                    <div class="valor-box">
-                        <span class="inteiro" id="intPart">3</span>
-                        <span class="centavos" id="centPart">,49</span>
+                <div class="selo-container">
+                    <svg class="selo-svg" viewBox="0 0 100 100">
+                        <path d="M50 0L61.2 15.4L80.1 6.2L81.5 25.4L100 30.9L92.7 48.7L100 66.5L81.5 72.1L80.1 91.2L61.2 82.1L50 97.5L38.8 82.1L19.9 91.2L18.5 72.1L0 66.5L7.3 48.7L0 30.9L18.5 25.4L19.9 6.2L38.8 15.4L50 0Z" stroke="#ffd400" stroke-width="2"/>
+                    </svg>
+                    <div class="preco-conteudo">
+                        <span class="rs">R$</span>
+                        <div class="valor-main">
+                            <span class="inteiro" id="intPart">3</span>
+                            <span class="centavos" id="centPart">,49</span>
+                        </div>
+                        <span class="unidade" id="unPreview">CADA</span>
                     </div>
-                    <span class="unidade" id="unPreview">CADA</span>
                 </div>
             </div>
-
-            <div class="bloco-rodape" id="rodapePreview">
-                Ofertas válidas enquanto durarem os estoques. Imagens meramente ilustrativas.
-            </div>
+            <div class="bloco-rodape" id="rodapePreview">Ofertas válidas enquanto durarem os estoques.</div>
         </div>
     </div>
 </div>
 
 <script>
-    // Função para ajustar o encarte na tela do celular
     function ajustarZoom() {
-        const container = document.getElementById('zoomContainer');
-        const larguraTela = window.innerWidth;
-        const alturaDisponivel = window.innerHeight;
-        
-        if (larguraTela < 850) {
-            // No mobile, o painel ocupa espaço, então calculamos o zoom baseado na largura
-            const escala = (larguraTela * 0.9) / 450;
-            container.style.transform = `scale(${escala})`;
-        } else {
-            // No desktop, calculamos o zoom baseado na altura para não cortar
-            const escala = (alturaDisponivel * 0.8) / 636;
-            container.style.transform = `scale(${escala})`;
-        }
+        const zoomHelper = document.getElementById('zoomHelper');
+        const larguraDisponivel = document.getElementById('previewArea').offsetWidth;
+        const alturaDisponivel = document.getElementById('previewArea').offsetHeight;
+        const escala = Math.min((larguraDisponivel - 40) / 450, (alturaDisponivel - 40) / 636);
+        zoomHelper.style.transform = `scale(${escala})`;
     }
-
     window.addEventListener('resize', ajustarZoom);
     window.addEventListener('load', ajustarZoom);
 
-    // Lógica de Inputs
-    const precoIn = document.getElementById('preco');
-    
-    function atualizarPreco() {
-        const valor = precoIn.value.replace('.', ',');
-        const partes = valor.split(',');
+    // Atualização de campos
+    const inputs = {
+        tituloTxt: 'tituloPreview',
+        nome: 'nomePreview',
+        unidade: 'unPreview',
+        rodapeTxt: 'rodapePreview'
+    };
+
+    Object.keys(inputs).forEach(id => {
+        document.getElementById(id).oninput = e => {
+            document.getElementById(inputs[id]).innerText = e.target.value.toUpperCase();
+        };
+    });
+
+    document.getElementById('preco').oninput = e => {
+        const partes = e.target.value.replace('.', ',').split(',');
         document.getElementById('intPart').innerText = partes[0];
         document.getElementById('centPart').innerText = partes[1] ? ',' + partes[1] : ',00';
-    }
-
-    document.getElementById('tituloTxt').oninput = e => document.getElementById('tituloPreview').innerText = e.target.value.toUpperCase();
-    document.getElementById('nome').oninput = e => document.getElementById('nomePreview').innerText = e.target.value.toUpperCase();
-    document.getElementById('unidade').oninput = e => document.getElementById('unPreview').innerText = e.target.value.toUpperCase();
-    document.getElementById('rodapeTxt').oninput = e => document.getElementById('rodapePreview').innerText = e.target.value;
-    precoIn.oninput = atualizarPreco;
+    };
 
     document.getElementById('produtoInput').onchange = e => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => document.getElementById('previewImg').src = reader.result;
-            reader.readAsDataURL(file);
-        }
-    }
+        const reader = new FileReader();
+        reader.onload = () => document.getElementById('previewImg').src = reader.result;
+        reader.readAsDataURL(e.target.files[0]);
+    };
 
     function mudarCor(cor, el) {
         document.documentElement.style.setProperty('--cor-main', cor);
-        document.getElementById('topoCor').style.background = cor;
-        document.getElementById('seloCor').style.background = cor;
         document.querySelectorAll('.cor').forEach(c => c.classList.remove('ativa'));
         el.classList.add('ativa');
     }
 
     function baixarImagem() {
         const btn = document.querySelector('.btn-baixar');
-        btn.innerText = "PROCESSANDO...";
-        btn.disabled = true;
-
+        const zoomHelper = document.getElementById('zoomHelper');
         const encarte = document.getElementById('encarte');
+
+        btn.innerText = "GERANDO ARQUIVO...";
         
-        html2canvas(encarte, { 
-            scale: 3, // Alta qualidade
+        // Truque para renderização perfeita: remove o zoom antes de capturar
+        const originalTransform = zoomHelper.style.transform;
+        zoomHelper.style.transform = "scale(1)";
+        
+        html2canvas(encarte, {
+            scale: 4, // Ultra qualidade para impressão
             useCORS: true,
+            logging: false,
             backgroundColor: "#ffffff"
         }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Couto_Edit_${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.download = `ENCARTE_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
             
-            btn.innerText = "BAIXAR IMAGEM (A4)";
-            btn.disabled = false;
+            zoomHelper.style.transform = originalTransform;
+            btn.innerText = "BAIXAR ARQUIVO A4";
         });
     }
-
-    atualizarPreco();
 </script>
-
 </body>
 </html>
